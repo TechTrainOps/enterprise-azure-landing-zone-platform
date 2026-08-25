@@ -33,14 +33,15 @@ stages:
             inputs:
               terraformVersion: '$(terraformVersion)'
 
+          # Bootstrap does not have a remote backend yet
           - task: TerraformTaskV4@4
             displayName: Terraform Init
             inputs:
               provider: 'azurerm'
-              command: 'init'
+              command: 'custom'
+              customCommand: 'init'
               workingDirectory: '$(terraformWorkingDirectory)'
               commandOptions: '-backend=false'
-              backendServiceArm: '$(serviceConnection)'
 
           - task: TerraformTaskV4@4
             displayName: Terraform Validate
@@ -92,14 +93,15 @@ stages:
                     artifact: 'terraform-bootstrap-plan'
                     path: '$(terraformWorkingDirectory)'
 
+                # Initialize without remote backend
                 - task: TerraformTaskV4@4
                   displayName: Terraform Init
                   inputs:
                     provider: 'azurerm'
-                    command: 'init'
+                    command: 'custom'
+                    customCommand: 'init'
                     workingDirectory: '$(terraformWorkingDirectory)'
                     commandOptions: '-backend=false'
-                    backendServiceArm: '$(serviceConnection)'
 
                 - task: TerraformTaskV4@4
                   displayName: Terraform Apply
