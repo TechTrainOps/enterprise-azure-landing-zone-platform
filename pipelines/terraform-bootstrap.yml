@@ -46,6 +46,8 @@ stages:
               provider: 'azurerm'
               command: 'validate'
               workingDirectory: '$(terraformWorkingDirectory)'
+              commandOptions: '-backend=false'
+              backendserviceArm: 'sc-ealz-dev-wif'
 
           - task: TerraformTaskV4@4
             displayName: Terraform Plan
@@ -96,6 +98,8 @@ stages:
                     provider: 'azurerm'
                     command: 'init'
                     workingDirectory: '$(terraformWorkingDirectory)'
+                    commandOptions: '-backend=false'
+                    backendserviceArm: 'sc-ealz-dev-wif'
 
                 - task: TerraformTaskV4@4
                   displayName: Terraform Apply
