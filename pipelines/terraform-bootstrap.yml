@@ -47,7 +47,7 @@ stages:
               command: 'validate'
               workingDirectory: '$(terraformWorkingDirectory)'
               commandOptions: '-backend=false'
-              backendserviceArm: 'sc-ealz-dev-wif'
+              backendserviceArm: 'sc-ealz-dev'
 
           - task: TerraformTaskV4@4
             displayName: Terraform Plan
@@ -99,7 +99,7 @@ stages:
                     command: 'init'
                     workingDirectory: '$(terraformWorkingDirectory)'
                     commandOptions: '-backend=false'
-                    backendserviceArm: 'sc-ealz-dev-wif'
+                    backendserviceArm: 'sc-ealz-dev'
 
                 - task: TerraformTaskV4@4
                   displayName: Terraform Apply
