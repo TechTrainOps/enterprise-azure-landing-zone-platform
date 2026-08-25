@@ -41,6 +41,7 @@ stages:
               command: 'custom'
               customCommand: 'init'
               workingDirectory: '$(terraformWorkingDirectory)'
+              environmentServiceNameAzureRM: '$(serviceConnection)'
               commandOptions: '-backend=false'
 
           - task: TerraformTaskV4@4
@@ -101,6 +102,7 @@ stages:
                     command: 'custom'
                     customCommand: 'init'
                     workingDirectory: '$(terraformWorkingDirectory)'
+                    environmentServiceNameAzureRM: '$(serviceConnection)'
                     commandOptions: '-backend=false'
 
                 - task: TerraformTaskV4@4
