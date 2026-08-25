@@ -3,13 +3,23 @@ trigger:
     include:
       - main
 
+  paths:
+    include:
+      - environments/dev/*
+      - pipelines/terraform-dev.yml
+
 pool:
   vmImage: ubuntu-latest
 
 variables:
   terraformVersion: '1.15.9'
-  environmentName: 'dev'
   terraformWorkingDirectory: 'environments/dev'
+  serviceConnection: 'sc-ealz-dev'
+
+  backendResourceGroup: 'rg-ealz-tfstate-eus2-001'
+  backendStorageAccount: 'stealztfstate001'
+  backendContainer: 'tfstate'
+  backendKey: 'dev.tfstate'
 
 stages:
   - stage: Plan
@@ -27,31 +37,40 @@ stages:
             inputs:
               terraformVersion: '$(terraformVersion)'
 
-          - task: AzureCLI@2
-            displayName: Terraform Init, Validate and Plan
+          - task: TerraformTaskV4@4
+            displayName: Terraform Init
             inputs:
-              azureSubscription: 'sc-ealz-dev'
-              scriptType: bash
-              scriptLocation: inlineScript
+              provider: 'azurerm'
+              command: 'init'
               workingDirectory: '$(terraformWorkingDirectory)'
-              addSpnToEnvironment: true
-              inlineScript: |
-                export ARM_CLIENT_ID="$servicePrincipalId"
-                export ARM_CLIENT_SECRET="$servicePrincipalKey"
-                export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
-                export ARM_TENANT_ID="$tenantId"
+              backendServiceArm: '$(serviceConnection)'
+              backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+              backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+              backendAzureRmContainerName: '$(backendContainer)'
+              backendAzureRmKey: '$(backendKey)'
 
-                terraform version
+          - task: TerraformTaskV4@4
+            displayName: Terraform Validate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+              workingDirectory: '$(terraformWorkingDirectory)'
 
-                terraform init
+          - task: TerraformTaskV4@4
+            displayName: Terraform Plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(terraformWorkingDirectory)'
+              environmentServiceNameAzureRM: '$(serviceConnection)'
+              commandOptions: '-out=tfplan'
 
-                terraform validate
-
-                terraform plan -out=tfplan
-
-          - publish: '$(terraformWorkingDirectory)/tfplan'
-            artifact: terraform-plan
+          - task: PublishPipelineArtifact@1
             displayName: Publish Terraform Plan
+            inputs:
+              targetPath: '$(terraformWorkingDirectory)/tfplan'
+              artifact: 'terraform-plan'
+              publishLocation: 'pipeline'
 
   - stage: Apply
     displayName: Terraform Apply
@@ -74,22 +93,29 @@ stages:
                   inputs:
                     terraformVersion: '$(terraformVersion)'
 
-                - task: AzureCLI@2
-                  displayName: Terraform Init and Apply
+                - task: DownloadPipelineArtifact@2
+                  displayName: Download Terraform Plan
                   inputs:
-                    azureSubscription: 'sc-ealz-dev'
-                    scriptType: bash
-                    scriptLocation: inlineScript
+                    artifact: 'terraform-plan'
+                    path: '$(terraformWorkingDirectory)'
+
+                - task: TerraformTaskV4@4
+                  displayName: Terraform Init
+                  inputs:
+                    provider: 'azurerm'
+                    command: 'init'
                     workingDirectory: '$(terraformWorkingDirectory)'
-                    addSpnToEnvironment: true
-                    inlineScript: |
-                      export ARM_CLIENT_ID="$servicePrincipalId"
-                      export ARM_CLIENT_SECRET="$servicePrincipalKey"
-                      export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
-                      export ARM_TENANT_ID="$tenantId"
+                    backendServiceArm: '$(serviceConnection)'
+                    backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+                    backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+                    backendAzureRmContainerName: '$(backendContainer)'
+                    backendAzureRmKey: '$(backendKey)'
 
-                      terraform version
-
-                      terraform init
-
-                      terraform apply -auto-approve
+                - task: TerraformTaskV4@4
+                  displayName: Terraform Apply
+                  inputs:
+                    provider: 'azurerm'
+                    command: 'apply'
+                    workingDirectory: '$(terraformWorkingDirectory)'
+                    environmentServiceNameAzureRM: '$(serviceConnection)'
+                    commandOptions: 'tfplan'
