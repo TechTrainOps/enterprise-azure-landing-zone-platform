@@ -30,7 +30,7 @@ stages:
           - task: AzureCLI@2
             displayName: Terraform Init, Validate and Plan
             inputs:
-              azureSubscription: 'YOUR-AZURE-SERVICE-CONNECTION'
+              azureSubscription: 'sc-ealz-dev'
               scriptType: bash
               scriptLocation: inlineScript
               workingDirectory: '$(terraformWorkingDirectory)'
@@ -77,7 +77,7 @@ stages:
                 - task: AzureCLI@2
                   displayName: Terraform Init and Apply
                   inputs:
-                    azureSubscription: 'YOUR-AZURE-SERVICE-CONNECTION'
+                    azureSubscription: 'sc-ealz-dev'
                     scriptType: bash
                     scriptLocation: inlineScript
                     workingDirectory: '$(terraformWorkingDirectory)'
