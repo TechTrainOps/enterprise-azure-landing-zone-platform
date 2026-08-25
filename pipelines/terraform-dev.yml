@@ -44,6 +44,7 @@ stages:
               command: 'init'
               workingDirectory: '$(terraformWorkingDirectory)'
               backendServiceArm: '$(serviceConnection)'
+              backendAzureRmUseEntraIdForAuthentication: true
               backendAzureRmResourceGroupName: '$(backendResourceGroup)'
               backendAzureRmStorageAccountName: '$(backendStorageAccount)'
               backendAzureRmContainerName: '$(backendContainer)'
@@ -106,6 +107,7 @@ stages:
                     command: 'init'
                     workingDirectory: '$(terraformWorkingDirectory)'
                     backendServiceArm: '$(serviceConnection)'
+                    backendAzureRmUseEntraIdForAuthentication: true
                     backendAzureRmResourceGroupName: '$(backendResourceGroup)'
                     backendAzureRmStorageAccountName: '$(backendStorageAccount)'
                     backendAzureRmContainerName: '$(backendContainer)'
