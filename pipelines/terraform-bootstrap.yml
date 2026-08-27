@@ -51,7 +51,6 @@ stages:
                   displayName: Copy Terraform State
                   inputs:
                     targetType: inline
-                    pwsh: true
                     workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformWorkingDirectory)'
                     script: |
                       Copy-Item `
