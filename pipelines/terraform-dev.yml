@@ -18,6 +18,11 @@ variables:
   terraformWorkingDirectory: 'environments/dev'
   serviceConnection: 'sc-ealz-dev'
 
+  backendResourceGroup: 'rg-ealz-tfstate-eus2-001'
+  backendStorageAccount: 'stealztfstate001'
+  backendContainer: 'tfstate'
+  backendKey: 'dev.tfstate'
+
 stages:
   - stage: Plan
     displayName: Terraform Plan
@@ -42,6 +47,10 @@ stages:
               workingDirectory: '$(terraformWorkingDirectory)'
               backendServiceArm: '$(serviceConnection)'
               backendAzureRmUseEntraIdForAuthentication: true
+              backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+              backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+              backendAzureRmContainerName: '$(backendContainer)'
+              backendAzureRmKey: '$(backendKey)'
               commandOptions: '-input=false'
  
 
@@ -104,6 +113,10 @@ stages:
                     workingDirectory: '$(terraformWorkingDirectory)'
                     backendServiceArm: '$(serviceConnection)'
                     backendAzureRmUseEntraIdForAuthentication: true
+                    backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+                    backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+                    backendAzureRmContainerName: '$(backendContainer)'
+                    backendAzureRmKey: '$(backendKey)'
                     commandOptions: '-input=false'
 
 

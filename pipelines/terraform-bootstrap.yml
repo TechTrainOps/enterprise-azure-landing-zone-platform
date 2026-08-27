@@ -18,6 +18,11 @@ variables:
   terraformWorkingDirectory: 'bootstrap/terraform-state'
   serviceConnection: 'sc-ealz-dev'
 
+  backendResourceGroupName: 'rg-ealz-tfstate-eus2-001'
+  backendStorageAccountName: 'stealztfstate001'
+  backendContainerName: 'tfstate'
+  backendKey: 'bootstrap.tfstate'
+
 stages:
 
   # TEMPORARY STAGE - Run only once
@@ -95,6 +100,10 @@ stages:
               workingDirectory: '$(terraformWorkingDirectory)'
               backendServiceArm: '$(serviceConnection)'
               backendAzureRmUseEntraIdForAuthentication: true
+              backendAzureRmResourceGroupName: '$(backendResourceGroupName)'
+              backendAzureRmStorageAccountName: '$(backendStorageAccountName)'
+              backendAzureRmContainerName: '$(backendContainerName)'
+              backendAzureRmKey: '$(backendKey)'
               commandOptions: '-input=false'
 
 
@@ -157,6 +166,10 @@ stages:
                     workingDirectory: '$(terraformWorkingDirectory)'
                     backendServiceArm: '$(serviceConnection)'
                     backendAzureRmUseEntraIdForAuthentication: true
+                    backendAzureRmResourceGroupName: '$(backendResourceGroupName)'
+                    backendAzureRmStorageAccountName: '$(backendStorageAccountName)'
+                    backendAzureRmContainerName: '$(backendContainerName)'
+                    backendAzureRmKey: '$(backendKey)'
                     commandOptions: '-input=false'
 
 
