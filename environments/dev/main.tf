@@ -1,3 +1,5 @@
+# Rg-module:
+
 module "rg" {
   source = "../../modules/resource-group"
 
@@ -11,6 +13,8 @@ module "rg" {
     }
   )
 }
+
+# Vnet-module:
 
 module "vnet" {
   source = "../../modules/networking/virtual-network"
@@ -31,4 +35,33 @@ module "vnet" {
   ip_address_pools     = var.vnet_ip_address_pools
 
   tags = var.tags
+}
+
+
+# Snet-module:
+module "subnet" {
+  source = "../../modules/networking/subnet"
+
+  name                 = var.subnet_name
+  resource_group_name  = module.rg.name
+  virtual_network_name = module.vnet.name
+
+  address_prefixes = var.subnet_address_prefixes
+
+  service_endpoints             = var.subnet_service_endpoints
+  service_endpoint_policy_ids   = var.subnet_service_endpoint_policy_ids
+
+  private_endpoint_network_policies = (
+    var.subnet_private_endpoint_network_policies
+  )
+
+  private_link_service_network_policies_enabled = (
+    var.subnet_private_link_service_network_policies_enabled
+  )
+
+  default_outbound_access_enabled = (
+    var.subnet_default_outbound_access_enabled
+  )
+
+  delegation = var.subnet_delegation
 }

@@ -1,3 +1,5 @@
+# Rg-vars:
+
 variable "project_name" {
   description = "Short name of the project."
   type        = string
@@ -18,6 +20,8 @@ variable "tags" {
   type        = map(string)
 }
 
+
+# Vnet-vars:
 variable "vnet_name" {
   description = "Name of the development virtual network"
   type        = string
@@ -80,6 +84,68 @@ variable "vnet_ip_address_pools" {
   type = list(object({
     id                     = string
     number_of_ip_addresses = string
+  }))
+
+  default = []
+}
+
+
+# Snet-vars:
+variable "subnet_name" {
+  description = "Name of the development subnet"
+  type        = string
+}
+
+variable "subnet_address_prefixes" {
+  description = "Address prefixes for the development subnet"
+  type        = list(string)
+}
+
+variable "subnet_service_endpoints" {
+  description = "Service endpoints enabled on the subnet"
+
+  type    = list(string)
+  default = []
+}
+
+variable "subnet_service_endpoint_policy_ids" {
+  description = "Service endpoint policy IDs associated with the subnet"
+
+  type    = list(string)
+  default = []
+}
+
+variable "subnet_private_endpoint_network_policies" {
+  description = "Private endpoint network policies"
+
+  type    = string
+  default = "Disabled"
+}
+
+variable "subnet_private_link_service_network_policies_enabled" {
+  description = "Whether private link service network policies are enabled"
+
+  type    = bool
+  default = true
+}
+
+variable "subnet_default_outbound_access_enabled" {
+  description = "Whether default outbound access is enabled"
+
+  type    = bool
+  default = true
+}
+
+variable "subnet_delegation" {
+  description = "Subnet delegation configuration"
+
+  type = list(object({
+    name = string
+
+    service_delegation = object({
+      name    = string
+      actions = list(string)
+    })
   }))
 
   default = []
