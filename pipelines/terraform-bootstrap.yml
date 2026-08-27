@@ -18,68 +18,61 @@ variables:
   terraformWorkingDirectory: 'bootstrap/terraform-state'
   serviceConnection: 'sc-ealz-dev'
 
-  backendResourceGroupName: 'rg-ealz-tfstate-eus2-001'
-  backendStorageAccountName: 'stealztfstate001'
-  backendContainerName: 'tfstate'
-  backendKey: 'bootstrap.tfstate'
-
 stages:
 
   # TEMPORARY STAGE - Run only once
-  - stage: MigrateState
-    displayName: Migrate Bootstrap State
+  # - stage: MigrateState
+  #   displayName: Migrate Bootstrap State
 
-    jobs:
-      - deployment: TerraformStateMigration
-        displayName: Migrate Local State to Remote Backend
-        environment: 'bootstrap'
+  #   jobs:
+  #     - deployment: TerraformStateMigration
+  #       displayName: Migrate Local State to Remote Backend
+  #       environment: 'bootstrap'
 
-        strategy:
-          runOnce:
-            deploy:
-              steps:
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
 
-                - checkout: self
+  #               - checkout: self
 
-                - task: DownloadSecureFile@1
-                  name: DownloadBootstrapState
-                  displayName: Download Bootstrap Terraform State
-                  inputs:
-                    secureFile: 'terraform.tfstate'
+  #               - task: DownloadSecureFile@1
+  #                 name: DownloadBootstrapState
+  #                 displayName: Download Bootstrap Terraform State
+  #                 inputs:
+  #                   secureFile: 'terraform.tfstate'
 
-                - task: PowerShell@2
-                  displayName: Copy Terraform State
-                  inputs:
-                    targetType: inline
-                    workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformWorkingDirectory)'
-                    script: |
-                      Copy-Item `
-                        "$(DownloadBootstrapState.secureFilePath)" `
-                        "$(System.DefaultWorkingDirectory)/$(terraformWorkingDirectory)/terraform.tfstate" `
-                        -Force
+  #               - task: PowerShell@2
+  #                 displayName: Copy Terraform State
+  #                 inputs:
+  #                   targetType: inline
+  #                   workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformWorkingDirectory)'
+  #                   script: |
+  #                     Copy-Item `
+  #                       "$(DownloadBootstrapState.secureFilePath)" `
+  #                       "$(System.DefaultWorkingDirectory)/$(terraformWorkingDirectory)/terraform.tfstate" `
+  #                       -Force
 
-                - task: TerraformInstaller@1
-                  displayName: Install Terraform
-                  inputs:
-                    terraformVersion: '$(terraformVersion)'
+  #               - task: TerraformInstaller@1
+  #                 displayName: Install Terraform
+  #                 inputs:
+  #                   terraformVersion: '$(terraformVersion)'
 
-                - task: TerraformTaskV4@4
-                  displayName: Migrate Terraform State
-                  inputs:
-                    provider: 'azurerm'
-                    command: 'init'
-                    workingDirectory: '$(terraformWorkingDirectory)'
-                    backendServiceArm: '$(serviceConnection)'
-                    backendAzureRmResourceGroupName: '$(backendResourceGroupName)'
-                    backendAzureRmStorageAccountName: '$(backendStorageAccountName)'
-                    backendAzureRmContainerName: '$(backendContainerName)'
-                    backendAzureRmKey: '$(backendKey)'
-                    commandOptions: '-migrate-state -force-copy -input=false'
+  #               - task: TerraformTaskV4@4
+  #                 displayName: Migrate Terraform State
+  #                 inputs:
+  #                   provider: 'azurerm'
+  #                   command: 'init'
+  #                   workingDirectory: '$(terraformWorkingDirectory)'
+  #                   backendServiceArm: '$(serviceConnection)'
+  #                   backendAzureRmResourceGroupName: '$(backendResourceGroupName)'
+  #                   backendAzureRmStorageAccountName: '$(backendStorageAccountName)'
+  #                   backendAzureRmContainerName: '$(backendContainerName)'
+  #                   backendAzureRmKey: '$(backendKey)'
+  #                   commandOptions: '-migrate-state -force-copy -input=false'
 
   - stage: Plan
     displayName: Terraform Bootstrap Plan
-    dependsOn: MigrateState
-    condition: succeeded()
 
     jobs:
       - job: TerraformPlan
@@ -101,10 +94,9 @@ stages:
               command: 'init'
               workingDirectory: '$(terraformWorkingDirectory)'
               backendServiceArm: '$(serviceConnection)'
-              backendAzureRmResourceGroupName: '$(backendResourceGroupName)'
-              backendAzureRmStorageAccountName: '$(backendStorageAccountName)'
-              backendAzureRmContainerName: '$(backendContainerName)'
-              backendAzureRmKey: '$(backendKey)'
+              backendAzureRmUseEntraIdForAuthentication: true
+              commandOptions: '-input=false'
+
 
           - task: TerraformTaskV4@4
             displayName: Terraform Validate
@@ -120,7 +112,7 @@ stages:
               command: 'plan'
               workingDirectory: '$(terraformWorkingDirectory)'
               environmentServiceNameAzureRM: '$(serviceConnection)'
-              commandOptions: '-out=tfplan'
+              commandOptions: '--out=tfplan -input=false'
 
           - task: PublishPipelineArtifact@1
             displayName: Publish Terraform Plan
@@ -164,10 +156,9 @@ stages:
                     command: 'init'
                     workingDirectory: '$(terraformWorkingDirectory)'
                     backendServiceArm: '$(serviceConnection)'
-                    backendAzureRmResourceGroupName: '$(backendResourceGroupName)'
-                    backendAzureRmStorageAccountName: '$(backendStorageAccountName)'
-                    backendAzureRmContainerName: '$(backendContainerName)'
-                    backendAzureRmKey: '$(backendKey)'
+                    backendAzureRmUseEntraIdForAuthentication: true
+                    commandOptions: '-input=false'
+
 
                 - task: TerraformTaskV4@4
                   displayName: Terraform Apply
