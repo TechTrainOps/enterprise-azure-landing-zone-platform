@@ -13,7 +13,7 @@ module "rg" {
 }
 
 module "vnet" {
-  source = "../../modules/networking/vnet"
+  source = "../../modules/networking/virtual-network"
 
   name                = var.vnet_name
   resource_group_name = module.resource_group.name
