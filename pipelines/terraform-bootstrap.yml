@@ -74,7 +74,7 @@ stages:
                     backendAzureRmStorageAccountName: '$(backendStorageAccountName)'
                     backendAzureRmContainerName: '$(backendContainerName)'
                     backendAzureRmKey: '$(backendKey)'
-                    commandOptions: '-migrate-state'
+                    commandOptions: '-migrate-state -force-copy -input=false'
 
   - stage: Plan
     displayName: Terraform Bootstrap Plan
