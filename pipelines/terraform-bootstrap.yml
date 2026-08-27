@@ -18,15 +18,76 @@ variables:
   terraformWorkingDirectory: 'bootstrap/terraform-state'
   serviceConnection: 'sc-ealz-dev'
 
+  backendResourceGroupName: 'rg-ealz-tfstate-eus2-001'
+  backendStorageAccountName: 'stealztfstate001'
+  backendContainerName: 'tfstate'
+  backendKey: 'bootstrap.tfstate'
+
 stages:
+
+  # TEMPORARY STAGE - Run only once
+  - stage: MigrateState
+    displayName: Migrate Bootstrap State
+
+    jobs:
+      - deployment: TerraformStateMigration
+        displayName: Migrate Local State to Remote Backend
+        environment: 'bootstrap'
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+
+                - checkout: self
+
+                - task: DownloadSecureFile@1
+                  name: DownloadBootstrapState
+                  displayName: Download Bootstrap Terraform State
+                  inputs:
+                    secureFile: 'terraform.tfstate'
+
+                - task: PowerShell@2
+                  displayName: Copy Terraform State
+                  inputs:
+                    targetType: inline
+                    pwsh: true
+                    workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformWorkingDirectory)'
+                    script: |
+                      Copy-Item `
+                        "$(DownloadBootstrapState.secureFilePath)" `
+                        "$(System.DefaultWorkingDirectory)/$(terraformWorkingDirectory)/terraform.tfstate" `
+                        -Force
+
+                - task: TerraformInstaller@1
+                  displayName: Install Terraform
+                  inputs:
+                    terraformVersion: '$(terraformVersion)'
+
+                - task: TerraformTaskV5@5
+                  displayName: Migrate Terraform State
+                  inputs:
+                    provider: 'azurerm'
+                    command: 'init'
+                    workingDirectory: '$(terraformWorkingDirectory)'
+                    backendServiceArm: '$(serviceConnection)'
+                    backendAzureRmResourceGroupName: '$(backendResourceGroupName)'
+                    backendAzureRmStorageAccountName: '$(backendStorageAccountName)'
+                    backendAzureRmContainerName: '$(backendContainerName)'
+                    backendAzureRmKey: '$(backendKey)'
+                    commandOptions: '-migrate-state'
+
   - stage: Plan
     displayName: Terraform Bootstrap Plan
+    dependsOn: MigrateState
+    condition: succeeded()
 
     jobs:
       - job: TerraformPlan
         displayName: Terraform Bootstrap Plan
 
         steps:
+
           - checkout: self
 
           - task: TerraformInstaller@1
@@ -34,25 +95,26 @@ stages:
             inputs:
               terraformVersion: '$(terraformVersion)'
 
-          # Bootstrap does not have a remote backend yet
-          - task: TerraformTaskV4@4
+          - task: TerraformTaskV5@5
             displayName: Terraform Init
             inputs:
               provider: 'azurerm'
-              command: 'custom'
-              customCommand: 'init'
+              command: 'init'
               workingDirectory: '$(terraformWorkingDirectory)'
-              environmentServiceNameAzureRM: '$(serviceConnection)'
-              commandOptions: '-backend=false'
+              backendServiceArm: '$(serviceConnection)'
+              backendAzureRmResourceGroupName: '$(backendResourceGroupName)'
+              backendAzureRmStorageAccountName: '$(backendStorageAccountName)'
+              backendAzureRmContainerName: '$(backendContainerName)'
+              backendAzureRmKey: '$(backendKey)'
 
-          - task: TerraformTaskV4@4
+          - task: TerraformTaskV5@5
             displayName: Terraform Validate
             inputs:
               provider: 'azurerm'
               command: 'validate'
               workingDirectory: '$(terraformWorkingDirectory)'
 
-          - task: TerraformTaskV4@4
+          - task: TerraformTaskV5@5
             displayName: Terraform Plan
             inputs:
               provider: 'azurerm'
@@ -82,6 +144,7 @@ stages:
           runOnce:
             deploy:
               steps:
+
                 - checkout: self
 
                 - task: TerraformInstaller@1
@@ -95,18 +158,19 @@ stages:
                     artifact: 'terraform-bootstrap-plan'
                     path: '$(terraformWorkingDirectory)'
 
-                # Initialize without remote backend
-                - task: TerraformTaskV4@4
+                - task: TerraformTaskV5@5
                   displayName: Terraform Init
                   inputs:
                     provider: 'azurerm'
-                    command: 'custom'
-                    customCommand: 'init'
+                    command: 'init'
                     workingDirectory: '$(terraformWorkingDirectory)'
-                    environmentServiceNameAzureRM: '$(serviceConnection)'
-                    commandOptions: '-backend=false'
+                    backendServiceArm: '$(serviceConnection)'
+                    backendAzureRmResourceGroupName: '$(backendResourceGroupName)'
+                    backendAzureRmStorageAccountName: '$(backendStorageAccountName)'
+                    backendAzureRmContainerName: '$(backendContainerName)'
+                    backendAzureRmKey: '$(backendKey)'
 
-                - task: TerraformTaskV4@4
+                - task: TerraformTaskV5@5
                   displayName: Terraform Apply
                   inputs:
                     provider: 'azurerm'
