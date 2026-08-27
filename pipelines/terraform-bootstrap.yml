@@ -64,7 +64,7 @@ stages:
                   inputs:
                     terraformVersion: '$(terraformVersion)'
 
-                - task: TerraformTaskV5@5
+                - task: TerraformTaskV4@4
                   displayName: Migrate Terraform State
                   inputs:
                     provider: 'azurerm'
@@ -95,7 +95,7 @@ stages:
             inputs:
               terraformVersion: '$(terraformVersion)'
 
-          - task: TerraformTaskV5@5
+          - task: TerraformTaskV4@4
             displayName: Terraform Init
             inputs:
               provider: 'azurerm'
@@ -107,14 +107,14 @@ stages:
               backendAzureRmContainerName: '$(backendContainerName)'
               backendAzureRmKey: '$(backendKey)'
 
-          - task: TerraformTaskV5@5
+          - task: TerraformTaskV4@4
             displayName: Terraform Validate
             inputs:
               provider: 'azurerm'
               command: 'validate'
               workingDirectory: '$(terraformWorkingDirectory)'
 
-          - task: TerraformTaskV5@5
+          - task: TerraformTaskV4@4
             displayName: Terraform Plan
             inputs:
               provider: 'azurerm'
@@ -158,7 +158,7 @@ stages:
                     artifact: 'terraform-bootstrap-plan'
                     path: '$(terraformWorkingDirectory)'
 
-                - task: TerraformTaskV5@5
+                - task: TerraformTaskV4@4
                   displayName: Terraform Init
                   inputs:
                     provider: 'azurerm'
@@ -170,7 +170,7 @@ stages:
                     backendAzureRmContainerName: '$(backendContainerName)'
                     backendAzureRmKey: '$(backendKey)'
 
-                - task: TerraformTaskV5@5
+                - task: TerraformTaskV4@4
                   displayName: Terraform Apply
                   inputs:
                     provider: 'azurerm'
