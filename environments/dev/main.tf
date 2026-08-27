@@ -16,7 +16,7 @@ module "vnet" {
   source = "../../modules/networking/virtual-network"
 
   name                = var.vnet_name
-  resource_group_name = module.resource_group.name
+  resource_group_name = module.rg.name
   location            = var.location
 
   address_space = var.vnet_address_space
