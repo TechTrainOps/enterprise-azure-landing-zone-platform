@@ -51,3 +51,9 @@ subnet_private_link_service_network_policies_enabled = true
 subnet_default_outbound_access_enabled = true
 
 subnet_delegation = []
+
+# NSG Tfvars:
+
+nsg_name = "nsg-ealz-dev-eastus2-001"
+
+nsg_security_rules = []

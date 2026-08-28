@@ -65,3 +65,31 @@ module "subnet" {
 
   delegation = var.subnet_delegation
 }
+
+# NSG-module:
+
+module "nsg" {
+  source = "../../modules/networking/network-security-group"
+
+  name                = var.nsg_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  security_rules = var.nsg_security_rules
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "nsg"
+    }
+  )
+}
+
+# NSG-association-module:
+
+module "subnet_nsg_association" {
+  source = "../../modules/networking/subnet-nsg-association"
+
+  subnet_id                 = module.subnet.id
+  network_security_group_id = module.nsg.id
+}

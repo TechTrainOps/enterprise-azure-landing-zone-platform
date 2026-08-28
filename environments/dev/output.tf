@@ -52,3 +52,36 @@ output "subnet_address_prefixes" {
 
   value = module.subnet.address_prefixes
 }
+
+# NSG-Ouput:
+output "nsg_id" {
+  description = "The ID of the Development Network Security Group"
+
+  value = module.nsg.id
+}
+
+output "nsg_name" {
+  description = "The name of the Development Network Security Group"
+
+  value = module.nsg.name
+}
+
+output "nsg_location" {
+  description = "The Azure region of the Development Network Security Group"
+
+  value = module.nsg.location
+}
+
+output "nsg_resource_group_name" {
+  description = "The resource group containing the Development Network Security Group"
+
+  value = module.nsg.resource_group_name
+}
+
+
+# NSG-Association-Output
+output "subnet_nsg_association_id" {
+  description = "The ID of the subnet and Network Security Group association"
+
+  value = module.subnet_nsg_association.id
+}
