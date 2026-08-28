@@ -182,3 +182,30 @@ variable "nsg_security_rules" {
 
   default = []
 }
+
+# RT-vars:
+
+variable "route_table_name" {
+  description = "Name of the Development Route Table"
+  type        = string
+}
+
+variable "route_table_disable_bgp_route_propagation" {
+  description = "Whether to disable BGP route propagation for the Route Table"
+
+  type    = bool
+  default = false
+}
+
+variable "route_table_routes" {
+  description = "Routes for the Development Route Table"
+
+  type = list(object({
+    name                   = string
+    address_prefix          = string
+    next_hop_type           = string
+    next_hop_in_ip_address  = optional(string)
+  }))
+
+  default = []
+}

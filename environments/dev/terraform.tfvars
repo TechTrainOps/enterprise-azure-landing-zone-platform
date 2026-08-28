@@ -57,3 +57,11 @@ subnet_delegation = []
 nsg_name = "nsg-ealz-dev-eastus2-001"
 
 nsg_security_rules = []
+
+# RT Tfvars:
+
+route_table_name = "rt-ealz-dev-eastus2-001"
+
+route_table_disable_bgp_route_propagation = false
+
+route_table_routes = []

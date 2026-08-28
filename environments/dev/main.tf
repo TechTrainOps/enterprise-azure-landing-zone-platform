@@ -93,3 +93,24 @@ module "subnet_nsg_association" {
   subnet_id                 = module.subnet.id
   network_security_group_id = module.nsg.id
 }
+
+# RT-module:
+
+module "route_table" {
+  source = "../../modules/networking/route-table"
+
+  name                = var.route_table_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  disable_bgp_route_propagation = var.route_table_disable_bgp_route_propagation
+
+  routes = var.route_table_routes
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "route-table"
+    }
+  )
+}

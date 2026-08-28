@@ -85,3 +85,35 @@ output "subnet_nsg_association_id" {
 
   value = module.subnet_nsg_association.id
 }
+
+# RT-Output
+
+output "route_table_id" {
+  description = "The ID of the Development Route Table"
+
+  value = module.route_table.id
+}
+
+output "route_table_name" {
+  description = "The name of the Development Route Table"
+
+  value = module.route_table.name
+}
+
+output "route_table_location" {
+  description = "The Azure region of the Development Route Table"
+
+  value = module.route_table.location
+}
+
+output "route_table_resource_group_name" {
+  description = "The Resource Group containing the Development Route Table"
+
+  value = module.route_table.resource_group_name
+}
+
+output "route_table_subnets" {
+  description = "Subnets associated with the Development Route Table"
+
+  value = module.route_table.subnets
+}
