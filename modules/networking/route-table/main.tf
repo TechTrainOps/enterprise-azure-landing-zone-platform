@@ -1,57 +1,19 @@
-variable "name" {
-  description = "Name of the Route Table"
-  type        = string
-}
+resource "azurerm_route_table" "route_table" {
+  name                          = var.name
+  resource_group_name           = var.resource_group_name
+  location                      = var.location
+  bgp_route_propagation_enabled = !var.disable_bgp_route_propagation
 
-variable "resource_group_name" {
-  description = "Name of the Resource Group where the Route Table will be created"
-  type        = string
-}
+  dynamic "route" {
+    for_each = var.routes
 
-variable "location" {
-  description = "Azure region where the Route Table will be created"
-  type        = string
-}
-
-variable "disable_bgp_route_propagation" {
-  description = "Whether to disable BGP route propagation"
-
-  type    = bool
-  default = false
-}
-
-variable "routes" {
-  description = "List of routes to create in the Route Table"
-
-  type = list(object({
-    name                   = string
-    address_prefix          = string
-    next_hop_type           = string
-    next_hop_in_ip_address  = optional(string)
-    has_bgp_override        = optional(bool)
-  }))
-
-  default = []
-
-  validation {
-    condition = alltrue([
-      for route in var.routes :
-      contains([
-        "VirtualNetworkGateway",
-        "VnetLocal",
-        "Internet",
-        "VirtualAppliance",
-        "None"
-      ], route.next_hop_type)
-    ])
-
-    error_message = "next_hop_type must be a valid Azure route next hop type."
+    content {
+      name                   = route.value.name
+      address_prefix         = route.value.address_prefix
+      next_hop_type          = route.value.next_hop_type
+      next_hop_in_ip_address = try(route.value.next_hop_in_ip_address, null)
+    }
   }
-}
 
-variable "tags" {
-  description = "Tags applied to the Route Table"
-
-  type    = map(string)
-  default = {}
+  tags = var.tags
 }
