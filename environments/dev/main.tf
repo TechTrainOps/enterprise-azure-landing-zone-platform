@@ -114,3 +114,14 @@ module "route_table" {
     }
   )
 }
+
+# RT-Association-module:
+
+module "subnet_route_table_association" {
+
+  source = "../../modules/networking/route-table-association"
+
+  subnet_id = module.subnet.id
+
+  route_table_id = module.route_table.id
+}

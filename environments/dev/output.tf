@@ -117,3 +117,11 @@ output "route_table_subnets" {
 
   value = module.route_table.subnets
 }
+
+# Rt-Association output
+
+output "subnet_route_table_association_id" {
+  description = "The ID of the subnet and route table association"
+
+  value = module.subnet_route_table_association.id
+}
