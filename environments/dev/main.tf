@@ -88,7 +88,7 @@ module "nsg" {
 # NSG-association-module:
 
 module "subnet_nsg_association" {
-  source = "../../modules/networking/subnet-nsg-association"
+  source = "../../modules/networking/network-security-group-association"
 
   subnet_id                 = module.subnet.id
   network_security_group_id = module.nsg.id
