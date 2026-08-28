@@ -139,3 +139,53 @@ output "route_names" {
 
   value = module.route.route_names
 }
+
+# Nat-Gateway- output
+
+output "nat_public_ip_id" {
+  description = "ID of the NAT Gateway Public IP"
+
+  value = module.nat_public_ip.id
+}
+
+output "nat_public_ip_name" {
+  description = "Name of the NAT Gateway Public IP"
+
+  value = module.nat_public_ip.name
+}
+
+output "nat_public_ip_address" {
+  description = "Allocated IP address of the NAT Gateway Public IP"
+
+  value = module.nat_public_ip.ip_address
+}
+
+output "nat_public_ip_fqdn" {
+  description = "FQDN of the NAT Gateway Public IP"
+
+  value = module.nat_public_ip.fqdn
+}
+
+output "nat_gateway_id" {
+  description = "ID of the NAT Gateway"
+
+  value = module.nat_gateway.id
+}
+
+output "nat_gateway_name" {
+  description = "Name of the NAT Gateway"
+
+  value = module.nat_gateway.name
+}
+
+output "nat_gateway_public_ip_association_id" {
+  description = "ID of the NAT Gateway Public IP association"
+
+  value = module.nat_gateway_public_ip_association.id
+}
+
+output "nat_gateway_subnet_association_id" {
+  description = "ID of the NAT Gateway subnet association"
+
+  value = module.nat_gateway_subnet_association.id
+}

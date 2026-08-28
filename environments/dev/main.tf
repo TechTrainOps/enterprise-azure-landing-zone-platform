@@ -138,3 +138,67 @@ module "route" {
 
   routes = var.routes
 }
+
+# Nat-Gateway-Public-Ip module:
+
+module "nat_public_ip" {
+  source = "../../modules/networking/public-ip"
+
+  name                = var.nat_public_ip_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  allocation_method       = var.nat_public_ip_allocation_method
+  sku                     = var.nat_public_ip_sku
+  sku_tier                = var.nat_public_ip_sku_tier
+  domain_name_label       = var.nat_public_ip_domain_name_label
+  reverse_fqdn            = var.nat_public_ip_reverse_fqdn
+  idle_timeout_in_minutes = var.nat_public_ip_idle_timeout_in_minutes
+  ip_version              = var.nat_public_ip_ip_version
+  zones                   = var.nat_public_ip_zones
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "nat-public-ip"
+    }
+  )
+}
+
+# Nat-Gateway module:
+
+module "nat_gateway" {
+  source = "../../modules/networking/nat-gateway"
+
+  name                = var.nat_gateway_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  sku_name                = var.nat_gateway_sku_name
+  idle_timeout_in_minutes = var.nat_gateway_idle_timeout_in_minutes
+  zones                   = var.nat_gateway_zones
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "nat-gateway"
+    }
+  )
+}
+
+# Nat-Gateway-Public-Ip association module:
+
+module "nat_gateway_public_ip_association" {
+  source = "../../modules/networking/nat-gateway-association"
+
+  nat_gateway_id       = module.nat_gateway.id
+  public_ip_address_id = module.nat_public_ip.id
+}
+# Nat-Gateway-subnet-association module:
+
+module "nat_gateway_subnet_association" {
+  source = "../../modules/networking/nat-gateway-subnet-association"
+
+  subnet_id      = module.subnet.id
+  nat_gateway_id = module.nat_gateway.id
+}

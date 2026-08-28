@@ -224,3 +224,85 @@ variable "routes" {
 
   default = {}
 }
+
+# Nat-gateway, Nat-gateway public and snet association-vars:
+
+# NAT Gateway Public IP
+
+variable "nat_public_ip_name" {
+  description = "Name of the Public IP address used by the NAT Gateway"
+  type        = string
+}
+
+variable "nat_public_ip_allocation_method" {
+  description = "Allocation method for the NAT Gateway Public IP"
+  type        = string
+  default     = "Static"
+}
+
+variable "nat_public_ip_sku" {
+  description = "SKU of the NAT Gateway Public IP"
+  type        = string
+  default     = "Standard"
+}
+
+variable "nat_public_ip_sku_tier" {
+  description = "SKU tier of the NAT Gateway Public IP"
+  type        = string
+  default     = "Regional"
+}
+
+variable "nat_public_ip_domain_name_label" {
+  description = "Optional DNS label for the NAT Gateway Public IP"
+  type        = string
+  default     = null
+}
+
+variable "nat_public_ip_reverse_fqdn" {
+  description = "Optional reverse FQDN for the NAT Gateway Public IP"
+  type        = string
+  default     = null
+}
+
+variable "nat_public_ip_idle_timeout_in_minutes" {
+  description = "Idle timeout for the NAT Gateway Public IP"
+  type        = number
+  default     = 4
+}
+
+variable "nat_public_ip_ip_version" {
+  description = "IP version for the NAT Gateway Public IP"
+  type        = string
+  default     = "IPv4"
+}
+
+variable "nat_public_ip_zones" {
+  description = "Availability Zones for the NAT Gateway Public IP"
+  type        = list(string)
+  default     = []
+}
+
+# NAT Gateway
+
+variable "nat_gateway_name" {
+  description = "Name of the NAT Gateway"
+  type        = string
+}
+
+variable "nat_gateway_sku_name" {
+  description = "SKU name of the NAT Gateway"
+  type        = string
+  default     = "Standard"
+}
+
+variable "nat_gateway_idle_timeout_in_minutes" {
+  description = "Idle timeout in minutes for the NAT Gateway"
+  type        = number
+  default     = 4
+}
+
+variable "nat_gateway_zones" {
+  description = "Availability Zones for the NAT Gateway"
+  type        = list(string)
+  default     = []
+}

@@ -69,3 +69,34 @@ route_table_routes = []
 # Routes Tfvars:
 
 routes = {}
+
+
+# NAT Gateway Public IP
+
+nat_public_ip_name = "pip-ealz-dev-eastus2-001"
+
+nat_public_ip_allocation_method = "Static"
+
+nat_public_ip_sku = "Standard"
+
+nat_public_ip_sku_tier = "Regional"
+
+nat_public_ip_domain_name_label = null
+
+nat_public_ip_reverse_fqdn = null
+
+nat_public_ip_idle_timeout_in_minutes = 4
+
+nat_public_ip_ip_version = "IPv4"
+
+nat_public_ip_zones = []
+
+# NAT Gateway
+
+nat_gateway_name = "nat-ealz-dev-eastus2-001"
+
+nat_gateway_sku_name = "Standard"
+
+nat_gateway_idle_timeout_in_minutes = 4
+
+nat_gateway_zones = []
