@@ -209,3 +209,29 @@ output "nsg_rule_priorities" {
 
   value = module.nsg_rules.priorities
 }
+
+# Private DNS Zone ouputs:
+
+output "private_dns_zone_id" {
+  description = "ID of the Development Private DNS Zone"
+
+  value = module.private_dns_zone.id
+}
+
+output "private_dns_zone_name" {
+  description = "Name of the Development Private DNS Zone"
+
+  value = module.private_dns_zone.name
+}
+
+output "private_dns_zone_resource_group_name" {
+  description = "Resource Group of the Development Private DNS Zone"
+
+  value = module.private_dns_zone.resource_group_name
+}
+
+output "private_dns_zone_number_of_record_sets" {
+  description = "Number of record sets in the Development Private DNS Zone"
+
+  value = module.private_dns_zone.number_of_record_sets
+}

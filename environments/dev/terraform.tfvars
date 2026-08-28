@@ -159,3 +159,17 @@ nsg_security_rules = {
     destination_address_prefix = "Internet"
   }
 }
+
+# Private Dns Zone Tfvars:
+
+
+private_dns_zone_name = "privatelink.vaultcore.azure.net"
+
+private_dns_zone_soa_record = null
+
+private_dns_zone_timeouts = {
+  create = "30m"
+  read   = "5m"
+  update = "30m"
+  delete = "30m"
+}

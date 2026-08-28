@@ -211,3 +211,24 @@ module "nsg_rules" {
 
   security_rules = var.nsg_security_rules
 }
+
+# Private Dns Zone module:
+
+module "private_dns_zone" {
+
+  source = "../../modules/networking/private-dns-zone"
+
+  name                = var.private_dns_zone_name
+  resource_group_name = module.rg.name
+
+  soa_record = var.private_dns_zone_soa_record
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "private-dns-zone"
+    }
+  )
+
+  timeouts = var.private_dns_zone_timeouts
+}
