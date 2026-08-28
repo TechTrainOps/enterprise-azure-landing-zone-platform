@@ -89,6 +89,9 @@ nat_public_ip_idle_timeout_in_minutes = 4
 nat_public_ip_ip_version = "IPv4"
 
 nat_public_ip_zones = []
+nat_public_ip_ip_tags = {
+  FirstPartyUsage = "/Unprivileged"
+}
 
 # NAT Gateway Tfvars
 

@@ -91,3 +91,10 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "ip_tags" {
+  description = "IP tags for the Public IP address"
+
+  type    = map(string)
+  default = null
+}

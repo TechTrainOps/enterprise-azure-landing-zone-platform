@@ -48,8 +48,8 @@ module "subnet" {
 
   address_prefixes = var.subnet_address_prefixes
 
-  service_endpoints             = var.subnet_service_endpoints
-  service_endpoint_policy_ids   = var.subnet_service_endpoint_policy_ids
+  service_endpoints           = var.subnet_service_endpoints
+  service_endpoint_policy_ids = var.subnet_service_endpoint_policy_ids
 
   private_endpoint_network_policies = (
     var.subnet_private_endpoint_network_policies
@@ -154,7 +154,7 @@ module "nat_public_ip" {
   idle_timeout_in_minutes = var.nat_public_ip_idle_timeout_in_minutes
   ip_version              = var.nat_public_ip_ip_version
   zones                   = var.nat_public_ip_zones
-
+  ip_tags                 = var.nat_public_ip_ip_tags
   tags = merge(
     var.tags,
     {

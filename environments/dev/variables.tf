@@ -177,9 +177,9 @@ variable "route_table_routes" {
 
   type = list(object({
     name                   = string
-    address_prefix          = string
-    next_hop_type           = string
-    next_hop_in_ip_address  = optional(string)
+    address_prefix         = string
+    next_hop_type          = string
+    next_hop_in_ip_address = optional(string)
   }))
 
   default = []
@@ -255,6 +255,13 @@ variable "nat_public_ip_zones" {
   description = "Availability Zones for the NAT Gateway Public IP"
   type        = list(string)
   default     = []
+}
+
+variable "nat_public_ip_ip_tags" {
+  description = "IP tags for the NAT Gateway Public IP"
+
+  type    = map(string)
+  default = null
 }
 
 # NAT Gateway
