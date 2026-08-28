@@ -56,7 +56,6 @@ subnet_delegation = []
 
 nsg_name = "nsg-ealz-dev-eastus2-001"
 
-nsg_security_rules = []
 
 # RT Tfvars:
 
@@ -91,7 +90,7 @@ nat_public_ip_ip_version = "IPv4"
 
 nat_public_ip_zones = []
 
-# NAT Gateway
+# NAT Gateway Tfvars
 
 nat_gateway_name = "nat-ealz-dev-eastus2-001"
 
@@ -100,3 +99,60 @@ nat_gateway_sku_name = "Standard"
 nat_gateway_idle_timeout_in_minutes = 4
 
 nat_gateway_zones = []
+
+
+# NSG Rules Tfvars
+
+nsg_security_rules = {
+
+  allow_rdp = {
+    name        = "Allow-RDP"
+    priority    = 100
+    direction   = "Inbound"
+    access      = "Allow"
+    protocol    = "Tcp"
+    description = "Allow Remote Desktop access"
+
+    source_port_range = "*"
+
+    destination_port_range = "3389"
+
+    source_address_prefix = "Internet"
+
+    destination_address_prefix = "*"
+  }
+
+  allow_https_inbound = {
+    name        = "Allow-HTTPS-Inbound"
+    priority    = 110
+    direction   = "Inbound"
+    access      = "Allow"
+    protocol    = "Tcp"
+    description = "Allow inbound HTTPS traffic"
+
+    source_port_range = "*"
+
+    destination_port_range = "443"
+
+    source_address_prefix = "Internet"
+
+    destination_address_prefix = "*"
+  }
+
+  allow_https_outbound = {
+    name        = "Allow-HTTPS-Outbound"
+    priority    = 100
+    direction   = "Outbound"
+    access      = "Allow"
+    protocol    = "Tcp"
+    description = "Allow outbound HTTPS traffic"
+
+    source_port_range = "*"
+
+    destination_port_range = "443"
+
+    source_address_prefix = "*"
+
+    destination_address_prefix = "Internet"
+  }
+}

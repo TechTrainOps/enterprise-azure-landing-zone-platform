@@ -75,8 +75,6 @@ module "nsg" {
   resource_group_name = module.rg.name
   location            = var.location
 
-  security_rules = var.nsg_security_rules
-
   tags = merge(
     var.tags,
     {
@@ -201,4 +199,15 @@ module "nat_gateway_subnet_association" {
 
   subnet_id      = module.subnet.id
   nat_gateway_id = module.nat_gateway.id
+}
+
+# NSG Rules module:
+
+module "nsg_rules" {
+  source = "../../modules/networking/network-security-rule"
+
+  resource_group_name         = module.rg.name
+  network_security_group_name = module.nsg.name
+
+  security_rules = var.nsg_security_rules
 }

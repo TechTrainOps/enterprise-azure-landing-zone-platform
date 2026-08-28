@@ -189,3 +189,23 @@ output "nat_gateway_subnet_association_id" {
 
   value = module.nat_gateway_subnet_association.id
 }
+
+# Nsg Rules output;
+
+output "nsg_rule_ids" {
+  description = "Map of NSG security rule IDs"
+
+  value = module.nsg_rules.ids
+}
+
+output "nsg_rule_names" {
+  description = "Map of NSG security rule names"
+
+  value = module.nsg_rules.names
+}
+
+output "nsg_rule_priorities" {
+  description = "Map of NSG security rule priorities"
+
+  value = module.nsg_rules.priorities
+}
