@@ -125,3 +125,16 @@ module "subnet_route_table_association" {
 
   route_table_id = module.route_table.id
 }
+
+# Routes module:
+
+module "route" {
+
+  source = "../../modules/networking/routes"
+
+  resource_group_name = module.rg.name
+
+  route_table_name = module.route_table.name
+
+  routes = var.routes
+}

@@ -209,3 +209,18 @@ variable "route_table_routes" {
 
   default = []
 }
+
+# Routes-vars:
+
+variable "routes" {
+  description = "Routes to create in the development route table"
+
+  type = map(object({
+    name                   = string
+    address_prefix         = string
+    next_hop_type          = string
+    next_hop_in_ip_address = optional(string)
+  }))
+
+  default = {}
+}

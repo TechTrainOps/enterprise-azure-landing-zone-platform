@@ -65,3 +65,7 @@ route_table_name = "rt-ealz-dev-eastus2-001"
 route_table_disable_bgp_route_propagation = false
 
 route_table_routes = []
+
+# Routes Tfvars:
+
+routes = {}
