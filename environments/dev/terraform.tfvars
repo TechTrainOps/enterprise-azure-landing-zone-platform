@@ -173,3 +173,19 @@ private_dns_zone_timeouts = {
   update = "30m"
   delete = "30m"
 }
+
+
+# Private DNS Zone VNet Link
+
+private_dns_zone_vnet_link_name = "link-ealz-dev-eastus2-001"
+
+private_dns_zone_vnet_link_registration_enabled = false
+
+private_dns_zone_vnet_link_resolution_policy = "Default"
+
+private_dns_zone_vnet_link_timeouts = {
+  create = "30m"
+  read   = "5m"
+  update = "30m"
+  delete = "30m"
+}

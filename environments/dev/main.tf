@@ -232,3 +232,31 @@ module "private_dns_zone" {
 
   timeouts = var.private_dns_zone_timeouts
 }
+
+# DNS Zone link module:
+
+module "private_dns_zone_vnet_link" {
+
+  source = "../../modules/networking/private-dns-zone-link"
+
+  name = var.private_dns_zone_vnet_link_name
+
+  private_dns_zone_name = module.private_dns_zone.name
+
+  resource_group_name = module.rg.name
+
+  virtual_network_id = module.vnet.id
+
+  registration_enabled = var.private_dns_zone_vnet_link_registration_enabled
+
+  resolution_policy = var.private_dns_zone_vnet_link_resolution_policy
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "private-dns-zone-vnet-link"
+    }
+  )
+
+  timeouts = var.private_dns_zone_vnet_link_timeouts
+}

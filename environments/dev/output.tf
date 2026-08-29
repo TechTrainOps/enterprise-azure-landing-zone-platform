@@ -235,3 +235,47 @@ output "private_dns_zone_number_of_record_sets" {
 
   value = module.private_dns_zone.number_of_record_sets
 }
+
+# DNS Zone link outputs:
+
+output "private_dns_zone_vnet_link_id" {
+  description = "ID of the Development Private DNS Zone VNet Link"
+
+  value = module.private_dns_zone_vnet_link.id
+}
+
+output "private_dns_zone_vnet_link_name" {
+  description = "Name of the Development Private DNS Zone VNet Link"
+
+  value = module.private_dns_zone_vnet_link.name
+}
+
+output "private_dns_zone_vnet_link_private_dns_zone_name" {
+  description = "Private DNS Zone associated with the VNet Link"
+
+  value = module.private_dns_zone_vnet_link.private_dns_zone_name
+}
+
+output "private_dns_zone_vnet_link_resource_group_name" {
+  description = "Resource Group containing the Private DNS Zone"
+
+  value = module.private_dns_zone_vnet_link.resource_group_name
+}
+
+output "private_dns_zone_vnet_link_virtual_network_id" {
+  description = "Virtual Network associated with the link"
+
+  value = module.private_dns_zone_vnet_link.virtual_network_id
+}
+
+output "private_dns_zone_vnet_link_registration_enabled" {
+  description = "Whether auto-registration is enabled"
+
+  value = module.private_dns_zone_vnet_link.registration_enabled
+}
+
+output "private_dns_zone_vnet_link_resolution_policy" {
+  description = "Resolution policy"
+
+  value = module.private_dns_zone_vnet_link.resolution_policy
+}
