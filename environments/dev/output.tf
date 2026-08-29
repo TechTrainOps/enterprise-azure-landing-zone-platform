@@ -131,13 +131,13 @@ output "subnet_route_table_association_id" {
 output "route_ids" {
   description = "Map of route IDs created in the development route table"
 
-  value = module.route.route_ids
+  value = module.routes.route_ids
 }
 
 output "route_names" {
   description = "Map of route names created in the development route table"
 
-  value = module.route.route_names
+  value = module.routes.route_names
 }
 
 # Nat-Gateway- output
