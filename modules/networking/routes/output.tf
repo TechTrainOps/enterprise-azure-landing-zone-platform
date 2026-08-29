@@ -1,5 +1,5 @@
 output "route_ids" {
-  description = "Map of created route IDs"
+  description = "IDs of the routes"
 
   value = {
     for key, route in azurerm_route.route :
@@ -8,7 +8,7 @@ output "route_ids" {
 }
 
 output "route_names" {
-  description = "Map of created route names"
+  description = "Names of the routes"
 
   value = {
     for key, route in azurerm_route.route :

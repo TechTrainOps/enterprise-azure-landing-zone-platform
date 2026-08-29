@@ -124,19 +124,6 @@ module "subnet_route_table_association" {
   route_table_id = module.route_table.id
 }
 
-# Routes module:
-
-module "route" {
-
-  source = "../../modules/networking/routes"
-
-  resource_group_name = module.rg.name
-
-  route_table_name = module.route_table.name
-
-  routes = var.routes
-}
-
 # Nat-Gateway-Public-Ip module:
 
 module "nat_public_ip" {
@@ -252,4 +239,21 @@ module "private_dns_zone_link" {
       ResourceType = "private-dns-zone-link"
     }
   )
+}
+
+# Routes Module:
+
+module "routes" {
+  source = "../../modules/networking/route"
+
+  routes = {
+    for key, route in var.routes :
+    key => merge(
+      route,
+      {
+        resource_group_name = module.rg.name
+        route_table_name    = module.route_table.name
+      }
+    )
+  }
 }

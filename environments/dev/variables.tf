@@ -188,7 +188,7 @@ variable "route_table_routes" {
 # Routes-vars:
 
 variable "routes" {
-  description = "Routes to create in the development route table"
+  description = "Routes for the development route table"
 
   type = map(object({
     name                   = string
