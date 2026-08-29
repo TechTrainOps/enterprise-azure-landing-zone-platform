@@ -182,16 +182,3 @@ private_dns_zone_link_name = "link-vnet-ealz-dev-eastus2-001"
 private_dns_zone_link_registration_enabled = false
 
 private_dns_zone_link_resolution_policy = "Default"
-
-
-# Private Endpoint
-
-private_endpoint_name = "pe-ealz-dev-eastus2-001"
-
-private_service_connection_name = "psc-ealz-dev-eastus2-001"
-
-private_endpoint_is_manual_connection = false
-
-private_endpoint_subresource_names = [
-  "vault"
-]
