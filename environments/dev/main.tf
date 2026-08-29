@@ -235,28 +235,21 @@ module "private_dns_zone" {
 
 # DNS Zone link module:
 
-module "private_dns_zone_vnet_link" {
-
+module "private_dns_zone_link" {
   source = "../../modules/networking/private-dns-zone-link"
 
-  name = var.private_dns_zone_vnet_link_name
+  name                  = var.private_dns_zone_link_name
+  resource_group_name   = module.rg.name
+  private_dns_zone_name = var.private_dns_zone_name
+  virtual_network_id    = module.vnet.id
 
-  private_dns_zone_name = module.private_dns_zone.name
-
-  resource_group_name = module.rg.name
-
-  virtual_network_id = module.vnet.id
-
-  registration_enabled = var.private_dns_zone_vnet_link_registration_enabled
-
-  resolution_policy = var.private_dns_zone_vnet_link_resolution_policy
+  registration_enabled = var.private_dns_zone_link_registration_enabled
+  resolution_policy    = var.private_dns_zone_link_resolution_policy
 
   tags = merge(
     var.tags,
     {
-      ResourceType = "private-dns-zone-vnet-link"
+      ResourceType = "private-dns-zone-link"
     }
   )
-
-  timeouts = var.private_dns_zone_vnet_link_timeouts
 }

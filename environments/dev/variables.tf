@@ -371,46 +371,24 @@ variable "private_dns_zone_timeouts" {
 
 # DNS Zone Link vars:
 
-variable "private_dns_zone_vnet_link_name" {
-  description = "Name of the Private DNS Zone VNet Link"
+variable "private_dns_zone_link_name" {
+  description = "Name of the Private DNS Zone Virtual Network Link"
   type        = string
 }
 
-variable "private_dns_zone_vnet_link_registration_enabled" {
-  description = "Whether VM auto-registration should be enabled"
+variable "private_dns_zone_name" {
+  description = "Name of the Private DNS Zone"
+  type        = string
+}
+
+variable "private_dns_zone_link_registration_enabled" {
+  description = "Whether VM registration is enabled"
   type        = bool
   default     = false
 }
 
-variable "private_dns_zone_vnet_link_resolution_policy" {
-  description = "Resolution policy for the Private DNS Zone VNet Link"
+variable "private_dns_zone_link_resolution_policy" {
+  description = "Resolution policy for the Private DNS Zone Virtual Network Link"
   type        = string
   default     = "Default"
-
-  validation {
-    condition = contains(
-      ["Default", "NxDomainRedirect"],
-      var.private_dns_zone_vnet_link_resolution_policy
-    )
-
-    error_message = "Resolution policy must be either Default or NxDomainRedirect."
-  }
-}
-
-variable "private_dns_zone_vnet_link_timeouts" {
-  description = "Timeout configuration for Private DNS Zone VNet Link"
-
-  type = object({
-    create = optional(string, "30m")
-    read   = optional(string, "5m")
-    update = optional(string, "30m")
-    delete = optional(string, "30m")
-  })
-
-  default = {
-    create = "30m"
-    read   = "5m"
-    update = "30m"
-    delete = "30m"
-  }
 }

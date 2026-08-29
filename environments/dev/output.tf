@@ -238,44 +238,32 @@ output "private_dns_zone_number_of_record_sets" {
 
 # DNS Zone link outputs:
 
-output "private_dns_zone_vnet_link_id" {
-  description = "ID of the Development Private DNS Zone VNet Link"
+output "private_dns_zone_link_id" {
+  description = "ID of the development Private DNS Zone Virtual Network Link"
 
-  value = module.private_dns_zone_vnet_link.id
+  value = module.private_dns_zone_link.id
 }
 
-output "private_dns_zone_vnet_link_name" {
-  description = "Name of the Development Private DNS Zone VNet Link"
+output "private_dns_zone_link_name" {
+  description = "Name of the development Private DNS Zone Virtual Network Link"
 
-  value = module.private_dns_zone_vnet_link.name
+  value = module.private_dns_zone_link.name
 }
 
-output "private_dns_zone_vnet_link_private_dns_zone_name" {
-  description = "Private DNS Zone associated with the VNet Link"
+output "private_dns_zone_link_private_dns_zone_id" {
+  description = "ID of the linked Private DNS Zone"
 
-  value = module.private_dns_zone_vnet_link.private_dns_zone_name
+  value = module.private_dns_zone_link.private_dns_zone_id
 }
 
-output "private_dns_zone_vnet_link_resource_group_name" {
-  description = "Resource Group containing the Private DNS Zone"
+output "private_dns_zone_link_virtual_network_id" {
+  description = "ID of the VNet linked to the Private DNS Zone"
 
-  value = module.private_dns_zone_vnet_link.resource_group_name
+  value = module.private_dns_zone_link.virtual_network_id
 }
 
-output "private_dns_zone_vnet_link_virtual_network_id" {
-  description = "Virtual Network associated with the link"
+output "private_dns_zone_link_registration_enabled" {
+  description = "Whether registration is enabled on the Private DNS Zone link"
 
-  value = module.private_dns_zone_vnet_link.virtual_network_id
-}
-
-output "private_dns_zone_vnet_link_registration_enabled" {
-  description = "Whether auto-registration is enabled"
-
-  value = module.private_dns_zone_vnet_link.registration_enabled
-}
-
-output "private_dns_zone_vnet_link_resolution_policy" {
-  description = "Resolution policy"
-
-  value = module.private_dns_zone_vnet_link.resolution_policy
+  value = module.private_dns_zone_link.registration_enabled
 }
