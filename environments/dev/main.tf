@@ -244,7 +244,7 @@ module "private_dns_zone_link" {
 # Routes Module:
 
 module "routes" {
-  source = "../../modules/networking/route"
+  source = "../../modules/networking/routes"
 
   routes = {
     for key, route in var.routes :
