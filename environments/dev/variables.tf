@@ -376,11 +376,6 @@ variable "private_dns_zone_link_name" {
   type        = string
 }
 
-variable "private_dns_zone_name" {
-  description = "Name of the Private DNS Zone"
-  type        = string
-}
-
 variable "private_dns_zone_link_registration_enabled" {
   description = "Whether VM registration is enabled"
   type        = bool
