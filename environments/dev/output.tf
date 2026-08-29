@@ -239,31 +239,31 @@ output "private_dns_zone_number_of_record_sets" {
 # DNS Zone link outputs:
 
 output "private_dns_zone_link_id" {
-  description = "ID of the development Private DNS Zone Virtual Network Link"
-
-  value = module.private_dns_zone_link.id
+  description = "Private DNS Zone VNet Link ID"
+  value       = module.private_dns_zone_link.id
 }
 
 output "private_dns_zone_link_name" {
-  description = "Name of the development Private DNS Zone Virtual Network Link"
-
-  value = module.private_dns_zone_link.name
+  description = "Private DNS Zone VNet Link name"
+  value       = module.private_dns_zone_link.name
 }
 
 output "private_dns_zone_link_private_dns_zone_id" {
-  description = "ID of the linked Private DNS Zone"
-
-  value = module.private_dns_zone_link.private_dns_zone_id
+  description = "Private DNS Zone ID associated with the link"
+  value       = module.private_dns_zone_link.private_dns_zone_id
 }
 
 output "private_dns_zone_link_virtual_network_id" {
-  description = "ID of the VNet linked to the Private DNS Zone"
-
-  value = module.private_dns_zone_link.virtual_network_id
+  description = "Virtual Network ID associated with the link"
+  value       = module.private_dns_zone_link.virtual_network_id
 }
 
 output "private_dns_zone_link_registration_enabled" {
-  description = "Whether registration is enabled on the Private DNS Zone link"
+  description = "DNS auto-registration status"
+  value       = module.private_dns_zone_link.registration_enabled
+}
 
-  value = module.private_dns_zone_link.registration_enabled
+output "private_dns_zone_link_resolution_policy" {
+  description = "DNS resolution policy"
+  value       = module.private_dns_zone_link.resolution_policy
 }
