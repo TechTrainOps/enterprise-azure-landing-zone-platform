@@ -3,13 +3,8 @@ variable "name" {
   type        = string
 }
 
-variable "resource_group_name" {
-  description = "Resource group containing the Private DNS Zone"
-  type        = string
-}
-
-variable "private_dns_zone_name" {
-  description = "Name of the Private DNS Zone"
+variable "private_dns_zone_id" {
+  description = "Resource ID of the Private DNS Zone"
   type        = string
 }
 
@@ -19,13 +14,13 @@ variable "virtual_network_id" {
 }
 
 variable "registration_enabled" {
-  description = "Whether VM registration is enabled"
+  description = "Whether auto-registration is enabled"
   type        = bool
   default     = false
 }
 
 variable "resolution_policy" {
-  description = "Resolution policy for the Private DNS Zone Virtual Network Link"
+  description = "DNS resolution policy"
   type        = string
   default     = "Default"
 
@@ -40,7 +35,7 @@ variable "resolution_policy" {
 }
 
 variable "tags" {
-  description = "Tags applied to the Private DNS Zone Virtual Network Link"
+  description = "Tags for the Private DNS Zone Virtual Network Link"
   type        = map(string)
   default     = {}
 }

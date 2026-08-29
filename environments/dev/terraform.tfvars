@@ -177,7 +177,7 @@ private_dns_zone_timeouts = {
 
 # Private DNS Zone Virtual Network Link
 
-private_dns_zone_link_name = "link-ealz-dev-eastus2-001"
+private_dns_zone_link_name = "link-vnet-ealz-dev-eastus2-001"
 
 private_dns_zone_link_registration_enabled = false
 

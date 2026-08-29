@@ -238,10 +238,10 @@ module "private_dns_zone" {
 module "private_dns_zone_link" {
   source = "../../modules/networking/private-dns-zone-link"
 
-  name                  = var.private_dns_zone_link_name
-  resource_group_name   = module.rg.name
-  private_dns_zone_name = var.private_dns_zone_name
-  virtual_network_id    = module.vnet.id
+  name = var.private_dns_zone_link_name
+
+  private_dns_zone_id = module.private_dns_zone.id
+  virtual_network_id  = module.vnet.id
 
   registration_enabled = var.private_dns_zone_link_registration_enabled
   resolution_policy    = var.private_dns_zone_link_resolution_policy
