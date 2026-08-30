@@ -479,3 +479,16 @@ variable "private_endpoint_subresource_names" {
   description = "Subresource names for the Private Endpoint"
   type        = list(string)
 }
+
+# key-vault-association vars:
+
+variable "pipeline_service_principal_object_id" {
+  description = "Object ID of the service principal used by the Azure DevOps pipeline"
+  type        = string
+}
+
+variable "key_vault_pipeline_role" {
+  description = "RBAC role assigned to the pipeline service principal on Key Vault"
+  type        = string
+  default     = "Key Vault Secrets User"
+}

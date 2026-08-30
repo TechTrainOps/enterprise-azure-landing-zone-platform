@@ -314,3 +314,13 @@ module "private_endpoint" {
     }
   )
 }
+
+# key-vault-pipeline-role-assignment:
+
+module "key_vault_pipeline_role_assignment" {
+  source = "../../modules/security/key-vault-role-assignment"
+
+  scope                = module.key_vault.id
+  role_definition_name = var.key_vault_pipeline_role
+  principal_id         = var.pipeline_service_principal_object_id
+}

@@ -220,3 +220,10 @@ private_endpoint_is_manual_connection = false
 private_endpoint_subresource_names = [
   "vault"
 ]
+
+
+# Kv association Tfvars:
+
+pipeline_service_principal_object_id = "e0447103-547e-4872-a7f8-a57acc277f31"
+
+key_vault_pipeline_role = "Key Vault Secrets User"
