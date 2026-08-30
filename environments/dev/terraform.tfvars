@@ -224,6 +224,6 @@ private_endpoint_subresource_names = [
 
 # Kv association Tfvars:
 
-pipeline_service_principal_object_id = "e0447103-547e-4872-a7f8-a57acc277f31"
+pipeline_service_principal_object_id = "d218567f-8341-4ddc-a786-7b770ee0374b"
 
 key_vault_pipeline_role = "Key Vault Secrets User"
