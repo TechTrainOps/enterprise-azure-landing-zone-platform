@@ -182,3 +182,26 @@ private_dns_zone_link_name = "link-vnet-ealz-dev-eastus2-001"
 private_dns_zone_link_registration_enabled = false
 
 private_dns_zone_link_resolution_policy = "Default"
+
+
+# Key-vault Tfvars:
+
+# Key Vault
+
+key_vault_name = "kv-ealz-dev-eastus2-001"
+
+tenant_id = "6646f62a-d8f4-4087-817c-ae123554b7c3"
+
+key_vault_sku_name = "standard"
+
+key_vault_enabled_for_deployment = false
+
+key_vault_enabled_for_disk_encryption = false
+
+key_vault_enabled_for_template_deployment = false
+
+key_vault_purge_protection_enabled = true
+
+key_vault_soft_delete_retention_days = 90
+
+key_vault_public_network_access_enabled = false

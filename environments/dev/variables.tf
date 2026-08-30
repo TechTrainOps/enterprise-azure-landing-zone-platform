@@ -396,3 +396,57 @@ variable "private_dns_zone_link_resolution_policy" {
     error_message = "Resolution policy must be Default or NxDomainRedirect."
   }
 }
+
+# Key Vault
+
+variable "key_vault_name" {
+  description = "Name of the Key Vault"
+  type        = string
+}
+
+variable "tenant_id" {
+  description = "Microsoft Entra tenant ID"
+  type        = string
+}
+
+variable "key_vault_sku_name" {
+  description = "Key Vault SKU"
+  type        = string
+  default     = "standard"
+}
+
+variable "key_vault_enabled_for_deployment" {
+  description = "Allow Azure VM deployments to retrieve certificates"
+  type        = bool
+  default     = false
+}
+
+variable "key_vault_enabled_for_disk_encryption" {
+  description = "Allow Azure Disk Encryption to retrieve secrets"
+  type        = bool
+  default     = false
+}
+
+variable "key_vault_enabled_for_template_deployment" {
+  description = "Allow ARM template deployments to retrieve secrets"
+  type        = bool
+  default     = false
+}
+
+variable "key_vault_purge_protection_enabled" {
+  description = "Enable Key Vault purge protection"
+  type        = bool
+  default     = true
+}
+
+variable "key_vault_soft_delete_retention_days" {
+  description = "Key Vault soft delete retention period"
+  type        = number
+  default     = 90
+}
+
+variable "key_vault_public_network_access_enabled" {
+  description = "Allow public network access to Key Vault"
+  type        = bool
+  default     = false
+}

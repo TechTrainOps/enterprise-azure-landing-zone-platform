@@ -267,3 +267,25 @@ output "private_dns_zone_link_resolution_policy" {
   description = "DNS resolution policy"
   value       = module.private_dns_zone_link.resolution_policy
 }
+
+# key-vault ouput:
+
+output "key_vault_id" {
+  description = "Key Vault resource ID"
+  value       = module.key_vault.id
+}
+
+output "key_vault_name" {
+  description = "Key Vault name"
+  value       = module.key_vault.name
+}
+
+output "key_vault_uri" {
+  description = "Key Vault URI"
+  value       = module.key_vault.vault_uri
+}
+
+output "key_vault_location" {
+  description = "Key Vault location"
+  value       = module.key_vault.location
+}

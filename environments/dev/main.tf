@@ -257,3 +257,33 @@ module "routes" {
     )
   }
 }
+
+# key-vault module:
+
+module "key_vault" {
+  source = "../../modules/security/key-vault"
+
+  name                = var.key_vault_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  tenant_id = var.tenant_id
+
+  sku_name = var.key_vault_sku_name
+
+  enabled_for_deployment          = var.key_vault_enabled_for_deployment
+  enabled_for_disk_encryption     = var.key_vault_enabled_for_disk_encryption
+  enabled_for_template_deployment = var.key_vault_enabled_for_template_deployment
+
+  purge_protection_enabled   = var.key_vault_purge_protection_enabled
+  soft_delete_retention_days = var.key_vault_soft_delete_retention_days
+
+  public_network_access_enabled = var.key_vault_public_network_access_enabled
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "key-vault"
+    }
+  )
+}
