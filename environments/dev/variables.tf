@@ -450,3 +450,9 @@ variable "key_vault_public_network_access_enabled" {
   type        = bool
   default     = false
 }
+
+variable "key_vault_rbac_authorization_enabled" {
+  description = "Enable Azure RBAC authorization for the Key Vault"
+  type        = bool
+  default     = true
+}

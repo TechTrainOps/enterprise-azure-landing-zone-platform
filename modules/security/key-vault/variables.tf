@@ -79,3 +79,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "rbac_authorization_enabled" {
+  description = "Enable Azure RBAC authorization for the Key Vault"
+  type        = bool
+  default     = true
+}

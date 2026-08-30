@@ -274,6 +274,7 @@ module "key_vault" {
   enabled_for_deployment          = var.key_vault_enabled_for_deployment
   enabled_for_disk_encryption     = var.key_vault_enabled_for_disk_encryption
   enabled_for_template_deployment = var.key_vault_enabled_for_template_deployment
+  rbac_authorization_enabled      = var.key_vault_rbac_authorization_enabled
 
   purge_protection_enabled   = var.key_vault_purge_protection_enabled
   soft_delete_retention_days = var.key_vault_soft_delete_retention_days

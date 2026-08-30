@@ -205,3 +205,5 @@ key_vault_purge_protection_enabled = true
 key_vault_soft_delete_retention_days = 90
 
 key_vault_public_network_access_enabled = false
+
+key_vault_rbac_authorization_enabled = true
