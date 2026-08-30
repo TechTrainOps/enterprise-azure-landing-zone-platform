@@ -456,3 +456,26 @@ variable "key_vault_rbac_authorization_enabled" {
   type        = bool
   default     = true
 }
+
+# PE vars:
+
+variable "private_endpoint_name" {
+  description = "Name of the Private Endpoint"
+  type        = string
+}
+
+variable "private_service_connection_name" {
+  description = "Name of the Private Service Connection"
+  type        = string
+}
+
+variable "private_endpoint_is_manual_connection" {
+  description = "Whether manual approval is required for the Private Endpoint"
+  type        = bool
+  default     = false
+}
+
+variable "private_endpoint_subresource_names" {
+  description = "Subresource names for the Private Endpoint"
+  type        = list(string)
+}

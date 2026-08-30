@@ -207,3 +207,16 @@ key_vault_soft_delete_retention_days = 90
 key_vault_public_network_access_enabled = false
 
 key_vault_rbac_authorization_enabled = true
+
+
+# PE Tfvars:
+
+private_endpoint_name = "pe-ealz-dev-eastus2-001"
+
+private_service_connection_name = "psc-ealz-dev-eastus2-001"
+
+private_endpoint_is_manual_connection = false
+
+private_endpoint_subresource_names = [
+  "vault"
+]

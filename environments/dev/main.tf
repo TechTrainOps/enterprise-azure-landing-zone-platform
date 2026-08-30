@@ -288,3 +288,29 @@ module "key_vault" {
     }
   )
 }
+
+
+# PE module:
+
+module "private_endpoint" {
+  source = "../../modules/networking/private-endpoint"
+
+  name                = var.private_endpoint_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  subnet_id = module.subnet.id
+
+  private_service_connection_name = var.private_service_connection_name
+  private_connection_resource_id  = module.key_vault.id
+
+  is_manual_connection = var.private_endpoint_is_manual_connection
+  subresource_names    = var.private_endpoint_subresource_names
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "private-endpoint"
+    }
+  )
+}

@@ -289,3 +289,21 @@ output "key_vault_location" {
   description = "Key Vault location"
   value       = module.key_vault.location
 }
+
+
+# PE output:
+
+output "private_endpoint_id" {
+  description = "Private Endpoint resource ID"
+  value       = module.private_endpoint.id
+}
+
+output "private_endpoint_name" {
+  description = "Private Endpoint name"
+  value       = module.private_endpoint.name
+}
+
+output "private_endpoint_network_interface_id" {
+  description = "Private Endpoint network interface ID"
+  value       = module.private_endpoint.network_interface_id
+}
