@@ -283,3 +283,10 @@ allowed_azure_locations = [
 # identity Tfvars:
 
 managed_identity_name = "id-ealz-dev-eastus2-001"
+
+
+# Action Group Tfvars:
+
+monitor_action_group_name       = "ag-ealz-dev-eastus2-001"
+monitor_action_group_short_name = "ealz-dev"
+monitor_alert_email             = "shakirshah@microsoft.com"

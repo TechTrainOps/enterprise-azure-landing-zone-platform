@@ -696,3 +696,50 @@ module "managed_identity_key_vault_role_assignment" {
 
   principal_id = module.managed_identity.principal_id
 }
+
+
+# Action-Group module:
+
+module "monitor_action_group" {
+  source = "../../modules/monitoring/action-group"
+
+  name                = var.monitor_action_group_name
+  resource_group_name = module.rg.name
+  short_name          = var.monitor_action_group_short_name
+
+  email_receiver_name = "platform-admin"
+  email_address       = var.monitor_alert_email
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "monitor-action-group"
+    }
+  )
+}
+
+
+# Activity-log-alert module:
+
+module "activity_log_alert" {
+  source = "../../modules/monitoring/activity-log-alert"
+
+  name                = "alert-ealz-dev-admin-changes"
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  scope = module.rg.id
+
+  description = "Alerts on administrative changes within the enterprise landing zone resource group."
+
+  category = "Administrative"
+
+  action_group_id = module.monitor_action_group.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "activity-log-alert"
+    }
+  )
+}

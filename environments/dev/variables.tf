@@ -626,3 +626,20 @@ variable "managed_identity_name" {
   description = "Name of the User Assigned Managed Identity"
   type        = string
 }
+
+
+# Action Group vars:
+variable "monitor_action_group_name" {
+  description = "Name of the monitoring Action Group"
+  type        = string
+}
+
+variable "monitor_action_group_short_name" {
+  description = "Short name of the monitoring Action Group"
+  type        = string
+}
+
+variable "monitor_alert_email" {
+  description = "Email address for Azure Monitor alerts"
+  type        = string
+}

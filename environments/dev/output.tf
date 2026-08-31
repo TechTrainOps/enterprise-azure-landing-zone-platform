@@ -475,3 +475,16 @@ output "managed_identity_key_vault_role_assignment_id" {
   description = "Managed Identity Key Vault RBAC assignment ID"
   value       = module.managed_identity_key_vault_role_assignment.id
 }
+
+
+# Activity log alert output:
+
+output "monitor_action_group_id" {
+  description = "Monitoring Action Group ID"
+  value       = module.monitor_action_group.id
+}
+
+output "activity_log_alert_id" {
+  description = "Activity Log alert ID"
+  value       = module.activity_log_alert.id
+}
