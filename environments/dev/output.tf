@@ -373,3 +373,8 @@ output "acr_private_dns_zone_id" {
   description = "Private DNS Zone ID for Azure Container Registry"
   value       = module.acr_private_dns_zone.id
 }
+
+output "acr_private_dns_zone_link_id" {
+  description = "ACR Private DNS Zone VNet Link ID"
+  value       = module.acr_private_dns_zone_link.id
+}

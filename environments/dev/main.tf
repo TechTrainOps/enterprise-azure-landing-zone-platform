@@ -463,7 +463,7 @@ module "container_registry" {
 }
 
 
-# ACR-pvt-dns-zone
+# ACR-pvt-dns-zone module:
 
 module "acr_private_dns_zone" {
   source = "../../modules/networking/private-dns-zone"
@@ -477,4 +477,17 @@ module "acr_private_dns_zone" {
       ResourceType = "private-dns-zone"
     }
   )
+}
+
+
+# ACR-pvt-dns-zone-link module:
+
+module "acr_private_dns_zone_link" {
+  source = "../../modules/networking/private-dns-zone-link"
+
+  name                = "acr-dns-vnet-link"
+  private_dns_zone_id = module.acr_private_dns_zone.id
+  virtual_network_id  = module.vnet.id
+
+  registration_enabled = false
 }
