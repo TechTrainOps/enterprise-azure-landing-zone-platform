@@ -248,3 +248,16 @@ storage_account_allow_nested_items_to_be_public = false
 storage_account_shared_access_key_enabled = false
 
 storage_private_dns_zone_name = "privatelink.blob.core.windows.net"
+
+
+# ACR Tfvars:
+
+container_registry_name = "crealzdeveastus2001"
+
+container_registry_sku = "Premium"
+
+container_registry_admin_enabled = false
+
+container_registry_public_network_access_enabled = false
+
+container_registry_anonymous_pull_enabled = false

@@ -431,3 +431,33 @@ module "storage_account_pipeline_role_assignment" {
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = var.pipeline_service_principal_object_id
 }
+
+
+# ACR module:
+
+module "container_registry" {
+  source = "../../modules/security/container-registry"
+
+  name                = var.container_registry_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  sku = var.container_registry_sku
+
+  admin_enabled = var.container_registry_admin_enabled
+
+  public_network_access_enabled = (
+    var.container_registry_public_network_access_enabled
+  )
+
+  anonymous_pull_enabled = (
+    var.container_registry_anonymous_pull_enabled
+  )
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "container-registry"
+    }
+  )
+}

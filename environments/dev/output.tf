@@ -350,3 +350,21 @@ output "storage_account_pipeline_role_assignment_role" {
   description = "RBAC role assigned to the pipeline service principal on the Storage Account"
   value       = module.storage_account_pipeline_role_assignment.role_definition_name
 }
+
+
+# ACR outputs:
+
+output "container_registry_id" {
+  description = "Container Registry resource ID"
+  value       = module.container_registry.id
+}
+
+output "container_registry_name" {
+  description = "Container Registry name"
+  value       = module.container_registry.name
+}
+
+output "container_registry_login_server" {
+  description = "Container Registry login server"
+  value       = module.container_registry.login_server
+}

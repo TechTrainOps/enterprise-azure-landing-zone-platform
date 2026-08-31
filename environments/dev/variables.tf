@@ -559,3 +559,34 @@ variable "storage_private_dns_zone_name" {
   type        = string
   default     = "privatelink.blob.core.windows.net"
 }
+
+# ACR vars:
+
+variable "container_registry_name" {
+  description = "Name of the Azure Container Registry"
+  type        = string
+}
+
+variable "container_registry_sku" {
+  description = "SKU of the Azure Container Registry"
+  type        = string
+  default     = "Premium"
+}
+
+variable "container_registry_admin_enabled" {
+  description = "Enable ACR admin account"
+  type        = bool
+  default     = false
+}
+
+variable "container_registry_public_network_access_enabled" {
+  description = "Enable public network access to ACR"
+  type        = bool
+  default     = false
+}
+
+variable "container_registry_anonymous_pull_enabled" {
+  description = "Allow anonymous image pulls"
+  type        = bool
+  default     = false
+}
