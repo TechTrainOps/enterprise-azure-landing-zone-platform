@@ -420,3 +420,14 @@ module "storage_private_endpoint" {
     }
   )
 }
+
+
+# storage-rbac module:
+
+module "storage_account_pipeline_role_assignment" {
+  source = "../../modules/security/key-vault-role-assignment"
+
+  scope                = module.storage_account.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = var.pipeline_service_principal_object_id
+}

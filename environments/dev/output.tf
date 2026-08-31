@@ -340,3 +340,13 @@ output "storage_private_endpoint_id" {
   description = "Storage Account Private Endpoint ID"
   value       = module.storage_private_endpoint.id
 }
+
+output "storage_account_pipeline_role_assignment_id" {
+  description = "RBAC role assignment ID for the pipeline service principal on the Storage Account"
+  value       = module.storage_account_pipeline_role_assignment.id
+}
+
+output "storage_account_pipeline_role_assignment_role" {
+  description = "RBAC role assigned to the pipeline service principal on the Storage Account"
+  value       = module.storage_account_pipeline_role_assignment.role_definition_name
+}
