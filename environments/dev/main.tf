@@ -665,3 +665,34 @@ module "allowed_regions_policy_assignment" {
 
   description = "Assigns the allowed Azure regions policy to the development resource group."
 }
+
+
+# Identity module:
+
+module "managed_identity" {
+  source = "../../modules/identity/user-assigned-identity"
+
+  name                = var.managed_identity_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "managed-identity"
+    }
+  )
+}
+
+
+# Identity role assignment module:
+
+module "managed_identity_key_vault_role_assignment" {
+  source = "../../modules/security/key-vault-role-assignment"
+
+  scope = module.key_vault.id
+
+  role_definition_name = "Key Vault Secrets User"
+
+  principal_id = module.managed_identity.principal_id
+}

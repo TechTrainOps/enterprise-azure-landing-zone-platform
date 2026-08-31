@@ -452,3 +452,26 @@ output "allowed_regions_policy_assignment_id" {
   description = "Allowed Azure regions policy assignment ID"
   value       = module.allowed_regions_policy_assignment.id
 }
+
+
+# Identity outputs:
+
+output "managed_identity_id" {
+  description = "User Assigned Managed Identity resource ID"
+  value       = module.managed_identity.id
+}
+
+output "managed_identity_client_id" {
+  description = "User Assigned Managed Identity client ID"
+  value       = module.managed_identity.client_id
+}
+
+output "managed_identity_principal_id" {
+  description = "User Assigned Managed Identity principal ID"
+  value       = module.managed_identity.principal_id
+}
+
+output "managed_identity_key_vault_role_assignment_id" {
+  description = "Managed Identity Key Vault RBAC assignment ID"
+  value       = module.managed_identity_key_vault_role_assignment.id
+}

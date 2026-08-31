@@ -618,3 +618,11 @@ variable "allowed_azure_locations" {
   description = "Azure regions allowed for the development environment"
   type        = list(string)
 }
+
+
+# identity vars:
+
+variable "managed_identity_name" {
+  description = "Name of the User Assigned Managed Identity"
+  type        = string
+}

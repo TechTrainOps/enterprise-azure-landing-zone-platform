@@ -278,3 +278,8 @@ log_analytics_retention_in_days = 30
 allowed_azure_locations = [
   "eastus2"
 ]
+
+
+# identity Tfvars:
+
+managed_identity_name = "id-ealz-dev-eastus2-001"
