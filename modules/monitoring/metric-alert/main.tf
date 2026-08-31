@@ -1,21 +1,28 @@
-resource "azurerm_monitor_diagnostic_setting" "diagnostic_setting" {
-  name                       = var.name
-  target_resource_id         = var.target_resource_id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
+resource "azurerm_monitor_metric_alert" "metric_alert" {
+  name                = var.name
+  resource_group_name = var.resource_group_name
 
-  dynamic "enabled_log" {
-    for_each = var.log_categories
+  scopes      = var.scopes
+  description = var.description
 
-    content {
-      category = enabled_log.value
-    }
+  severity    = var.severity
+  enabled     = var.enabled
+  auto_mitigate = var.auto_mitigate
+
+  frequency   = var.frequency
+  window_size = var.window_size
+
+  criteria {
+    metric_namespace = var.metric_namespace
+    metric_name      = var.metric_name
+    aggregation      = var.aggregation
+    operator         = var.operator
+    threshold        = var.threshold
   }
 
-  dynamic "enabled_metric" {
-    for_each = var.metric_categories
-
-    content {
-      category = enabled_metric.value
-    }
+  action {
+    action_group_id = var.action_group_id
   }
+
+  tags = var.tags
 }

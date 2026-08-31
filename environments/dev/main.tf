@@ -744,20 +744,38 @@ module "activity_log_alert" {
 }
 
 
-# stg-metric-alert module:
+# Storage Account metric alert
 
-data "azurerm_monitor_diagnostic_categories" "storage_account" {
-  resource_id = module.storage_account.id
-}
+module "storage_account_metric_alert" {
+  source = "../../modules/monitoring/metric-alert"
 
-module "storage_account_diagnostic_setting" {
-  source = "../../modules/monitoring/diagnostic-setting"
+  name                = "alert-ealz-dev-storage-capacity"
+  resource_group_name = module.rg.name
 
-  name                       = "diag-storage"
-  target_resource_id         = module.storage_account.id
-  log_analytics_workspace_id = module.log_analytics.id
+  scopes = [
+    module.storage_account.id
+  ]
 
-  log_categories = []
+  description = "Alerts when the storage account used capacity exceeds the configured threshold."
 
-  metric_categories = data.azurerm_monitor_diagnostic_categories.storage_account.metrics
+  metric_namespace = "Microsoft.Storage/storageAccounts"
+  metric_name      = "UsedCapacity"
+
+  aggregation = "Average"
+  operator    = "GreaterThan"
+  threshold   = 107374182400
+
+  frequency   = "PT5M"
+  window_size = "PT15M"
+
+  severity = 2
+
+  action_group_id = module.monitor_action_group.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "metric-alert"
+    }
+  )
 }

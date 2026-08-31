@@ -1,9 +1,9 @@
 output "id" {
-  description = "Diagnostic setting ID"
-  value       = azurerm_monitor_diagnostic_setting.diagnostic_setting.id
+  description = "Metric alert resource ID"
+  value       = azurerm_monitor_metric_alert.metric_alert.id
 }
 
 output "name" {
-  description = "Diagnostic setting name"
-  value       = azurerm_monitor_diagnostic_setting.diagnostic_setting.name
+  description = "Metric alert name"
+  value       = azurerm_monitor_metric_alert.metric_alert.name
 }
