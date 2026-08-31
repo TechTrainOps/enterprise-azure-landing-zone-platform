@@ -328,7 +328,7 @@ module "key_vault_pipeline_role_assignment" {
 # storage account module:
 
 module "storage_account" {
-  source = "../../modules/storage/storage-account"
+  source = "../../modules/security/storage-account"
 
   name                     = var.storage_account_name
   resource_group_name      = module.rg.name
