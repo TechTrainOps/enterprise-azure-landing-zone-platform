@@ -553,3 +553,9 @@ variable "storage_account_shared_access_key_enabled" {
   type        = bool
   default     = true
 }
+
+variable "storage_private_dns_zone_name" {
+  description = "Private DNS zone for Storage Blob Private Endpoint"
+  type        = string
+  default     = "privatelink.blob.core.windows.net"
+}

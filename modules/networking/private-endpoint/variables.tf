@@ -44,3 +44,15 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "private_dns_zone_ids" {
+  description = "Private DNS zone IDs associated with the Private Endpoint"
+  type        = list(string)
+  default     = []
+}
+
+variable "private_dns_zone_group_name" {
+  description = "Name of the Private DNS Zone Group"
+  type        = string
+  default     = "default"
+}

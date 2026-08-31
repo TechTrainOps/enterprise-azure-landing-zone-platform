@@ -11,5 +11,14 @@ resource "azurerm_private_endpoint" "private_endpoint" {
     subresource_names              = var.subresource_names
   }
 
+  dynamic "private_dns_zone_group" {
+    for_each = length(var.private_dns_zone_ids) > 0 ? [1] : []
+
+    content {
+      name                 = var.private_dns_zone_group_name
+      private_dns_zone_ids = var.private_dns_zone_ids
+    }
+  }
+
   tags = var.tags
 }

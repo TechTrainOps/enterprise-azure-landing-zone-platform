@@ -239,10 +239,12 @@ storage_account_replication_type = "LRS"
 storage_account_access_tier      = "Hot"
 
 storage_account_enable_https_traffic_only = true
-storage_account_min_tls_version            = "TLS1_2"
+storage_account_min_tls_version           = "TLS1_2"
 
 storage_account_public_network_access_enabled = false
 
 storage_account_allow_nested_items_to_be_public = false
 
 storage_account_shared_access_key_enabled = true
+
+storage_private_dns_zone_name = "privatelink.blob.core.windows.net"

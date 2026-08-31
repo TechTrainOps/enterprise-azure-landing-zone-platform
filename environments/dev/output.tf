@@ -325,3 +325,18 @@ output "storage_account_primary_blob_endpoint" {
   description = "Primary Blob endpoint"
   value       = module.storage_account.primary_blob_endpoint
 }
+
+output "storage_private_dns_zone_id" {
+  description = "Storage Private DNS Zone ID"
+  value       = module.storage_private_dns_zone.id
+}
+
+output "storage_private_dns_zone_link_id" {
+  description = "Storage Private DNS Zone VNet Link ID"
+  value       = module.storage_private_dns_zone_link.id
+}
+
+output "storage_private_endpoint_id" {
+  description = "Storage Account Private Endpoint ID"
+  value       = module.storage_private_endpoint.id
+}

@@ -330,9 +330,9 @@ module "key_vault_pipeline_role_assignment" {
 module "storage_account" {
   source = "../../modules/security/storage-account"
 
-  name                     = var.storage_account_name
-  resource_group_name      = module.rg.name
-  location                 = var.location
+  name                = var.storage_account_name
+  resource_group_name = module.rg.name
+  location            = var.location
 
   account_kind             = var.storage_account_kind
   account_tier             = var.storage_account_tier
@@ -354,6 +354,69 @@ module "storage_account" {
     var.tags,
     {
       ResourceType = "storage-account"
+    }
+  )
+}
+
+# storage-pvt-dns-zone module:
+
+module "storage_private_dns_zone" {
+  source = "../../modules/networking/private-dns-zone"
+
+  name                = var.storage_private_dns_zone_name
+  resource_group_name = module.rg.name
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "private-dns-zone"
+    }
+  )
+}
+
+# storage-pvt-dns-zone-link module:
+
+module "storage_private_dns_zone_link" {
+  source = "../../modules/networking/private-dns-zone-link"
+
+  name                = "storage-dns-vnet-link"
+  private_dns_zone_id = module.storage_private_dns_zone.id
+  virtual_network_id  = module.vnet.id
+
+  registration_enabled = false
+}
+
+
+# storage-pvt-dns-zone-link module:
+module "storage_private_endpoint" {
+  source = "../../modules/networking/private-endpoint"
+
+  name                = "pe-ealz-dev-eastus2-storage-001"
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  subnet_id = module.subnet.id
+
+  private_service_connection_name = "psc-ealz-dev-eastus2-storage-001"
+
+  private_connection_resource_id = module.storage_account.id
+
+  is_manual_connection = false
+
+  subresource_names = [
+    "blob"
+  ]
+
+  private_dns_zone_ids = [
+    module.storage_private_dns_zone.id
+  ]
+
+  private_dns_zone_group_name = "storage-dns-zone-group"
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "private-endpoint"
     }
   )
 }
