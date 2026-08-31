@@ -245,6 +245,6 @@ storage_account_public_network_access_enabled = false
 
 storage_account_allow_nested_items_to_be_public = false
 
-storage_account_shared_access_key_enabled = true
+storage_account_shared_access_key_enabled = false
 
 storage_private_dns_zone_name = "privatelink.blob.core.windows.net"
