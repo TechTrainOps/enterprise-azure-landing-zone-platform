@@ -569,11 +569,11 @@ module "key_vault_diagnostic_setting" {
   target_resource_id         = module.key_vault.id
   log_analytics_workspace_id = module.log_analytics.id
 
-  log_categories = [
+  enabled_logs = [
     "AuditEvent"
   ]
 
-  metric_categories = []
+  enabled_metrics = []
 }
 
 
@@ -582,8 +582,7 @@ module "key_vault_diagnostic_setting" {
 module "storage_account_diagnostic_setting" {
   source = "../../modules/monitoring/diagnostic-setting"
 
-  name = "diag-storage-blob"
-
+  name                       = "diag-storage-blob"
   target_resource_id         = module.storage_account.blob_service_id
   log_analytics_workspace_id = module.log_analytics.id
 
@@ -592,6 +591,8 @@ module "storage_account_diagnostic_setting" {
     "StorageWrite",
     "StorageDelete"
   ]
+
+  enabled_metrics = []
 }
 
 

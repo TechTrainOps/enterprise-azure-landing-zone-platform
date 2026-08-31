@@ -19,20 +19,8 @@ variable "enabled_logs" {
   default     = []
 }
 
-variable "log_categories" {
-  description = "Diagnostic log categories"
-  type        = list(string)
-  default     = []
-}
-
-variable "metric_categories" {
-  description = "Diagnostic metric categories"
-  type        = list(string)
-  default     = []
-}
-
 variable "enabled_metrics" {
-  description = "Diagnostic metric categories"
+  description = "Diagnostic metric categories to enable"
   type        = list(string)
   default     = []
 }
