@@ -227,3 +227,22 @@ private_endpoint_subresource_names = [
 pipeline_service_principal_object_id = "d218567f-8341-4ddc-a786-7b770ee0374b"
 
 key_vault_pipeline_role = "Key Vault Secrets User"
+
+
+# storage-account Tfvars:
+
+storage_account_name = "stealzdeveastus2001"
+
+storage_account_kind             = "StorageV2"
+storage_account_tier             = "Standard"
+storage_account_replication_type = "LRS"
+storage_account_access_tier      = "Hot"
+
+storage_account_enable_https_traffic_only = true
+storage_account_min_tls_version            = "TLS1_2"
+
+storage_account_public_network_access_enabled = false
+
+storage_account_allow_nested_items_to_be_public = false
+
+storage_account_shared_access_key_enabled = true

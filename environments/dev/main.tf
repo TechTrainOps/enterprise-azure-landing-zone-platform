@@ -324,3 +324,36 @@ module "key_vault_pipeline_role_assignment" {
   role_definition_name = var.key_vault_pipeline_role
   principal_id         = var.pipeline_service_principal_object_id
 }
+
+# storage account module:
+
+module "storage_account" {
+  source = "../../modules/storage/storage-account"
+
+  name                     = var.storage_account_name
+  resource_group_name      = module.rg.name
+  location                 = var.location
+
+  account_kind             = var.storage_account_kind
+  account_tier             = var.storage_account_tier
+  account_replication_type = var.storage_account_replication_type
+  access_tier              = var.storage_account_access_tier
+
+  enable_https_traffic_only = var.storage_account_enable_https_traffic_only
+  min_tls_version            = var.storage_account_min_tls_version
+
+  public_network_access_enabled = var.storage_account_public_network_access_enabled
+
+  allow_nested_items_to_be_public = (
+    var.storage_account_allow_nested_items_to_be_public
+  )
+
+  shared_access_key_enabled = var.storage_account_shared_access_key_enabled
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "storage-account"
+    }
+  )
+}

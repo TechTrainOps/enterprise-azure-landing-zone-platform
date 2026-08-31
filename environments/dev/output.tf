@@ -307,3 +307,21 @@ output "private_endpoint_network_interface_id" {
   description = "Private Endpoint network interface ID"
   value       = module.private_endpoint.network_interface_id
 }
+
+
+# storage-account outputs:
+
+output "storage_account_id" {
+  description = "Storage account resource ID"
+  value       = module.storage_account.id
+}
+
+output "storage_account_name" {
+  description = "Storage account name"
+  value       = module.storage_account.name
+}
+
+output "storage_account_primary_blob_endpoint" {
+  description = "Primary Blob endpoint"
+  value       = module.storage_account.primary_blob_endpoint
+}

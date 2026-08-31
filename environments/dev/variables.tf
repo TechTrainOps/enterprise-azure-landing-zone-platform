@@ -492,3 +492,64 @@ variable "key_vault_pipeline_role" {
   type        = string
   default     = "Key Vault Secrets User"
 }
+
+# storage-account vars:
+
+variable "storage_account_name" {
+  description = "Name of the storage account"
+  type        = string
+}
+
+variable "storage_account_kind" {
+  description = "Storage account kind"
+  type        = string
+  default     = "StorageV2"
+}
+
+variable "storage_account_tier" {
+  description = "Storage account tier"
+  type        = string
+  default     = "Standard"
+}
+
+variable "storage_account_replication_type" {
+  description = "Storage account replication type"
+  type        = string
+  default     = "LRS"
+}
+
+variable "storage_account_access_tier" {
+  description = "Storage account access tier"
+  type        = string
+  default     = "Hot"
+}
+
+variable "storage_account_enable_https_traffic_only" {
+  description = "Require HTTPS traffic"
+  type        = bool
+  default     = true
+}
+
+variable "storage_account_min_tls_version" {
+  description = "Minimum TLS version"
+  type        = string
+  default     = "TLS1_2"
+}
+
+variable "storage_account_public_network_access_enabled" {
+  description = "Enable public network access"
+  type        = bool
+  default     = false
+}
+
+variable "storage_account_allow_nested_items_to_be_public" {
+  description = "Allow nested items to be publicly accessible"
+  type        = bool
+  default     = false
+}
+
+variable "storage_account_shared_access_key_enabled" {
+  description = "Enable shared access keys"
+  type        = bool
+  default     = true
+}
