@@ -429,3 +429,16 @@ output "acr_diagnostic_setting_id" {
   description = "ACR diagnostic setting ID"
   value       = module.acr_diagnostic_setting.id
 }
+
+
+# policy-assignment output:
+
+output "required_tags_policy_id" {
+  description = "Required tags policy definition ID"
+  value       = module.required_tags_policy.id
+}
+
+output "required_tags_policy_assignment_id" {
+  description = "Required tags policy assignment ID"
+  value       = module.required_tags_policy_assignment.id
+}

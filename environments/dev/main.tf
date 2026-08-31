@@ -609,3 +609,29 @@ module "acr_diagnostic_setting" {
     "ContainerRegistryLoginEvents"
   ]
 }
+
+
+# Policy module:
+module "required_tags_policy" {
+  source = "../../modules/governance/policy"
+
+  name         = "require-standard-tags"
+  display_name = "Require standard resource tags"
+
+  description = "Audits Azure resources that do not contain the required enterprise tags."
+}
+
+
+# Policy-assignment module:
+
+module "required_tags_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "required-tags-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = module.required_tags_policy.id
+
+  description = "Assigns the enterprise required-tags policy to the development resource group."
+}
