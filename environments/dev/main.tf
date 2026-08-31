@@ -558,3 +558,66 @@ module "log_analytics" {
     }
   )
 }
+
+
+# Log-analytics-diag-settings-kv module:
+
+module "key_vault_diagnostic_setting" {
+  source = "../../modules/monitoring/diagnostic-setting"
+
+  name = "diag-keyvault"
+
+  target_resource_id         = module.key_vault.id
+  log_analytics_workspace_id = module.log_analytics.id
+
+  enabled_logs = [
+    "AuditEvent"
+  ]
+
+  enabled_metrics = [
+    "AllMetrics"
+  ]
+}
+
+
+# Log-analytics-diag-settings-stg module:
+
+module "storage_account_diagnostic_setting" {
+  source = "../../modules/monitoring/diagnostic-setting"
+
+  name = "diag-storage"
+
+  target_resource_id         = module.storage_account.id
+  log_analytics_workspace_id = module.log_analytics.id
+
+  enabled_logs = [
+    "StorageRead",
+    "StorageWrite",
+    "StorageDelete"
+  ]
+
+  enabled_metrics = [
+    "Transaction"
+  ]
+}
+
+
+# Log-analytics-diag-settings-acr module:
+
+module "acr_diagnostic_setting" {
+  source = "../../modules/monitoring/diagnostic-setting"
+
+  name = "diag-acr"
+
+  target_resource_id         = module.container_registry.id
+  log_analytics_workspace_id = module.log_analytics.id
+
+  enabled_logs = [
+    "ContainerRegistryRepositoryEvents",
+    "ContainerRegistryLoginEvents"
+  ]
+
+  enabled_metrics = [
+    "AllMetrics"
+  ]
+}
