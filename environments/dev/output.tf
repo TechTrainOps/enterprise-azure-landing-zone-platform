@@ -420,10 +420,10 @@ output "key_vault_diagnostic_setting_id" {
   value       = module.key_vault_diagnostic_setting.id
 }
 
-# output "storage_account_diagnostic_setting_id" {
-#   description = "Storage Account diagnostic setting ID"
-#   value       = module.storage_account_diagnostic_setting.id
-# }
+output "storage_account_diagnostic_setting_id" {
+  description = "Storage Account Blob diagnostic setting ID"
+  value       = module.storage_account_diagnostic_setting.id
+}
 
 output "acr_diagnostic_setting_id" {
   description = "ACR diagnostic setting ID"

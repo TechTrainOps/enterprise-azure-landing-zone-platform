@@ -23,3 +23,8 @@ output "primary_access_key" {
   value       = azurerm_storage_account.storage_account.primary_access_key
   sensitive   = true
 }
+
+output "blob_service_id" {
+  description = "Blob service resource ID"
+  value       = "${azurerm_storage_account.storage_account.id}/blobServices/default"
+}
