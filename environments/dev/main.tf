@@ -609,6 +609,7 @@ module "acr_diagnostic_setting" {
     "ContainerRegistryRepositoryEvents",
     "ContainerRegistryLoginEvents"
   ]
+  enabled_metrics = []
 }
 
 
