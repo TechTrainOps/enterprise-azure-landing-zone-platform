@@ -383,3 +383,13 @@ output "acr_private_endpoint_id" {
   description = "ACR Private Endpoint ID"
   value       = module.acr_private_endpoint.id
 }
+
+output "acr_pipeline_role_assignment_id" {
+  description = "RBAC role assignment ID for the pipeline service principal on ACR"
+  value       = module.acr_pipeline_role_assignment.id
+}
+
+output "acr_pipeline_role_assignment_role" {
+  description = "RBAC role assigned to the pipeline service principal on ACR"
+  value       = module.acr_pipeline_role_assignment.role_definition_name
+}

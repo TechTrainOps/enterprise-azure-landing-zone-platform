@@ -527,3 +527,14 @@ module "acr_private_endpoint" {
     }
   )
 }
+
+
+# ACR RBAC module:
+
+module "acr_pipeline_role_assignment" {
+  source = "../../modules/security/key-vault-role-assignment"
+
+  scope                = module.container_registry.id
+  role_definition_name = "AcrPush"
+  principal_id         = var.pipeline_service_principal_object_id
+}
