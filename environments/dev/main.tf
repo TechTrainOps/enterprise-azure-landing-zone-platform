@@ -538,3 +538,23 @@ module "acr_pipeline_role_assignment" {
   role_definition_name = "AcrPush"
   principal_id         = var.pipeline_service_principal_object_id
 }
+
+
+# Log Analytics module:
+
+module "log_analytics" {
+  source = "../../modules/monitoring/log-analytics"
+
+  name                = var.log_analytics_workspace_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  retention_in_days = var.log_analytics_retention_in_days
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "log-analytics"
+    }
+  )
+}

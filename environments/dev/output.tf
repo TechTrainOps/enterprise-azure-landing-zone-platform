@@ -393,3 +393,21 @@ output "acr_pipeline_role_assignment_role" {
   description = "RBAC role assigned to the pipeline service principal on ACR"
   value       = module.acr_pipeline_role_assignment.role_definition_name
 }
+
+
+# Log Analytics outputs:
+
+output "log_analytics_workspace_id" {
+  description = "Log Analytics Workspace resource ID"
+  value       = module.log_analytics.id
+}
+
+output "log_analytics_workspace_name" {
+  description = "Log Analytics Workspace name"
+  value       = module.log_analytics.name
+}
+
+output "log_analytics_workspace_id_value" {
+  description = "Log Analytics Workspace ID"
+  value       = module.log_analytics.workspace_id
+}

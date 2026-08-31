@@ -596,3 +596,17 @@ variable "acr_private_dns_zone_name" {
   type        = string
   default     = "privatelink.azurecr.io"
 }
+
+
+# Log-Analytics vars:
+
+variable "log_analytics_workspace_name" {
+  description = "Name of the Log Analytics Workspace"
+  type        = string
+}
+
+variable "log_analytics_retention_in_days" {
+  description = "Log Analytics retention period"
+  type        = number
+  default     = 30
+}

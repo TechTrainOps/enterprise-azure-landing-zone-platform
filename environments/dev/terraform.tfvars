@@ -263,3 +263,11 @@ container_registry_public_network_access_enabled = false
 container_registry_anonymous_pull_enabled = false
 
 acr_private_dns_zone_name = "privatelink.azurecr.io"
+
+
+
+# Log-Analytics Tfvars:
+
+log_analytics_workspace_name = "law-ealz-dev-eastus2-001"
+
+log_analytics_retention_in_days = 30
