@@ -8,7 +8,7 @@ resource "azurerm_storage_account" "storage_account" {
 
   access_tier = var.access_tier
 
-  enable_https_traffic_only = var.enable_https_traffic_only
+  https_traffic_only_enabled = var.https_traffic_only_enabled
   min_tls_version            = var.min_tls_version
 
   public_network_access_enabled = var.public_network_access_enabled

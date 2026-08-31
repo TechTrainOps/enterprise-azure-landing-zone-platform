@@ -37,10 +37,9 @@ variable "access_tier" {
   default     = "Hot"
 }
 
-variable "enable_https_traffic_only" {
-  description = "Require HTTPS traffic"
-  type        = bool
-  default     = true
+variable "https_traffic_only_enabled" {
+  type    = bool
+  default = true
 }
 
 variable "min_tls_version" {

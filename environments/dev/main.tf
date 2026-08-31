@@ -339,7 +339,7 @@ module "storage_account" {
   account_replication_type = var.storage_account_replication_type
   access_tier              = var.storage_account_access_tier
 
-  enable_https_traffic_only = var.storage_account_enable_https_traffic_only
+  https_traffic_only_enabled = var.storage_account_enable_https_traffic_only
   min_tls_version            = var.storage_account_min_tls_version
 
   public_network_access_enabled = var.storage_account_public_network_access_enabled
