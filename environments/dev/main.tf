@@ -565,14 +565,15 @@ module "log_analytics" {
 module "key_vault_diagnostic_setting" {
   source = "../../modules/monitoring/diagnostic-setting"
 
-  name = "diag-keyvault"
-
+  name                       = "diag-keyvault"
   target_resource_id         = module.key_vault.id
   log_analytics_workspace_id = module.log_analytics.id
 
-  enabled_logs = [
+  log_categories = [
     "AuditEvent"
   ]
+
+  metric_categories = []
 }
 
 
