@@ -1,7 +1,7 @@
 resource "azurerm_monitor_activity_log_alert" "alert" {
   name                = var.name
   resource_group_name = var.resource_group_name
-  location            = var.location
+  location            = "global"
   scopes              = [var.scope]
   description         = var.description
 

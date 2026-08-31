@@ -33,8 +33,3 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
-
-variable "location" {
-  description = "Azure region where the Activity Log Alert is created"
-  type        = string
-}

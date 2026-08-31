@@ -726,7 +726,6 @@ module "activity_log_alert" {
 
   name                = "alert-ealz-dev-admin-changes"
   resource_group_name = module.rg.name
-  location            = var.location
 
   scope = module.rg.id
 
