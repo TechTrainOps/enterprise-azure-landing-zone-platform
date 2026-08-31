@@ -573,10 +573,6 @@ module "key_vault_diagnostic_setting" {
   enabled_logs = [
     "AuditEvent"
   ]
-
-  enabled_metrics = [
-    "AllMetrics"
-  ]
 }
 
 
@@ -595,10 +591,6 @@ module "storage_account_diagnostic_setting" {
     "StorageWrite",
     "StorageDelete"
   ]
-
-  enabled_metrics = [
-    "Transaction"
-  ]
 }
 
 
@@ -615,9 +607,5 @@ module "acr_diagnostic_setting" {
   enabled_logs = [
     "ContainerRegistryRepositoryEvents",
     "ContainerRegistryLoginEvents"
-  ]
-
-  enabled_metrics = [
-    "AllMetrics"
   ]
 }
