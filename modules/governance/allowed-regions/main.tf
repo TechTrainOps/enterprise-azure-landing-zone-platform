@@ -1,19 +1,30 @@
-variable "name" {
-  description = "Policy definition name"
-  type        = string
-}
+resource "azurerm_policy_definition" "policy" {
+  name         = var.name
+  policy_type  = "Custom"
+  mode         = "All"
+  display_name = var.display_name
+  description  = var.description
 
-variable "display_name" {
-  description = "Policy display name"
-  type        = string
-}
+  policy_rule = jsonencode({
+    if = {
+      allOf = [
+        {
+          field = "location"
+          notIn = var.allowed_locations
+        },
+        {
+          field     = "location"
+          notEquals = "global"
+        }
+      ]
+    }
 
-variable "description" {
-  description = "Policy description"
-  type        = string
-}
+    then = {
+      effect = "audit"
+    }
+  })
 
-variable "allowed_locations" {
-  description = "Azure regions allowed for resource deployment"
-  type        = list(string)
+  metadata = jsonencode({
+    category = "Governance"
+  })
 }

@@ -12,3 +12,8 @@ variable "description" {
   description = "Policy description"
   type        = string
 }
+
+variable "allowed_locations" {
+  description = "Azure regions allowed for resource deployment"
+  type        = list(string)
+}
