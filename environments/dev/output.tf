@@ -378,3 +378,8 @@ output "acr_private_dns_zone_link_id" {
   description = "ACR Private DNS Zone VNet Link ID"
   value       = module.acr_private_dns_zone_link.id
 }
+
+output "acr_private_endpoint_id" {
+  description = "ACR Private Endpoint ID"
+  value       = module.acr_private_endpoint.id
+}

@@ -491,3 +491,39 @@ module "acr_private_dns_zone_link" {
 
   registration_enabled = false
 }
+
+
+# ACR-pvt-endpoint module:
+
+module "acr_private_endpoint" {
+  source = "../../modules/networking/private-endpoint"
+
+  name                = "pe-ealz-dev-eastus2-acr-001"
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  subnet_id = module.subnet.id
+
+  private_service_connection_name = "psc-ealz-dev-eastus2-acr-001"
+
+  private_connection_resource_id = module.container_registry.id
+
+  is_manual_connection = false
+
+  subresource_names = [
+    "registry"
+  ]
+
+  private_dns_zone_ids = [
+    module.acr_private_dns_zone.id
+  ]
+
+  private_dns_zone_group_name = "acr-dns-zone-group"
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "private-endpoint"
+    }
+  )
+}
