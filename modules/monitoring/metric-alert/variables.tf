@@ -1,22 +1,16 @@
 variable "name" {
-  description = "Name of the diagnostic setting"
+  description = "Diagnostic setting name"
   type        = string
 }
 
 variable "target_resource_id" {
-  description = "Resource ID of the resource being monitored"
+  description = "Resource ID for the diagnostic setting"
   type        = string
 }
 
 variable "log_analytics_workspace_id" {
-  description = "Log Analytics Workspace resource ID"
+  description = "Log Analytics workspace ID"
   type        = string
-}
-
-variable "enabled_logs" {
-  description = "Diagnostic log categories to enable"
-  type        = list(string)
-  default     = []
 }
 
 variable "log_categories" {

@@ -742,3 +742,22 @@ module "activity_log_alert" {
     }
   )
 }
+
+
+# stg-metric-alert module:
+
+data "azurerm_monitor_diagnostic_categories" "storage_account" {
+  resource_id = module.storage_account.id
+}
+
+module "storage_account_diagnostic_setting" {
+  source = "../../modules/monitoring/diagnostic-setting"
+
+  name                       = "diag-storage"
+  target_resource_id         = module.storage_account.id
+  log_analytics_workspace_id = module.log_analytics.id
+
+  log_categories = []
+
+  metric_categories = data.azurerm_monitor_diagnostic_categories.storage_account.metrics
+}
