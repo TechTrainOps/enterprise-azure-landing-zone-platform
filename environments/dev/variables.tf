@@ -590,3 +590,9 @@ variable "container_registry_anonymous_pull_enabled" {
   type        = bool
   default     = false
 }
+
+variable "acr_private_dns_zone_name" {
+  description = "Private DNS zone for Azure Container Registry"
+  type        = string
+  default     = "privatelink.azurecr.io"
+}

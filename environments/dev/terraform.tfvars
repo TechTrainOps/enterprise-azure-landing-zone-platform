@@ -261,3 +261,5 @@ container_registry_admin_enabled = false
 container_registry_public_network_access_enabled = false
 
 container_registry_anonymous_pull_enabled = false
+
+acr_private_dns_zone_name = "privatelink.azurecr.io"

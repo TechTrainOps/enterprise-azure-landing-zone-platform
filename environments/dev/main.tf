@@ -461,3 +461,20 @@ module "container_registry" {
     }
   )
 }
+
+
+# ACR-pvt-dns-zone
+
+module "acr_private_dns_zone" {
+  source = "../../modules/networking/private-dns-zone"
+
+  name                = var.acr_private_dns_zone_name
+  resource_group_name = module.rg.name
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "private-dns-zone"
+    }
+  )
+}

@@ -368,3 +368,8 @@ output "container_registry_login_server" {
   description = "Container Registry login server"
   value       = module.container_registry.login_server
 }
+
+output "acr_private_dns_zone_id" {
+  description = "Private DNS Zone ID for Azure Container Registry"
+  value       = module.acr_private_dns_zone.id
+}
