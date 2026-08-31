@@ -9,23 +9,23 @@ resource "azurerm_policy_definition" "policy" {
     if = {
       anyOf = [
         {
-          field = "tags['Environment']"
+          field  = "tags['Environment']"
           exists = "false"
         },
         {
-          field = "tags['ManagedBy']"
+          field  = "tags['ManagedBy']"
           exists = "false"
         },
         {
-          field = "tags['Owner']"
+          field  = "tags['Owner']"
           exists = "false"
         },
         {
-          field = "tags['Project']"
+          field  = "tags['Project']"
           exists = "false"
         },
         {
-          field = "tags['ResourceType']"
+          field  = "tags['ResourceType']"
           exists = "false"
         }
       ]

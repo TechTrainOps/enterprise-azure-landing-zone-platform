@@ -635,3 +635,33 @@ module "required_tags_policy_assignment" {
 
   description = "Assigns the enterprise required-tags policy to the development resource group."
 }
+
+
+
+# governance-allowed-region module:
+
+module "allowed_regions_policy" {
+  source = "../../modules/governance/allowed-regions"
+
+  name         = "allowed-azure-regions"
+  display_name = "Allowed Azure regions"
+
+  description = "Audits resources deployed outside the approved Azure regions."
+
+  allowed_locations = var.allowed_azure_locations
+}
+
+
+# governance-allowed-region policy assignment module:
+
+module "allowed_regions_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "allowed-regions-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = module.allowed_regions_policy.id
+
+  description = "Assigns the allowed Azure regions policy to the development resource group."
+}

@@ -271,3 +271,10 @@ acr_private_dns_zone_name = "privatelink.azurecr.io"
 log_analytics_workspace_name = "law-ealz-dev-eastus2-001"
 
 log_analytics_retention_in_days = 30
+
+
+# governance-allowed-region Tfvars:
+
+allowed_azure_locations = [
+  "eastus2"
+]

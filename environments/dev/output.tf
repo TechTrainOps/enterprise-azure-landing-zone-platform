@@ -442,3 +442,13 @@ output "required_tags_policy_assignment_id" {
   description = "Required tags policy assignment ID"
   value       = module.required_tags_policy_assignment.id
 }
+
+output "allowed_regions_policy_id" {
+  description = "Allowed Azure regions policy definition ID"
+  value       = module.allowed_regions_policy.id
+}
+
+output "allowed_regions_policy_assignment_id" {
+  description = "Allowed Azure regions policy assignment ID"
+  value       = module.allowed_regions_policy_assignment.id
+}

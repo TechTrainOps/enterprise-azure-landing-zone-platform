@@ -610,3 +610,11 @@ variable "log_analytics_retention_in_days" {
   type        = number
   default     = 30
 }
+
+
+# governance-allowed-region vars:
+
+variable "allowed_azure_locations" {
+  description = "Azure regions allowed for the development environment"
+  type        = list(string)
+}
