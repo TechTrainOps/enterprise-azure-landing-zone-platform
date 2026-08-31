@@ -578,20 +578,20 @@ module "key_vault_diagnostic_setting" {
 
 # Log-analytics-diag-settings-stg module:
 
-module "storage_account_diagnostic_setting" {
-  source = "../../modules/monitoring/diagnostic-setting"
+# module "storage_account_diagnostic_setting" {
+#   source = "../../modules/monitoring/diagnostic-setting"
 
-  name = "diag-storage"
+#   name = "diag-storage"
 
-  target_resource_id         = module.storage_account.id
-  log_analytics_workspace_id = module.log_analytics.id
+#   target_resource_id         = module.storage_account.id
+#   log_analytics_workspace_id = module.log_analytics.id
 
-  enabled_logs = [
-    "StorageRead",
-    "StorageWrite",
-    "StorageDelete"
-  ]
-}
+#   enabled_logs = [
+#     "StorageRead",
+#     "StorageWrite",
+#     "StorageDelete"
+#   ]
+# }
 
 
 # Log-analytics-diag-settings-acr module:
