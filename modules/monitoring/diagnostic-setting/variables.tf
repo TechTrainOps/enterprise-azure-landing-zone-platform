@@ -30,3 +30,9 @@ variable "metric_categories" {
   type        = list(string)
   default     = []
 }
+
+variable "enabled_metrics" {
+  description = "Diagnostic metric categories"
+  type        = list(string)
+  default     = []
+}
