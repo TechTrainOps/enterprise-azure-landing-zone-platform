@@ -768,8 +768,8 @@ module "storage_account_metric_alert" {
   operator    = "GreaterThan"
   threshold   = 107374182400
 
-  frequency   = "PT5M"
-  window_size = "PT15M"
+  frequency   = "PT1H"
+  window_size = "PT1H"
 
   severity = 2
 
