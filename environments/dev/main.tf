@@ -782,3 +782,41 @@ module "storage_account_metric_alert" {
     }
   )
 }
+
+
+
+# ACR metric alert module:
+
+module "acr_metric_alert" {
+  source = "../../modules/monitoring/metric-alert"
+
+  name                = "alert-ealz-dev-acr-requests"
+  resource_group_name = module.rg.name
+
+  scopes = [
+    module.container_registry.id
+  ]
+
+  description = "Alerts when ACR request count exceeds the configured threshold."
+
+  metric_namespace = "Microsoft.ContainerRegistry/registries"
+  metric_name      = "TotalPullCount"
+
+  aggregation = "Total"
+  operator    = "GreaterThan"
+  threshold   = 1000
+
+  frequency   = "PT5M"
+  window_size = "PT15M"
+
+  severity = 2
+
+  action_group_id = module.monitor_action_group.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "metric-alert"
+    }
+  )
+}
