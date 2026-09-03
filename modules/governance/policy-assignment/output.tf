@@ -10,5 +10,5 @@ output "name" {
 
 output "principal_id" {
   description = "Principal ID of the policy assignment managed identity"
-  value = var.enable_identity ? azurerm_resource_group_policy_assignment.assignment.identity[0].principal_id : null
+  value       = var.enable_identity ? azurerm_resource_group_policy_assignment.assignment.identity[0].principal_id : null
 }

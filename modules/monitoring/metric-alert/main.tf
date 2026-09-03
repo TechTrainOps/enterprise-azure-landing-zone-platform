@@ -5,8 +5,8 @@ resource "azurerm_monitor_metric_alert" "metric_alert" {
   scopes      = var.scopes
   description = var.description
 
-  severity    = var.severity
-  enabled     = var.enabled
+  severity      = var.severity
+  enabled       = var.enabled
   auto_mitigate = var.auto_mitigate
 
   frequency   = var.frequency

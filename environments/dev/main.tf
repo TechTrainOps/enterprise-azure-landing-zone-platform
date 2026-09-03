@@ -950,3 +950,75 @@ module "key_vault_diagnostic_policy_log_analytics_role" {
 
 
 
+# Storage Account diagnostic policy
+
+data "azurerm_policy_definition" "storage_account_diagnostic_settings" {
+  name = "6f8f98a4-f108-47cb-8e98-91a0d85cd474"
+}
+
+module "storage_account_diagnostic_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "assign-ealz-dev-storage-diagnostics"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.storage_account_diagnostic_settings.id
+
+  description = "Deploys Storage Account diagnostic settings to the enterprise Log Analytics workspace."
+
+  display_name = "Deploy Storage Account diagnostic settings"
+
+  location = var.location
+
+  enable_identity = true
+
+  parameters = jsonencode({
+    effect = {
+      value = "DeployIfNotExists"
+    }
+
+    logAnalytics = {
+      value = module.log_analytics.id
+    }
+  })
+
+  depends_on = [
+    module.log_analytics
+  ]
+}
+
+
+# STG-monitoring-assignment:
+
+module "storage_account_diagnostic_policy_monitoring_role" {
+  source = "../../modules/security/key-vault-role-assignment"
+
+  scope = module.rg.id
+
+  role_definition_name = "Monitoring Contributor"
+
+  principal_id = module.storage_account_diagnostic_policy_assignment.principal_id
+
+  depends_on = [
+    module.storage_account_diagnostic_policy_assignment
+  ]
+}
+
+
+# STG-diag-log-analytics-assignment:
+
+module "storage_account_diagnostic_policy_log_analytics_role" {
+  source = "../../modules/security/key-vault-role-assignment"
+
+  scope = module.log_analytics.id
+
+  role_definition_name = "Log Analytics Contributor"
+
+  principal_id = module.storage_account_diagnostic_policy_assignment.principal_id
+
+  depends_on = [
+    module.storage_account_diagnostic_policy_assignment,
+    module.log_analytics
+  ]
+}
