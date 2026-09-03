@@ -857,3 +857,55 @@ module "key_vault_metric_alert" {
     }
   )
 }
+
+
+# KV policy module:
+
+data "azurerm_policy_definition" "key_vault_diagnostic_settings" {
+  name = "bef3f64c-5290-43b7-85b0-9b254eef4c47"
+}
+
+
+module "key_vault_diagnostic_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "assign-ealz-dev-kv-diagnostics"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.key_vault_diagnostic_settings.id
+
+  description = "Deploys Key Vault diagnostic settings to the enterprise Log Analytics workspace."
+
+  display_name = "Deploy Key Vault diagnostic settings"
+
+  location = var.location
+
+  enable_identity = true
+
+  parameters = jsonencode({
+    effect = {
+      value = "DeployIfNotExists"
+    }
+
+    profileName = {
+      value = "diag-policy-keyvault"
+    }
+
+    logAnalytics = {
+      value = module.log_analytics.id
+    }
+
+    metricsEnabled = {
+      value = "False"
+    }
+
+    logsEnabled = {
+      value = "True"
+    }
+  })
+
+  depends_on = [
+    module.log_analytics
+  ]
+}
