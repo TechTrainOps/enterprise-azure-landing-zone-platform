@@ -1022,3 +1022,69 @@ module "storage_account_diagnostic_policy_log_analytics_role" {
     module.log_analytics
   ]
 }
+
+
+# ACR diagnostic policy
+data "azurerm_policy_definition" "acr_diagnostic_settings" {
+  name = "56288eb2-4350-461d-9ece-2bb242269dce"
+}
+
+module "acr_diagnostic_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "assign-ealz-dev-acr-diagnostics"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.acr_diagnostic_settings.id
+
+  description = "Deploys ACR diagnostic settings to the enterprise Log Analytics workspace."
+
+  display_name = "Deploy ACR diagnostic settings"
+
+  location = var.location
+
+  enable_identity = true
+
+  parameters = jsonencode({
+    effect = {
+      value = "DeployIfNotExists"
+    }
+
+    categoryGroup = {
+      value = "allLogs"
+    }
+
+    diagnosticSettingName = {
+      value = "diag-policy-acr"
+    }
+
+    logAnalytics = {
+      value = module.log_analytics.id
+    }
+
+    resourceLocationList = {
+      value = [
+        "*"
+      ]
+    }
+  })
+
+  depends_on = [
+    module.log_analytics
+  ]
+}
+
+
+# ACR diagnostic policy identity role assignment
+module "acr_diagnostic_policy_log_analytics_role_assignment" {
+  source = "../../modules/security/key-vault-role-assignment"
+
+  scope                = module.log_analytics.id
+  role_definition_name = "Log Analytics Contributor"
+  principal_id         = module.acr_diagnostic_policy_assignment.principal_id
+
+  depends_on = [
+    module.acr_diagnostic_policy_assignment
+  ]
+}
