@@ -820,3 +820,40 @@ module "acr_metric_alert" {
     }
   )
 }
+
+
+# KV metric alert module:
+
+module "key_vault_metric_alert" {
+  source = "../../modules/monitoring/metric-alert"
+
+  name                = "alert-ealz-dev-keyvault-requests"
+  resource_group_name = module.rg.name
+
+  scopes = [
+    module.key_vault.id
+  ]
+
+  description = "Alerts when Key Vault request volume exceeds the configured threshold."
+
+  metric_namespace = "Microsoft.KeyVault/vaults"
+  metric_name      = "ServiceApiHit"
+
+  aggregation = "Total"
+  operator    = "GreaterThan"
+  threshold   = 1000
+
+  frequency   = "PT5M"
+  window_size = "PT15M"
+
+  severity = 2
+
+  action_group_id = module.monitor_action_group.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "metric-alert"
+    }
+  )
+}
