@@ -325,6 +325,7 @@ module "key_vault_pipeline_role_assignment" {
   principal_id         = var.pipeline_service_principal_object_id
 }
 
+
 # storage account module:
 
 module "storage_account" {
@@ -909,3 +910,43 @@ module "key_vault_diagnostic_policy_assignment" {
     module.log_analytics
   ]
 }
+
+
+# key-vault-monitoring-assignment:
+
+
+module "key_vault_diagnostic_policy_monitoring_role" {
+  source = "../../modules/security/key-vault-role-assignment"
+
+  scope = module.rg.id
+
+  role_definition_name = "Monitoring Contributor"
+
+  principal_id = module.key_vault_diagnostic_policy_assignment.principal_id
+
+  depends_on = [
+    module.key_vault_diagnostic_policy_assignment
+  ]
+}
+
+
+
+# KV diag-log-analytics module:
+
+module "key_vault_diagnostic_policy_log_analytics_role" {
+  source = "../../modules/security/key-vault-role-assignment"
+
+  scope = module.log_analytics.id
+
+  role_definition_name = "Log Analytics Contributor"
+
+  principal_id = module.key_vault_diagnostic_policy_assignment.principal_id
+
+  depends_on = [
+    module.key_vault_diagnostic_policy_assignment,
+    module.log_analytics
+  ]
+}
+
+
+
