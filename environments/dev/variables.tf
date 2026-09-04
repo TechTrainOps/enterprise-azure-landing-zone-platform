@@ -676,27 +676,6 @@ variable "availability_set_name" {
   type        = string
 }
 
-variable "linux_vm_name" {
-  description = "Linux VM name"
-  type        = string
-}
-
-variable "linux_vm_size" {
-  description = "Linux VM size"
-  type        = string
-  default     = "Standard_D2s_v5"
-}
-
-variable "linux_vm_admin_username" {
-  description = "Linux VM administrator username"
-  type        = string
-}
-
-variable "linux_vm_admin_ssh_public_key" {
-  description = "Linux VM administrator SSH public key"
-  type        = string
-}
-
 variable "windows_vm_name" {
   description = "Windows VM name"
   type        = string
