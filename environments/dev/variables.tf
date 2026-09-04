@@ -690,6 +690,7 @@ variable "windows_vm_size" {
 variable "windows_vm_admin_username" {
   description = "Windows VM administrator username"
   type        = string
+  sensitive   = true
 }
 
 variable "windows_vm_admin_password" {

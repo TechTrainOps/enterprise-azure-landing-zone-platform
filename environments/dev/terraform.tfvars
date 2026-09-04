@@ -301,6 +301,8 @@ windows_vm_size = "Standard_D2s_v5"
 
 windows_vm_admin_username = "azureadmin"
 
+windows_vm_admin_password = "pass@1234"
+
 managed_disk_name = "disk-ealz-dev-eastus2-001"
 
 managed_disk_size_gb = 64
