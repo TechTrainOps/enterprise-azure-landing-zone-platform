@@ -280,7 +280,7 @@ monitor_alert_email             = "shakirshah@microsoft.com"
 
 linux_vm_name = "vm-ealz-dev-eastus2-001"
 
-linux_vm_size = "Standard_D2s_v5"
+linux_vm_size = "Standard_B2s"
 
 linux_vm_admin_username = "linuxadmin"
 

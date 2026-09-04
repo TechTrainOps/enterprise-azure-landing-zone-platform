@@ -32,14 +32,15 @@ resource "azurerm_linux_virtual_machine_scale_set" "linux_vmss" {
   }
 
   network_interface {
-    name = "${var.name}-nic"
+  name    = "${var.name}-nic"
+  primary = true
 
-    ip_configuration {
-      name      = "internal"
-      primary   = true
-      subnet_id = var.subnet_id
-    }
+  ip_configuration {
+    name      = "internal"
+    primary   = true
+    subnet_id = var.subnet_id
   }
+}
 
   tags = var.tags
 }

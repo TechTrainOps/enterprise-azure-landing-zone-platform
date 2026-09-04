@@ -23,6 +23,8 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
   resource_group_name = var.resource_group_name
   size                = var.size
 
+  computer_name = "win-ealz-dev-001"
+
   admin_username = var.admin_username
   admin_password = var.admin_password
 
