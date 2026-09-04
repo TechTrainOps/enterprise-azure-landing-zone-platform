@@ -1088,3 +1088,85 @@ module "acr_diagnostic_policy_log_analytics_role_assignment" {
     module.acr_diagnostic_policy_assignment
   ]
 }
+
+
+# ============================================================
+# ACR Security Governance
+# ============================================================
+
+# ACR public network access policy
+data "azurerm_policy_definition" "acr_public_network_access" {
+  name = "0fdf0491-d080-4575-b627-ad0e843cba0f"
+}
+
+module "acr_public_network_access_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "acr-public-network-access-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.acr_public_network_access.id
+
+  description = "Audits Azure Container Registries that allow public network access."
+
+  display_name = "Audit ACR public network access"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
+
+
+# ACR local admin account policy
+data "azurerm_policy_definition" "acr_local_admin_disabled" {
+  name = "dc921057-6b28-4fbe-9b83-f7bec05db6c2"
+}
+
+module "acr_local_admin_disabled_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "acr-local-admin-disabled-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.acr_local_admin_disabled.id
+
+  description = "Audits Azure Container Registries where the local admin account is enabled."
+
+  display_name = "Audit ACR local admin account"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
+
+
+# ACR private link policy
+data "azurerm_policy_definition" "acr_private_link" {
+  name = "e8eef0a8-67cf-4eb4-9386-14b0e78733d4"
+}
+
+module "acr_private_link_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "acr-private-link-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.acr_private_link.id
+
+  description = "Audits Azure Container Registries that do not use an approved private endpoint."
+
+  display_name = "Audit ACR private link"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
