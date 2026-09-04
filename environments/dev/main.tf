@@ -1507,3 +1507,33 @@ module "subnet_nsg_association_policy_assignment" {
     }
   })
 }
+
+
+
+# ============================================================
+# Virtual Network Flow Log Governance
+# ============================================================
+
+data "azurerm_policy_definition" "vnet_flow_logs" {
+  name = "4c3c6c5f-0d47-4402-99b8-aa543dd8bcee"
+}
+
+module "vnet_flow_logs_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "vnet-flow-logs-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.vnet_flow_logs.id
+
+  description = "Audits virtual networks that do not have flow logging configured."
+
+  display_name = "Audit VNet flow logs"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
