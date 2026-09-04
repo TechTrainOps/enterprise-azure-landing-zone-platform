@@ -1170,3 +1170,186 @@ module "acr_private_link_policy_assignment" {
     }
   })
 }
+
+
+# ============================================================
+# Storage Account Security Governance
+# ============================================================
+
+
+# ------------------------------------------------------------
+# Storage Account - Secure Transfer / HTTPS
+# ------------------------------------------------------------
+
+data "azurerm_policy_definition" "storage_secure_transfer" {
+  name = "404c3081-a854-4457-ae30-26a93ef643f9"
+}
+
+module "storage_secure_transfer_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "storage-secure-transfer-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.storage_secure_transfer.id
+
+  description = "Audits Storage Accounts that do not require secure HTTPS transfer."
+
+  display_name = "Audit Storage secure transfer"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
+
+
+# ------------------------------------------------------------
+# Storage Account - Minimum TLS Version
+# ------------------------------------------------------------
+
+data "azurerm_policy_definition" "storage_minimum_tls" {
+  name = "fe83a0eb-a853-422d-aac2-1bffd182c5d0"
+}
+
+module "storage_minimum_tls_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "storage-minimum-tls-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.storage_minimum_tls.id
+
+  description = "Audits Storage Accounts that do not use TLS 1.2 or the configured minimum TLS version."
+
+  display_name = "Audit Storage minimum TLS version"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+
+    minimumTlsVersion = {
+      value = "TLS1_2"
+    }
+  })
+}
+
+
+# ------------------------------------------------------------
+# Storage Account - Public Network Access
+# ------------------------------------------------------------
+
+data "azurerm_policy_definition" "storage_public_network_access" {
+  name = "b2982f36-99f2-4db5-8eff-283140c09693"
+}
+
+module "storage_public_network_access_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "storage-public-network-access-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.storage_public_network_access.id
+
+  description = "Audits Storage Accounts that allow public network access."
+
+  display_name = "Audit Storage public network access"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
+
+
+# ------------------------------------------------------------
+# Storage Account - Public Blob Access
+# ------------------------------------------------------------
+
+data "azurerm_policy_definition" "storage_blob_public_access" {
+  name = "4fa4b6c0-31ca-4c0d-b10d-24b96f62a751"
+}
+
+module "storage_blob_public_access_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "storage-blob-public-access-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.storage_blob_public_access.id
+
+  description = "Audits Storage Accounts that allow public access to blobs."
+
+  display_name = "Audit Storage blob public access"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
+
+
+# ------------------------------------------------------------
+# Storage Account - Shared Key Access
+# ------------------------------------------------------------
+
+data "azurerm_policy_definition" "storage_shared_key_access" {
+  name = "fd9903f1-38c2-4d36-8e44-5c1c20c561e8"
+}
+
+module "storage_shared_key_access_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "storage-shared-key-access-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.storage_shared_key_access.id
+
+  description = "Audits Storage Accounts that allow Shared Key authorization."
+
+  display_name = "Audit Storage shared key access"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
+
+
+# ------------------------------------------------------------
+# Storage Account - Private Link
+# ------------------------------------------------------------
+
+data "azurerm_policy_definition" "storage_private_link" {
+  name = "6edd7eda-6dd8-40f7-810d-67160c639cd9"
+}
+
+module "storage_private_link_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "storage-private-link-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.storage_private_link.id
+
+  description = "Audits Storage Accounts that do not have an approved private endpoint."
+
+  display_name = "Audit Storage private link"
+
+  parameters = jsonencode({
+    effect = {
+      value = "AuditIfNotExists"
+    }
+  })
+}
