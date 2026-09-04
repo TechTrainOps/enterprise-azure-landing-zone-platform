@@ -1353,3 +1353,124 @@ module "storage_private_link_policy_assignment" {
     }
   })
 }
+
+
+# ============================================================
+# Key Vault Security Governance
+# ============================================================
+
+
+# ------------------------------------------------------------
+# Key Vault - RBAC Permission Model
+# ------------------------------------------------------------
+
+data "azurerm_policy_definition" "key_vault_rbac" {
+  name = "12d4fa5e-1f9f-4c21-97a9-b99b3c6611b5"
+}
+
+module "key_vault_rbac_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "key-vault-rbac-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.key_vault_rbac.id
+
+  description = "Audits Key Vaults that do not use the Azure RBAC permission model."
+
+  display_name = "Audit Key Vault RBAC permission model"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
+
+
+# ------------------------------------------------------------
+# Key Vault - Public Network Access
+# ------------------------------------------------------------
+
+data "azurerm_policy_definition" "key_vault_public_network_access" {
+  name = "405c5871-3e91-4644-8a63-58e19d68ff5b"
+}
+
+module "key_vault_public_network_access_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "key-vault-public-network-access-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.key_vault_public_network_access.id
+
+  description = "Audits Key Vaults that allow public network access."
+
+  display_name = "Audit Key Vault public network access"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
+
+
+# ------------------------------------------------------------
+# Key Vault - Purge Protection
+# ------------------------------------------------------------
+
+data "azurerm_policy_definition" "key_vault_purge_protection" {
+  name = "0b60c0b2-2dc2-4e1c-b5c9-abbed971de53"
+}
+
+module "key_vault_purge_protection_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "key-vault-purge-protection-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.key_vault_purge_protection.id
+
+  description = "Audits Key Vaults that do not have purge protection enabled."
+
+  display_name = "Audit Key Vault purge protection"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
+
+
+# ------------------------------------------------------------
+# Key Vault - Soft Delete
+# ------------------------------------------------------------
+
+data "azurerm_policy_definition" "key_vault_soft_delete" {
+  name = "1e66c121-a66a-4b1f-9b83-0fd99bf0fc2d"
+}
+
+module "key_vault_soft_delete_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "key-vault-soft-delete-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.key_vault_soft_delete.id
+
+  description = "Audits Key Vaults that do not have soft delete enabled."
+
+  display_name = "Audit Key Vault soft delete"
+
+  parameters = jsonencode({
+    effect = {
+      value = "Audit"
+    }
+  })
+}
