@@ -1474,3 +1474,36 @@ module "key_vault_soft_delete_policy_assignment" {
     }
   })
 }
+
+
+# ============================================================
+# Network Security Governance
+# ============================================================
+
+# ------------------------------------------------------------
+# Subnets - Network Security Group Association
+# ------------------------------------------------------------
+
+data "azurerm_policy_definition" "subnet_nsg_association" {
+  name = "e71308d3-144b-4262-b144-efdc3cc90517"
+}
+
+module "subnet_nsg_association_policy_assignment" {
+  source = "../../modules/governance/policy-assignment"
+
+  name = "subnet-nsg-association-dev"
+
+  resource_group_id = module.rg.id
+
+  policy_definition_id = data.azurerm_policy_definition.subnet_nsg_association.id
+
+  description = "Audits subnets that are not associated with a Network Security Group."
+
+  display_name = "Audit subnet NSG association"
+
+  parameters = jsonencode({
+    effect = {
+      value = "AuditIfNotExists"
+    }
+  })
+}
