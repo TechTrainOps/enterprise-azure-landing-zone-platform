@@ -273,3 +273,42 @@ managed_identity_name = "id-ealz-dev-eastus2-001"
 monitor_action_group_name       = "ag-ealz-dev-eastus2-001"
 monitor_action_group_short_name = "ealz-dev"
 monitor_alert_email             = "shakirshah@microsoft.com"
+
+
+
+# Linux-vm-tfvars:
+
+linux_vm_name = "vm-ealz-dev-eastus2-001"
+
+linux_vm_size = "Standard_D2s_v5"
+
+linux_vm_admin_username = "linuxadmin"
+
+linux_vm_admin_ssh_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKMiTgSmASLiC8hP5uaEfVZsc5VBIYXhafbjgfYAcuwm ealz-dev-linux-vm"
+
+
+
+# Availability Set
+
+availability_set_name = "availset-ealz-dev-eastus2-001"
+
+
+# windows-vm Tfvars
+
+windows_vm_name = "vm-windows-ealz-dev-eastus2-001"
+
+windows_vm_size = "Standard_D2s_v5"
+
+windows_vm_admin_username = "azureadmin"
+
+managed_disk_name = "disk-ealz-dev-eastus2-001"
+
+managed_disk_size_gb = 64
+
+vm_extension_name = "ama-linux"
+
+vmss_name = "vmss-ealz-dev-eastus2-001"
+
+vmss_sku = "Standard_D2s_v5"
+
+vmss_instances = 2

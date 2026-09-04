@@ -488,3 +488,46 @@ output "activity_log_alert_id" {
   description = "Activity Log alert ID"
   value       = module.activity_log_alert.id
 }
+
+
+# compute outputs:
+
+output "availability_set_id" {
+  description = "Availability set resource ID"
+  value       = module.availability_set.id
+}
+
+output "linux_vm_id" {
+  description = "Linux VM resource ID"
+  value       = module.linux_virtual_machine.id
+}
+
+output "linux_vm_private_ip" {
+  description = "Linux VM private IP address"
+  value       = module.linux_virtual_machine.private_ip_address
+}
+
+output "windows_vm_id" {
+  description = "Windows VM resource ID"
+  value       = module.windows_virtual_machine.id
+}
+
+output "windows_vm_private_ip" {
+  description = "Windows VM private IP address"
+  value       = module.windows_virtual_machine.private_ip_address
+}
+
+output "managed_disk_id" {
+  description = "Managed disk resource ID"
+  value       = module.managed_disk.id
+}
+
+output "vmss_id" {
+  description = "Linux VMSS resource ID"
+  value       = module.linux_virtual_machine_scale_set.id
+}
+
+output "vmss_principal_id" {
+  description = "Linux VMSS managed identity principal ID"
+  value       = module.linux_virtual_machine_scale_set.principal_id
+}

@@ -1568,3 +1568,135 @@ module "subscription_activity_log_diagnostic_setting" {
 
   enabled_metrics = []
 }
+
+
+
+# ============================================================
+# COMPUTE
+# ============================================================
+
+module "availability_set" {
+  source = "../../modules/compute/availability-set"
+
+  name                = var.availability_set_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "availability-set"
+    }
+  )
+}
+
+
+module "linux_virtual_machine" {
+  source = "../../modules/compute/linux-virtual-machine"
+
+  name                = var.linux_vm_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  subnet_id = module.subnet.id
+
+  vm_size        = var.linux_vm_size
+  admin_username = var.linux_vm_admin_username
+
+  admin_ssh_public_key = var.linux_vm_admin_ssh_public_key
+
+  availability_set_id = module.availability_set.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "virtual-machine"
+    }
+  )
+}
+
+
+module "windows_virtual_machine" {
+  source = "../../modules/compute/windows-virtual-machine"
+
+  name                = var.windows_vm_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  subnet_id = module.subnet.id
+
+  size = var.windows_vm_size
+
+  admin_username = var.windows_vm_admin_username
+  admin_password = var.windows_vm_admin_password
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "windows-virtual-machine"
+    }
+  )
+}
+
+
+module "managed_disk" {
+  source = "../../modules/compute/managed-disk"
+
+  name                = var.managed_disk_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  disk_size_gb = var.managed_disk_size_gb
+
+  virtual_machine_id = module.linux_virtual_machine.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "managed-disk"
+    }
+  )
+}
+
+
+module "linux_vm_extension" {
+  source = "../../modules/compute/virtual-machine-extension"
+
+  name               = var.vm_extension_name
+  virtual_machine_id = module.linux_virtual_machine.id
+
+  publisher            = "Microsoft.Azure.Monitor"
+  type                 = "AzureMonitorLinuxAgent"
+  type_handler_version = "1.0"
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "vm-extension"
+    }
+  )
+}
+
+
+module "linux_virtual_machine_scale_set" {
+  source = "../../modules/compute/virtual-machine-scale-set"
+
+  name                = var.vmss_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  subnet_id = module.subnet.id
+
+  sku       = var.vmss_sku
+  instances = var.vmss_instances
+
+  admin_username       = var.linux_vm_admin_username
+  admin_ssh_public_key = var.linux_vm_admin_ssh_public_key
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "linux-vmss"
+    }
+  )
+}

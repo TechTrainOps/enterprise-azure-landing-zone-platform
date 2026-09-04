@@ -643,3 +643,111 @@ variable "monitor_alert_email" {
   description = "Email address for Azure Monitor alerts"
   type        = string
 }
+
+
+# Linux-vm-vars:
+
+variable "linux_vm_name" {
+  description = "Linux VM name"
+  type        = string
+}
+
+variable "linux_vm_size" {
+  description = "Linux VM size"
+  type        = string
+}
+
+variable "linux_vm_admin_username" {
+  description = "Linux VM administrator username"
+  type        = string
+}
+
+variable "linux_vm_admin_ssh_public_key" {
+  description = "SSH public key for Linux VM administrator"
+  type        = string
+  sensitive   = true
+}
+
+
+# Availbility-set vars:
+
+variable "availability_set_name" {
+  description = "Availability Set name"
+  type        = string
+}
+
+variable "linux_vm_name" {
+  description = "Linux VM name"
+  type        = string
+}
+
+variable "linux_vm_size" {
+  description = "Linux VM size"
+  type        = string
+  default     = "Standard_D2s_v5"
+}
+
+variable "linux_vm_admin_username" {
+  description = "Linux VM administrator username"
+  type        = string
+}
+
+variable "linux_vm_admin_ssh_public_key" {
+  description = "Linux VM administrator SSH public key"
+  type        = string
+}
+
+variable "windows_vm_name" {
+  description = "Windows VM name"
+  type        = string
+}
+
+variable "windows_vm_size" {
+  description = "Windows VM size"
+  type        = string
+  default     = "Standard_D2s_v5"
+}
+
+variable "windows_vm_admin_username" {
+  description = "Windows VM administrator username"
+  type        = string
+}
+
+variable "windows_vm_admin_password" {
+  description = "Windows VM administrator password"
+  type        = string
+  sensitive   = true
+}
+
+variable "managed_disk_name" {
+  description = "Managed data disk name"
+  type        = string
+}
+
+variable "managed_disk_size_gb" {
+  description = "Managed data disk size in GB"
+  type        = number
+  default     = 64
+}
+
+variable "vm_extension_name" {
+  description = "VM extension name"
+  type        = string
+}
+
+variable "vmss_name" {
+  description = "Linux VMSS name"
+  type        = string
+}
+
+variable "vmss_sku" {
+  description = "Linux VMSS SKU"
+  type        = string
+  default     = "Standard_D2s_v5"
+}
+
+variable "vmss_instances" {
+  description = "Linux VMSS instance count"
+  type        = number
+  default     = 2
+}
