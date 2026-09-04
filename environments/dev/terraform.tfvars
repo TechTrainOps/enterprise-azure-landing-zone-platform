@@ -108,23 +108,6 @@ nat_gateway_zones = []
 
 nsg_security_rules = {
 
-  allow_rdp = {
-    name        = "Allow-RDP"
-    priority    = 100
-    direction   = "Inbound"
-    access      = "Allow"
-    protocol    = "Tcp"
-    description = "Allow Remote Desktop access"
-
-    source_port_range = "*"
-
-    destination_port_range = "3389"
-
-    source_address_prefix = "Internet"
-
-    destination_address_prefix = "*"
-  }
-
   allow_https_inbound = {
     name        = "Allow-HTTPS-Inbound"
     priority    = 110
