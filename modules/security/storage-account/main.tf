@@ -13,6 +13,11 @@ resource "azurerm_storage_account" "storage_account" {
 
   public_network_access_enabled = var.public_network_access_enabled
 
+    network_rules {
+    default_action = "Deny"
+    bypass         = ["AzureServices"]
+  }
+
   allow_nested_items_to_be_public = var.allow_nested_items_to_be_public
   shared_access_key_enabled       = var.shared_access_key_enabled
 
