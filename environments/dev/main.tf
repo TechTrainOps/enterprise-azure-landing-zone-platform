@@ -1537,3 +1537,34 @@ module "vnet_flow_logs_policy_assignment" {
     }
   })
 }
+
+
+
+# ============================================================
+# Subscription Activity Log -> Log Analytics
+# ============================================================
+
+data "azurerm_subscription" "current" {}
+
+module "subscription_activity_log_diagnostic_setting" {
+  source = "../../modules/monitoring/diagnostic-setting"
+
+  name = "diag-subscription-activity-log"
+
+  target_resource_id = data.azurerm_subscription.current.id
+
+  log_analytics_workspace_id = module.log_analytics.id
+
+  enabled_logs = [
+    "Administrative",
+    "Security",
+    "ServiceHealth",
+    "Alert",
+    "Recommendation",
+    "Policy",
+    "ResourceHealth",
+    "Autoscale"
+  ]
+
+  enabled_metrics = []
+}
