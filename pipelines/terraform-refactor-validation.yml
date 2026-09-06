@@ -43,6 +43,10 @@ stages:
 
           - powershell: |
               terraform fmt -check -recursive
+              if ($LASTEXITCODE -ne 0) {
+                Write-Error "Terraform formatting check failed."
+                exit 1
+               }
             displayName: Terraform Format Check
             workingDirectory: '$(Build.SourcesDirectory)'
 
