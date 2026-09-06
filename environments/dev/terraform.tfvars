@@ -314,3 +314,34 @@ vmss_name = "vmss-ealz-dev-eastus2-001"
 vmss_sku = "Standard_D2als_v7"
 
 vmss_instances = 2
+
+
+
+# Azure Bastion
+bastion_name = "bas-ealz-dev-eastus2-001"
+
+bastion_sku = "Standard"
+
+bastion_subnet_name = "AzureBastionSubnet"
+
+bastion_subnet_address_prefixes = [
+  "10.10.2.0/26"
+]
+
+bastion_public_ip_name = "pip-bastion-ealz-dev-eastus2-001"
+
+bastion_public_ip_allocation_method = "Static"
+
+bastion_public_ip_sku = "Standard"
+
+bastion_public_ip_sku_tier = "Regional"
+
+bastion_copy_paste_enabled = true
+
+bastion_file_copy_enabled = true
+
+bastion_ip_connect_enabled = true
+
+bastion_shareable_link_enabled = false
+
+bastion_tunneling_enabled = true

@@ -1700,3 +1700,82 @@ module "linux_virtual_machine_scale_set" {
     }
   )
 }
+
+
+# Azure Bastion subnet
+module "bastion_subnet" {
+  source = "../../modules/networking/subnet"
+
+  name                 = var.bastion_subnet_name
+  resource_group_name  = module.rg.name
+  virtual_network_name = module.vnet.name
+
+  address_prefixes = var.bastion_subnet_address_prefixes
+
+  service_endpoints           = []
+  service_endpoint_policy_ids = []
+
+  private_endpoint_network_policies = "Disabled"
+
+  private_link_service_network_policies_enabled = true
+
+  default_outbound_access_enabled = false
+
+  delegation = null
+}
+
+
+
+# Azure Bastion Public IP
+module "bastion_public_ip" {
+  source = "../../modules/networking/public-ip"
+
+  name                = var.bastion_public_ip_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  allocation_method       = var.bastion_public_ip_allocation_method
+  sku                     = var.bastion_public_ip_sku
+  sku_tier                = var.bastion_public_ip_sku_tier
+  domain_name_label       = null
+  reverse_fqdn            = null
+  idle_timeout_in_minutes = 4
+  ip_version              = "IPv4"
+  zones                   = []
+  ip_tags                 = {}
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "bastion-public-ip"
+    }
+  )
+}
+
+
+# Azure Bastion
+module "bastion" {
+  source = "../../modules/networking/azure-bastion"
+
+  name                = var.bastion_name
+  location            = var.location
+  resource_group_name = module.rg.name
+
+  sku = var.bastion_sku
+
+  subnet_id            = module.bastion_subnet.id
+  public_ip_address_id = module.bastion_public_ip.id
+
+  copy_paste_enabled     = var.bastion_copy_paste_enabled
+  file_copy_enabled      = var.bastion_file_copy_enabled
+  ip_connect_enabled     = var.bastion_ip_connect_enabled
+  shareable_link_enabled = var.bastion_shareable_link_enabled
+  tunneling_enabled      = var.bastion_tunneling_enabled
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "bastion"
+    }
+  )
+}

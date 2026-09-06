@@ -731,3 +731,71 @@ variable "vmss_instances" {
   type        = number
   default     = 2
 }
+
+
+# Bastion Vars:
+
+variable "bastion_name" {
+  description = "Azure Bastion host name"
+  type        = string
+}
+
+variable "bastion_sku" {
+  description = "Azure Bastion SKU"
+  type        = string
+}
+
+variable "bastion_subnet_name" {
+  description = "Azure Bastion subnet name"
+  type        = string
+}
+
+variable "bastion_subnet_address_prefixes" {
+  description = "Azure Bastion subnet address prefixes"
+  type        = list(string)
+}
+
+variable "bastion_public_ip_name" {
+  description = "Azure Bastion public IP name"
+  type        = string
+}
+
+variable "bastion_public_ip_allocation_method" {
+  description = "Azure Bastion public IP allocation method"
+  type        = string
+}
+
+variable "bastion_public_ip_sku" {
+  description = "Azure Bastion public IP SKU"
+  type        = string
+}
+
+variable "bastion_public_ip_sku_tier" {
+  description = "Azure Bastion public IP SKU tier"
+  type        = string
+}
+
+variable "bastion_copy_paste_enabled" {
+  description = "Enable Bastion copy and paste"
+  type        = bool
+}
+
+variable "bastion_file_copy_enabled" {
+  description = "Enable Bastion file copy"
+  type        = bool
+}
+
+variable "bastion_ip_connect_enabled" {
+  description = "Enable Bastion IP connectivity"
+  type        = bool
+}
+
+variable "bastion_shareable_link_enabled" {
+  description = "Enable Bastion shareable links"
+  type        = bool
+}
+
+variable "bastion_tunneling_enabled" {
+  description = "Enable Bastion tunneling"
+  type        = bool
+}
