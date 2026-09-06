@@ -18,6 +18,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "scheduled_query_alert
   criteria {
     query                   = var.query
     time_aggregation_method = var.time_aggregation_method
+    metric_measure_column   = var.metric_measure_column
     threshold               = var.threshold
     operator                = var.operator
   }

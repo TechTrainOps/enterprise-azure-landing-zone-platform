@@ -83,3 +83,8 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "metric_measure_column" {
+  description = "Column containing the numeric metric value used for aggregation."
+  type        = string
+}

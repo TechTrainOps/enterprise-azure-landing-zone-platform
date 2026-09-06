@@ -2071,6 +2071,7 @@ module "linux_vm_memory_alert" {
   KQL
 
   time_aggregation_method = "Average"
+  metric_measure_column   = "MemoryUsed"
   threshold               = 85
   operator                = "GreaterThan"
 
@@ -2114,6 +2115,7 @@ module "windows_vm_memory_alert" {
   KQL
 
   time_aggregation_method = "Average"
+  metric_measure_column   = "MemoryUsed"
   threshold               = 85
   operator                = "GreaterThan"
 
@@ -2157,6 +2159,7 @@ module "linux_vm_disk_alert" {
   KQL
 
   time_aggregation_method = "Average"
+  metric_measure_column   = "FreeSpace"
   threshold               = 15
   operator                = "LessThan"
 
@@ -2199,6 +2202,7 @@ module "windows_vm_disk_alert" {
   KQL
 
   time_aggregation_method = "Average"
+  metric_measure_column   = "FreeSpace"
   threshold               = 15
   operator                = "LessThan"
 
