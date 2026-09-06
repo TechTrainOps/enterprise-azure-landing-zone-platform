@@ -1754,7 +1754,9 @@ module "bastion_public_ip" {
   idle_timeout_in_minutes = 4
   ip_version              = "IPv4"
   zones                   = []
-  ip_tags                 = {}
+  ip_tags = {
+  FirstPartyUsage = "/Unprivileged"
+}
 
   tags = merge(
     var.tags,
