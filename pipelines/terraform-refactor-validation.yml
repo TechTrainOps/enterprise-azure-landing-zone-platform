@@ -42,7 +42,7 @@ stages:
           # --------------------------------------------------
 
           - powershell: |
-              terraform fmt -check -recursive -diff
+              terraform fmt -check -recursive
             displayName: Terraform Format Check
             workingDirectory: '$(Build.SourcesDirectory)'
 
