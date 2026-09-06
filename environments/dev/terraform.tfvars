@@ -280,7 +280,7 @@ monitor_alert_email             = "shakirshah@microsoft.com"
 
 linux_vm_name = "vm-ealz-dev-eastus2-001"
 
-linux_vm_size = "Standard_B2s"
+linux_vm_size = "Standard_D2als_v7"
 
 linux_vm_admin_username = "linuxadmin"
 
@@ -297,7 +297,7 @@ availability_set_name = "availset-ealz-dev-eastus2-001"
 
 windows_vm_name = "vm-windows-ealz-dev-eastus2-001"
 
-windows_vm_size = "Standard_D2s_v5"
+windows_vm_size = "Standard_D2als_v7"
 
 windows_vm_admin_username = "azureadmin"
 
