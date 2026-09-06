@@ -40,6 +40,11 @@ stages:
             inputs:
               terraformVersion: '$(terraformVersion)'
 
+          - powershell: |
+            terraform fmt -check -recursive -diff
+            displayName: Terraform Format Check
+            workingDirectory: '$(terraformWorkingDirectory)'
+
           - task: TerraformTaskV4@4
             displayName: Terraform Init
             inputs:
