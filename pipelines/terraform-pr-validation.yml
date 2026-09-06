@@ -30,7 +30,7 @@ variables:
 
 stages:
   - stage: Validate
-    displayName: Terraform PR Validation
+    displayName: Terraform Pull Request Validation
 
     jobs:
       - job: TerraformValidation
