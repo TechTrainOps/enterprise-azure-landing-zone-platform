@@ -1,13 +1,17 @@
-trigger:
+trigger: none
+
+pr:
+  autoCancel: true
   branches:
     include:
       - main
-
-paths:
-  include:
-    - environments/dev/*
-    - modules/**
-    - pipelines/terraform-dev.yml
+  paths:
+    include:
+      - environments/dev/**
+      - modules/**
+      - shared/**
+      - pipelines/terraform-pr-validation.yml
+      - pipelines/terraform-dev.yml
 
 pool:
   name: MultiOsPool
@@ -25,12 +29,12 @@ variables:
   backendKey: 'dev.tfstate'
 
 stages:
-  - stage: Plan
-    displayName: Terraform Plan
+  - stage: Validate
+    displayName: Terraform PR Validation
 
     jobs:
-      - job: TerraformPlan
-        displayName: Terraform Plan
+      - job: TerraformValidation
+        displayName: Terraform Validate and Plan
 
         steps:
           - checkout: self
@@ -41,7 +45,7 @@ stages:
               terraformVersion: '$(terraformVersion)'
 
           - powershell: |
-            terraform fmt -check -recursive -diff
+              terraform fmt -check -recursive -diff
             displayName: Terraform Format Check
             workingDirectory: '$(terraformWorkingDirectory)'
 
@@ -58,7 +62,6 @@ stages:
               backendAzureRmContainerName: '$(backendContainer)'
               backendAzureRmKey: '$(backendKey)'
               commandOptions: '-input=false'
- 
 
           - task: TerraformTaskV4@4
             displayName: Terraform Validate
@@ -75,62 +78,22 @@ stages:
               workingDirectory: '$(terraformWorkingDirectory)'
               environmentServiceNameAzureRM: '$(serviceConnection)'
               commandOptions: '-out=tfplan -input=false'
-              
+
+          - powershell: |
+              terraform show -no-color tfplan | Out-File -FilePath tfplan.txt -Encoding utf8
+            displayName: Generate Readable Terraform Plan
+            workingDirectory: '$(terraformWorkingDirectory)'
 
           - task: PublishPipelineArtifact@1
             displayName: Publish Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan'
-              artifact: 'terraform-plan'
+              artifact: 'terraform-pr-plan'
               publishLocation: 'pipeline'
 
-  - stage: Apply
-    displayName: Terraform Apply
-    dependsOn: Plan
-    condition: succeeded()
-
-    jobs:
-      - deployment: TerraformApply
-        displayName: Terraform Apply
-        environment: 'dev'
-
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-
-                - task: TerraformInstaller@1
-                  displayName: Install Terraform
-                  inputs:
-                    terraformVersion: '$(terraformVersion)'
-
-                - task: DownloadPipelineArtifact@2
-                  displayName: Download Terraform Plan
-                  inputs:
-                    artifact: 'terraform-plan'
-                    path: '$(terraformWorkingDirectory)'
-
-                - task: TerraformTaskV4@4
-                  displayName: Terraform Init
-                  inputs:
-                    provider: 'azurerm'
-                    command: 'init'
-                    workingDirectory: '$(terraformWorkingDirectory)'
-                    backendServiceArm: '$(serviceConnection)'
-                    backendAzureRmUseEntraIdForAuthentication: true
-                    backendAzureRmResourceGroupName: '$(backendResourceGroup)'
-                    backendAzureRmStorageAccountName: '$(backendStorageAccount)'
-                    backendAzureRmContainerName: '$(backendContainer)'
-                    backendAzureRmKey: '$(backendKey)'
-                    commandOptions: '-input=false'
-
-
-                - task: TerraformTaskV4@4
-                  displayName: Terraform Apply
-                  inputs:
-                    provider: 'azurerm'
-                    command: 'apply'
-                    workingDirectory: '$(terraformWorkingDirectory)'
-                    environmentServiceNameAzureRM: '$(serviceConnection)'
-                    commandOptions: 'tfplan'
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Readable Terraform Plan
+            inputs:
+              targetPath: '$(terraformWorkingDirectory)/tfplan.txt'
+              artifact: 'terraform-pr-plan-readable'
+              publishLocation: 'pipeline'
