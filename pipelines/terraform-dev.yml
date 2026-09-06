@@ -3,10 +3,11 @@ trigger:
     include:
       - main
 
-  paths:
-    include:
-      - environments/dev/*
-      - pipelines/terraform-dev.yml
+paths:
+  include:
+    - environments/dev/*
+    - modules/**
+    - pipelines/terraform-dev.yml
 
 pool:
   name: MultiOsPool
