@@ -1,0 +1,251 @@
+trigger: none
+
+pr: none
+
+pool:
+  name: MultiOsPool
+  demands:
+    - Agent.Name -equals prod-win-vm-age
+
+variables:
+  terraformVersion: '1.15.9'
+  serviceConnection: 'sc-ealz-dev'
+
+  backendResourceGroup: 'rg-ealz-tfstate-eus2-001'
+  backendStorageAccount: 'stealztfstate001'
+  backendContainer: 'tfstate'
+
+stages:
+
+# ============================================================
+# Stage 1: Validate all domain Terraform roots
+# ============================================================
+
+  - stage: Validate
+    displayName: Validate Refactored Terraform
+
+    jobs:
+      - job: ValidateTerraform
+        displayName: Validate Domain Stacks
+
+        steps:
+
+          - checkout: self
+
+          - task: TerraformInstaller@1
+            displayName: Install Terraform
+            inputs:
+              terraformVersion: '$(terraformVersion)'
+
+          # --------------------------------------------------
+          # Terraform formatting
+          # --------------------------------------------------
+
+          - powershell: |
+              terraform fmt -check -recursive -diff
+            displayName: Terraform Format Check
+            workingDirectory: '$(Build.SourcesDirectory)'
+
+          # ==================================================
+          # Resource Groups
+          # ==================================================
+
+          - task: TerraformTaskV4@4
+            displayName: Resource Groups - Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: 'environments/dev/resource-groups'
+              backendServiceArm: '$(serviceConnection)'
+              backendAzureRmUseEntraIdForAuthentication: true
+              backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+              backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+              backendAzureRmContainerName: '$(backendContainer)'
+              backendAzureRmKey: 'dev-resource-groups.tfstate'
+              commandOptions: '-input=false'
+
+          - task: TerraformTaskV4@4
+            displayName: Resource Groups - Validate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+              workingDirectory: 'environments/dev/resource-groups'
+
+          - task: TerraformTaskV4@4
+            displayName: Resource Groups - Plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: 'environments/dev/resource-groups'
+              environmentServiceNameAzureRM: '$(serviceConnection)'
+              commandOptions: '-input=false -out=tfplan'
+
+          # ==================================================
+          # Identity
+          # ==================================================
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Identity - Init
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'init'
+          #     workingDirectory: 'environments/dev/identity'
+          #     backendServiceArm: '$(serviceConnection)'
+          #     backendAzureRmUseEntraIdForAuthentication: true
+          #     backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+          #     backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+          #     backendAzureRmContainerName: '$(backendContainer)'
+          #     backendAzureRmKey: 'dev-identity.tfstate'
+          #     commandOptions: '-input=false'
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Identity - Validate
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'validate'
+          #     workingDirectory: 'environments/dev/identity'
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Identity - Plan
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'plan'
+          #     workingDirectory: 'environments/dev/identity'
+          #     environmentServiceNameAzureRM: '$(serviceConnection)'
+          #     commandOptions: '-input=false -out=tfplan'
+
+          # # ==================================================
+          # # Networking
+          # # ==================================================
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Networking - Init
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'init'
+          #     workingDirectory: 'environments/dev/networking'
+          #     backendServiceArm: '$(serviceConnection)'
+          #     backendAzureRmUseEntraIdForAuthentication: true
+          #     backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+          #     backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+          #     backendAzureRmContainerName: '$(backendContainer)'
+          #     backendAzureRmKey: 'dev-networking.tfstate'
+          #     commandOptions: '-input=false'
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Networking - Validate
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'validate'
+          #     workingDirectory: 'environments/dev/networking'
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Networking - Plan
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'plan'
+          #     workingDirectory: 'environments/dev/networking'
+          #     environmentServiceNameAzureRM: '$(serviceConnection)'
+          #     commandOptions: '-input=false -out=tfplan'
+
+          # # ==================================================
+          # # Security
+          # # ==================================================
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Security - Init
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'init'
+          #     workingDirectory: 'environments/dev/security'
+          #     backendServiceArm: '$(serviceConnection)'
+          #     backendAzureRmUseEntraIdForAuthentication: true
+          #     backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+          #     backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+          #     backendAzureRmContainerName: '$(backendContainer)'
+          #     backendAzureRmKey: 'dev-security.tfstate'
+          #     commandOptions: '-input=false'
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Security - Validate
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'validate'
+          #     workingDirectory: 'environments/dev/security'
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Security - Plan
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'plan'
+          #     workingDirectory: 'environments/dev/security'
+          #     environmentServiceNameAzureRM: '$(serviceConnection)'
+          #     commandOptions: '-input=false -out=tfplan'
+
+          # # ==================================================
+          # # Monitoring
+          # # ==================================================
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Monitoring - Init
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'init'
+          #     workingDirectory: 'environments/dev/monitoring'
+          #     backendServiceArm: '$(serviceConnection)'
+          #     backendAzureRmUseEntraIdForAuthentication: true
+          #     backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+          #     backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+          #     backendAzureRmContainerName: '$(backendContainer)'
+          #     backendAzureRmKey: 'dev-monitoring.tfstate'
+          #     commandOptions: '-input=false'
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Monitoring - Validate
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'validate'
+          #     workingDirectory: 'environments/dev/monitoring'
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Monitoring - Plan
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'plan'
+          #     workingDirectory: 'environments/dev/monitoring'
+          #     environmentServiceNameAzureRM: '$(serviceConnection)'
+          #     commandOptions: '-input=false -out=tfplan'
+
+          # # ==================================================
+          # # Compute
+          # # ==================================================
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Compute - Init
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'init'
+          #     workingDirectory: 'environments/dev/compute'
+          #     backendServiceArm: '$(serviceConnection)'
+          #     backendAzureRmUseEntraIdForAuthentication: true
+          #     backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+          #     backendStorageAccountName: '$(backendStorageAccount)'
+          #     backendAzureRmContainerName: '$(backendContainer)'
+          #     backendAzureRmKey: 'dev-compute.tfstate'
+          #     commandOptions: '-input=false'
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Compute - Validate
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'validate'
+          #     workingDirectory: 'environments/dev/compute'
+
+          # - task: TerraformTaskV4@4
+          #   displayName: Compute - Plan
+          #   inputs:
+          #     provider: 'azurerm'
+          #     command: 'plan'
+          #     workingDirectory: 'environments/dev/compute'
+          #     environmentServiceNameAzureRM: '$(serviceConnection)'
+          #     commandOptions: '-input=false -out=tfplan'
