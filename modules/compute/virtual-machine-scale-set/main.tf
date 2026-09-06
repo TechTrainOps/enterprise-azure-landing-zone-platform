@@ -28,19 +28,20 @@ resource "azurerm_linux_virtual_machine_scale_set" "linux_vmss" {
   upgrade_mode = "Automatic"
 
   identity {
-    type = "SystemAssigned"
+    type         = length(var.user_assigned_identity_ids) > 0 ? "SystemAssigned, UserAssigned" : "SystemAssigned"
+    identity_ids = var.user_assigned_identity_ids
   }
 
   network_interface {
-  name    = "${var.name}-nic"
-  primary = true
+    name    = "${var.name}-nic"
+    primary = true
 
-  ip_configuration {
-    name      = "internal"
-    primary   = true
-    subnet_id = var.subnet_id
+    ip_configuration {
+      name      = "internal"
+      primary   = true
+      subnet_id = var.subnet_id
+    }
   }
-}
 
   tags = var.tags
 }

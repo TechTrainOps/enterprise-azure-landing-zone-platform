@@ -1607,6 +1607,10 @@ module "linux_virtual_machine" {
 
   availability_set_id = module.availability_set.id
 
+  user_assigned_identity_ids = [
+    module.managed_identity.id
+  ]
+
   tags = merge(
     var.tags,
     {
@@ -1629,6 +1633,10 @@ module "windows_virtual_machine" {
 
   admin_username = var.windows_vm_admin_username
   admin_password = var.windows_vm_admin_password
+
+  user_assigned_identity_ids = [
+    module.managed_identity.id
+  ]
 
   tags = merge(
     var.tags,
@@ -1692,6 +1700,10 @@ module "linux_virtual_machine_scale_set" {
 
   admin_username       = var.linux_vm_admin_username
   admin_ssh_public_key = var.linux_vm_admin_ssh_public_key
+
+  user_assigned_identity_ids = [
+    module.managed_identity.id
+  ]
 
   tags = merge(
     var.tags,
@@ -1778,4 +1790,24 @@ module "bastion" {
       ResourceType = "bastion"
     }
   )
+}
+
+
+# Managed Identity - Storage Blob access
+module "managed_identity_storage_role_assignment" {
+  source = "../../modules/security/key-vault-role-assignment"
+
+  scope                = module.storage_account.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = module.managed_identity.principal_id
+}
+
+
+# Managed Identity - ACR pull access
+module "managed_identity_acr_role_assignment" {
+  source = "../../modules/security/key-vault-role-assignment"
+
+  scope                = module.container_registry.id
+  role_definition_name = "AcrPull"
+  principal_id         = module.managed_identity.principal_id
 }

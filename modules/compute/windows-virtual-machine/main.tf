@@ -46,7 +46,8 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
   }
 
   identity {
-    type = "SystemAssigned"
+    type         = length(var.user_assigned_identity_ids) > 0 ? "SystemAssigned, UserAssigned" : "SystemAssigned"
+    identity_ids = var.user_assigned_identity_ids
   }
 
   tags = merge(

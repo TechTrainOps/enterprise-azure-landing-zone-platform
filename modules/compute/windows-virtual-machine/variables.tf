@@ -70,3 +70,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "user_assigned_identity_ids" {
+  description = "User assigned managed identity resource IDs"
+  type        = list(string)
+  default     = []
+}
