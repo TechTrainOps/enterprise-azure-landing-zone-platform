@@ -1898,3 +1898,149 @@ module "vmss_data_collection_rule_association" {
 
   description = "Associates the compute monitoring DCR with the Linux VMSS."
 }
+
+
+# Compute VM CPU metric alert
+module "compute_vm_cpu_metric_alert" {
+  source = "../../modules/monitoring/metric-alert"
+
+  name                = "alert-ealz-dev-vm-cpu"
+  resource_group_name = module.rg.name
+
+  scopes = [
+    module.linux_virtual_machine.id,
+    module.windows_virtual_machine.id
+  ]
+
+  description = "Alerts when CPU utilization exceeds 80 percent on enterprise virtual machines."
+
+  metric_namespace = "Microsoft.Compute/virtualMachines"
+  metric_name      = "Percentage CPU"
+
+  aggregation = "Average"
+  operator    = "GreaterThan"
+  threshold   = 80
+
+  frequency   = "PT5M"
+  window_size = "PT15M"
+
+  severity = 2
+
+  action_group_id = module.monitor_action_group.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "metric-alert"
+    }
+  )
+}
+
+
+# Compute VM availability metric alert
+module "compute_vm_availability_metric_alert" {
+  source = "../../modules/monitoring/metric-alert"
+
+  name                = "alert-ealz-dev-vm-availability"
+  resource_group_name = module.rg.name
+
+  scopes = [
+    module.linux_virtual_machine.id,
+    module.windows_virtual_machine.id
+  ]
+
+  description = "Alerts when an enterprise virtual machine becomes unavailable."
+
+  metric_namespace = "Microsoft.Compute/virtualMachines"
+  metric_name      = "VmAvailabilityMetric"
+
+  aggregation = "Average"
+  operator    = "LessThan"
+  threshold   = 1
+
+  frequency   = "PT1M"
+  window_size = "PT5M"
+
+  severity = 1
+
+  action_group_id = module.monitor_action_group.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "metric-alert"
+    }
+  )
+}
+
+
+# VMSS CPU metric alert
+module "vmss_cpu_metric_alert" {
+  source = "../../modules/monitoring/metric-alert"
+
+  name                = "alert-ealz-dev-vmss-cpu"
+  resource_group_name = module.rg.name
+
+  scopes = [
+    module.linux_virtual_machine_scale_set.id
+  ]
+
+  description = "Alerts when CPU utilization exceeds 80 percent on the enterprise Linux VMSS."
+
+  metric_namespace = "Microsoft.Compute/virtualMachineScaleSets"
+  metric_name      = "Percentage CPU"
+
+  aggregation = "Average"
+  operator    = "GreaterThan"
+  threshold   = 80
+
+  frequency   = "PT5M"
+  window_size = "PT15M"
+
+  severity = 2
+
+  action_group_id = module.monitor_action_group.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "metric-alert"
+    }
+  )
+}
+
+
+# VMSS availability metric alert
+module "vmss_availability_metric_alert" {
+  source = "../../modules/monitoring/metric-alert"
+
+  name                = "alert-ealz-dev-vmss-availability"
+  resource_group_name = module.rg.name
+
+  scopes = [
+    module.linux_virtual_machine_scale_set.id
+  ]
+
+  description = "Alerts when an enterprise Linux VMSS becomes unavailable."
+
+  metric_namespace = "Microsoft.Compute/virtualMachineScaleSets"
+  metric_name      = "VmAvailabilityMetric"
+
+  aggregation = "Average"
+  operator    = "LessThan"
+  threshold   = 1
+
+  frequency   = "PT1M"
+  window_size = "PT5M"
+
+  severity = 1
+
+  action_group_id = module.monitor_action_group.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "metric-alert"
+    }
+  )
+}
