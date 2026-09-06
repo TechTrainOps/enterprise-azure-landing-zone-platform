@@ -12,7 +12,7 @@ resource "azurerm_monitor_data_collection_rule" "compute" {
 
   data_sources {
     performance_counter {
-      name                          = "compute-performance"
+      name                          = "compute-performance-windows"
       streams                       = ["Microsoft-Perf"]
       sampling_frequency_in_seconds = 60
 
@@ -22,6 +22,21 @@ resource "azurerm_monitor_data_collection_rule" "compute" {
         "\\LogicalDisk(_Total)\\% Free Space",
         "\\LogicalDisk(_Total)\\Disk Reads/sec",
         "\\LogicalDisk(_Total)\\Disk Writes/sec"
+      ]
+    }
+
+    performance_counter {
+      name                          = "compute-performance-linux"
+      streams                       = ["Microsoft-Perf"]
+      sampling_frequency_in_seconds = 60
+
+      counter_specifiers = [
+        "\\Processor(*)\\% Processor Time",
+        "\\Memory(*)\\% Used Memory",
+        "\\Logical Disk(*)\\% Free Space",
+        "\\Logical Disk(*)\\% Used Space",
+        "\\Logical Disk(*)\\Disk Reads/sec",
+        "\\Logical Disk(*)\\Disk Writes/sec"
       ]
     }
 

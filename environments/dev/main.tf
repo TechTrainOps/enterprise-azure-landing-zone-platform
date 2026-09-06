@@ -1915,7 +1915,7 @@ module "compute_vm_cpu_metric_alert" {
   target_resource_type     = "Microsoft.Compute/virtualMachines"
   target_resource_location = var.location
 
-  description     = "Alerts when CPU utilization exceeds 80 percent on enterprise virtual machines."
+  description      = "Alerts when CPU utilization exceeds 80 percent on enterprise virtual machines."
   metric_namespace = "Microsoft.Compute/virtualMachines"
   metric_name      = "Percentage CPU"
   aggregation      = "Average"
@@ -2040,3 +2040,169 @@ module "vmss_availability_metric_alert" {
     }
   )
 }
+
+
+# module "linux_vm_memory_alert" {
+#   source = "../../modules/monitoring/scheduled-query-alert"
+
+#   name                = "alert-ealz-dev-linux-memory"
+#   resource_group_name = module.rg.name
+#   location            = var.location
+
+#   display_name = "Linux VM memory utilization high"
+#   description  = "Alerts when memory utilization exceeds 85 percent on the enterprise Linux virtual machine."
+#   severity     = 2
+#   enabled      = true
+
+#   log_analytics_workspace_id = module.log_analytics.id
+
+#   evaluation_frequency = "PT5M"
+#   window_duration      = "PT15M"
+
+#   query = <<-KQL
+#     Perf
+#     | where TimeGenerated >= ago(15m)
+#     | where ObjectName == "Memory"
+#     | where CounterName == "% Used Memory"
+#     | summarize MemoryUsed = avg(CounterValue) by Computer
+#     | where MemoryUsed > 85
+#   KQL
+
+#   time_aggregation_method = "Average"
+#   threshold               = 85
+#   operator                = "GreaterThan"
+
+#   action_group_id = module.monitor_action_group.id
+
+#   tags = merge(
+#     var.tags,
+#     {
+#       ResourceType = "scheduled-query-alert"
+#     }
+#   )
+# }
+
+
+# module "windows_vm_memory_alert" {
+#   source = "../../modules/monitoring/scheduled-query-alert"
+
+#   name                = "alert-ealz-dev-windows-memory"
+#   resource_group_name = module.rg.name
+#   location            = var.location
+
+#   display_name = "Windows VM memory utilization high"
+#   description  = "Alerts when memory utilization exceeds 85 percent on the enterprise Windows virtual machine."
+#   severity     = 2
+#   enabled      = true
+
+#   log_analytics_workspace_id = module.log_analytics.id
+
+#   evaluation_frequency = "PT5M"
+#   window_duration      = "PT15M"
+
+#   query = <<-KQL
+#     Perf
+#     | where TimeGenerated >= ago(15m)
+#     | where ObjectName == "Memory"
+#     | where CounterName == "% Committed Bytes In Use"
+#     | summarize MemoryUsed = avg(CounterValue) by Computer
+#     | where MemoryUsed > 85
+#   KQL
+
+#   time_aggregation_method = "Average"
+#   threshold               = 85
+#   operator                = "GreaterThan"
+
+#   action_group_id = module.monitor_action_group.id
+
+#   tags = merge(
+#     var.tags,
+#     {
+#       ResourceType = "scheduled-query-alert"
+#     }
+#   )
+# }
+
+
+# module "linux_vm_disk_alert" {
+#   source = "../../modules/monitoring/scheduled-query-alert"
+
+#   name                = "alert-ealz-dev-linux-disk"
+#   resource_group_name = module.rg.name
+#   location            = var.location
+
+#   display_name = "Linux VM filesystem utilization high"
+#   description  = "Alerts when Linux filesystem utilization exceeds 85 percent."
+#   severity     = 2
+#   enabled      = true
+
+#   log_analytics_workspace_id = module.log_analytics.id
+
+#   evaluation_frequency = "PT5M"
+#   window_duration      = "PT15M"
+
+#   query = <<-KQL
+#     Perf
+#     | where TimeGenerated >= ago(15m)
+#     | where ObjectName == "Logical Disk"
+#     | where CounterName == "% Used Space"
+#     | where InstanceName !in ("_Total", "Total")
+#     | summarize DiskUsed = avg(CounterValue) by Computer, InstanceName
+#     | where DiskUsed > 85
+#   KQL
+
+#   time_aggregation_method = "Average"
+#   threshold               = 85
+#   operator                = "GreaterThan"
+
+#   action_group_id = module.monitor_action_group.id
+
+#   tags = merge(
+#     var.tags,
+#     {
+#       ResourceType = "scheduled-query-alert"
+#     }
+#   )
+# }
+
+
+# module "windows_vm_disk_alert" {
+#   source = "../../modules/monitoring/scheduled-query-alert"
+
+#   name                = "alert-ealz-dev-windows-disk"
+#   resource_group_name = module.rg.name
+#   location            = var.location
+
+#   display_name = "Windows VM logical disk utilization high"
+#   description  = "Alerts when Windows logical disk utilization exceeds 85 percent."
+#   severity     = 2
+#   enabled      = true
+
+#   log_analytics_workspace_id = module.log_analytics.id
+
+#   evaluation_frequency = "PT5M"
+#   window_duration      = "PT15M"
+
+#   query = <<-KQL
+#     Perf
+#     | where TimeGenerated >= ago(15m)
+#     | where ObjectName == "LogicalDisk"
+#     | where CounterName == "% Free Space"
+#     | where InstanceName !in ("_Total", "Total")
+#     | summarize FreeSpace = avg(CounterValue) by Computer, InstanceName
+#     | where FreeSpace < 15
+#   KQL
+
+#   time_aggregation_method = "Average"
+#   threshold               = 15
+#   operator                = "LessThan"
+
+#   action_group_id = module.monitor_action_group.id
+
+#   tags = merge(
+#     var.tags,
+#     {
+#       ResourceType = "scheduled-query-alert"
+#     }
+#   )
+# }
