@@ -46,7 +46,7 @@ variable "evaluation_frequency" {
 }
 
 variable "window_duration" {
-  description = "Time window evaluated by the query."
+  description = "Time window evaluated by the alert."
   type        = string
   default     = "PT15M"
 }

@@ -2043,166 +2043,171 @@ module "vmss_availability_metric_alert" {
 
 
 # module "linux_vm_memory_alert" {
-#   source = "../../modules/monitoring/scheduled-query-alert"
 
-#   name                = "alert-ealz-dev-linux-memory"
-#   resource_group_name = module.rg.name
-#   location            = var.location
+module "linux_vm_memory_alert" {
+  source = "../../modules/monitoring/scheduled-query-alert"
 
-#   display_name = "Linux VM memory utilization high"
-#   description  = "Alerts when memory utilization exceeds 85 percent on the enterprise Linux virtual machine."
-#   severity     = 2
-#   enabled      = true
+  name                = "alert-ealz-dev-linux-memory"
+  resource_group_name = module.rg.name
+  location            = var.location
 
-#   log_analytics_workspace_id = module.log_analytics.id
+  display_name = "Linux VM memory utilization high"
+  description  = "Alerts when memory utilization exceeds 85 percent on the enterprise Linux compute resources."
+  severity     = 2
+  enabled      = true
 
-#   evaluation_frequency = "PT5M"
-#   window_duration      = "PT15M"
+  log_analytics_workspace_id = module.log_analytics.id
 
-#   query = <<-KQL
-#     Perf
-#     | where TimeGenerated >= ago(15m)
-#     | where ObjectName == "Memory"
-#     | where CounterName == "% Used Memory"
-#     | summarize MemoryUsed = avg(CounterValue) by Computer
-#     | where MemoryUsed > 85
-#   KQL
+  evaluation_frequency = "PT5M"
+  window_duration      = "PT15M"
 
-#   time_aggregation_method = "Average"
-#   threshold               = 85
-#   operator                = "GreaterThan"
+  query = <<-KQL
+    Perf
+    | where TimeGenerated >= ago(15m)
+    | where ObjectName == "Memory"
+    | where CounterName == "% Used Memory"
+    | summarize MemoryUsed = avg(CounterValue) by Computer
+    | where MemoryUsed > 85
+  KQL
 
-#   action_group_id = module.monitor_action_group.id
+  time_aggregation_method = "Average"
+  threshold               = 85
+  operator                = "GreaterThan"
 
-#   tags = merge(
-#     var.tags,
-#     {
-#       ResourceType = "scheduled-query-alert"
-#     }
-#   )
-# }
+  action_group_id = module.monitor_action_group.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "scheduled-query-alert"
+    }
+  )
+}
 
 
 # module "windows_vm_memory_alert" {
-#   source = "../../modules/monitoring/scheduled-query-alert"
 
-#   name                = "alert-ealz-dev-windows-memory"
-#   resource_group_name = module.rg.name
-#   location            = var.location
+module "windows_vm_memory_alert" {
+  source = "../../modules/monitoring/scheduled-query-alert"
 
-#   display_name = "Windows VM memory utilization high"
-#   description  = "Alerts when memory utilization exceeds 85 percent on the enterprise Windows virtual machine."
-#   severity     = 2
-#   enabled      = true
+  name                = "alert-ealz-dev-windows-memory"
+  resource_group_name = module.rg.name
+  location            = var.location
 
-#   log_analytics_workspace_id = module.log_analytics.id
+  display_name = "Windows VM memory utilization high"
+  description  = "Alerts when memory utilization exceeds 85 percent on the enterprise Windows virtual machine."
+  severity     = 2
+  enabled      = true
 
-#   evaluation_frequency = "PT5M"
-#   window_duration      = "PT15M"
+  log_analytics_workspace_id = module.log_analytics.id
 
-#   query = <<-KQL
-#     Perf
-#     | where TimeGenerated >= ago(15m)
-#     | where ObjectName == "Memory"
-#     | where CounterName == "% Committed Bytes In Use"
-#     | summarize MemoryUsed = avg(CounterValue) by Computer
-#     | where MemoryUsed > 85
-#   KQL
+  evaluation_frequency = "PT5M"
+  window_duration      = "PT15M"
 
-#   time_aggregation_method = "Average"
-#   threshold               = 85
-#   operator                = "GreaterThan"
+  query = <<-KQL
+    Perf
+    | where TimeGenerated >= ago(15m)
+    | where ObjectName == "Memory"
+    | where CounterName == "% Committed Bytes In Use"
+    | summarize MemoryUsed = avg(CounterValue) by Computer
+    | where MemoryUsed > 85
+  KQL
 
-#   action_group_id = module.monitor_action_group.id
+  time_aggregation_method = "Average"
+  threshold               = 85
+  operator                = "GreaterThan"
 
-#   tags = merge(
-#     var.tags,
-#     {
-#       ResourceType = "scheduled-query-alert"
-#     }
-#   )
-# }
+  action_group_id = module.monitor_action_group.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "scheduled-query-alert"
+    }
+  )
+}
 
 
 # module "linux_vm_disk_alert" {
-#   source = "../../modules/monitoring/scheduled-query-alert"
 
-#   name                = "alert-ealz-dev-linux-disk"
-#   resource_group_name = module.rg.name
-#   location            = var.location
+module "linux_vm_disk_alert" {
+  source = "../../modules/monitoring/scheduled-query-alert"
 
-#   display_name = "Linux VM filesystem utilization high"
-#   description  = "Alerts when Linux filesystem utilization exceeds 85 percent."
-#   severity     = 2
-#   enabled      = true
+  name                = "alert-ealz-dev-linux-disk"
+  resource_group_name = module.rg.name
+  location            = var.location
 
-#   log_analytics_workspace_id = module.log_analytics.id
+  display_name = "Linux VM disk utilization high"
+  description  = "Alerts when Linux filesystem free space falls below 15 percent."
+  severity     = 2
+  enabled      = true
 
-#   evaluation_frequency = "PT5M"
-#   window_duration      = "PT15M"
+  log_analytics_workspace_id = module.log_analytics.id
 
-#   query = <<-KQL
-#     Perf
-#     | where TimeGenerated >= ago(15m)
-#     | where ObjectName == "Logical Disk"
-#     | where CounterName == "% Used Space"
-#     | where InstanceName !in ("_Total", "Total")
-#     | summarize DiskUsed = avg(CounterValue) by Computer, InstanceName
-#     | where DiskUsed > 85
-#   KQL
+  evaluation_frequency = "PT5M"
+  window_duration      = "PT15M"
 
-#   time_aggregation_method = "Average"
-#   threshold               = 85
-#   operator                = "GreaterThan"
+  query = <<-KQL
+    Perf
+    | where TimeGenerated >= ago(15m)
+    | where ObjectName == "Logical Disk"
+    | where CounterName == "% Free Space"
+    | summarize FreeSpace = avg(CounterValue) by Computer, InstanceName
+    | where FreeSpace < 15
+  KQL
 
-#   action_group_id = module.monitor_action_group.id
+  time_aggregation_method = "Average"
+  threshold               = 15
+  operator                = "LessThan"
 
-#   tags = merge(
-#     var.tags,
-#     {
-#       ResourceType = "scheduled-query-alert"
-#     }
-#   )
-# }
+  action_group_id = module.monitor_action_group.id
 
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "scheduled-query-alert"
+    }
+  )
+}
 
 # module "windows_vm_disk_alert" {
-#   source = "../../modules/monitoring/scheduled-query-alert"
 
-#   name                = "alert-ealz-dev-windows-disk"
-#   resource_group_name = module.rg.name
-#   location            = var.location
+module "windows_vm_disk_alert" {
+  source = "../../modules/monitoring/scheduled-query-alert"
 
-#   display_name = "Windows VM logical disk utilization high"
-#   description  = "Alerts when Windows logical disk utilization exceeds 85 percent."
-#   severity     = 2
-#   enabled      = true
+  name                = "alert-ealz-dev-windows-disk"
+  resource_group_name = module.rg.name
+  location            = var.location
 
-#   log_analytics_workspace_id = module.log_analytics.id
+  display_name = "Windows VM disk utilization high"
+  description  = "Alerts when Windows logical disk free space falls below 15 percent."
+  severity     = 2
+  enabled      = true
 
-#   evaluation_frequency = "PT5M"
-#   window_duration      = "PT15M"
+  log_analytics_workspace_id = module.log_analytics.id
 
-#   query = <<-KQL
-#     Perf
-#     | where TimeGenerated >= ago(15m)
-#     | where ObjectName == "LogicalDisk"
-#     | where CounterName == "% Free Space"
-#     | where InstanceName !in ("_Total", "Total")
-#     | summarize FreeSpace = avg(CounterValue) by Computer, InstanceName
-#     | where FreeSpace < 15
-#   KQL
+  evaluation_frequency = "PT5M"
+  window_duration      = "PT15M"
 
-#   time_aggregation_method = "Average"
-#   threshold               = 15
-#   operator                = "LessThan"
+  query = <<-KQL
+    Perf
+    | where TimeGenerated >= ago(15m)
+    | where ObjectName == "LogicalDisk"
+    | where CounterName == "% Free Space"
+    | summarize FreeSpace = avg(CounterValue) by Computer, InstanceName
+    | where FreeSpace < 15
+  KQL
 
-#   action_group_id = module.monitor_action_group.id
+  time_aggregation_method = "Average"
+  threshold               = 15
+  operator                = "LessThan"
 
-#   tags = merge(
-#     var.tags,
-#     {
-#       ResourceType = "scheduled-query-alert"
-#     }
-#   )
-# }
+  action_group_id = module.monitor_action_group.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "scheduled-query-alert"
+    }
+  )
+}
