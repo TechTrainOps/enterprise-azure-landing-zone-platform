@@ -9,6 +9,8 @@ trigger:
       - shared/**
       - pipelines/terraform-dev.yml
 
+pr: none
+
 pool:
   name: MultiOsPool
   demands:
