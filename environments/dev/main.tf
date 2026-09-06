@@ -1755,8 +1755,8 @@ module "bastion_public_ip" {
   ip_version              = "IPv4"
   zones                   = []
   ip_tags = {
-  FirstPartyUsage = "/Unprivileged"
-}
+    FirstPartyUsage = "/Unprivileged"
+  }
 
   tags = merge(
     var.tags,
@@ -1812,4 +1812,89 @@ module "managed_identity_acr_role_assignment" {
   scope                = module.container_registry.id
   role_definition_name = "AcrPull"
   principal_id         = module.managed_identity.principal_id
+}
+
+
+# Compute monitoring Data Collection Rule
+module "compute_data_collection_rule" {
+  source = "../../modules/monitoring/data-collection-rule"
+
+  name                = var.compute_data_collection_rule_name
+  resource_group_name = module.rg.name
+  location            = var.location
+
+  log_analytics_workspace_id = module.log_analytics.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "data-collection-rule"
+    }
+  )
+}
+
+
+# DCR-association-linux-vm:
+
+module "linux_vm_data_collection_rule_association" {
+  source = "../../modules/monitoring/data-collection-rule-association"
+
+  name                    = "dcr-assoc-linux-vm"
+  target_resource_id      = module.linux_virtual_machine.id
+  data_collection_rule_id = module.compute_data_collection_rule.id
+
+  description = "Associates the compute monitoring DCR with the Linux VM."
+}
+
+
+# Windows-monitoring:
+
+module "windows_vm_extension" {
+  source = "../../modules/compute/windows-vm-extension"
+
+  name               = "ama-windows"
+  virtual_machine_id = module.windows_virtual_machine.id
+
+  tags = merge(
+    var.tags,
+    {
+      ResourceType = "virtual-machine-extension"
+    }
+  )
+}
+
+
+# DCR-association-win-vm:
+
+module "windows_vm_data_collection_rule_association" {
+  source = "../../modules/monitoring/data-collection-rule-association"
+
+  name                    = "dcr-assoc-windows-vm"
+  target_resource_id      = module.windows_virtual_machine.id
+  data_collection_rule_id = module.compute_data_collection_rule.id
+
+  description = "Associates the compute monitoring DCR with the Windows VM."
+}
+
+
+# VMSS-monitoring:
+
+module "vmss_extension" {
+  source = "../../modules/compute/virtual-machine-scale-set-extension"
+
+  name                         = "ama-linux"
+  virtual_machine_scale_set_id = module.linux_virtual_machine_scale_set.id
+}
+
+
+# DCR-association-vmss-vm:
+
+module "vmss_data_collection_rule_association" {
+  source = "../../modules/monitoring/data-collection-rule-association"
+
+  name                    = "dcr-assoc-vmss"
+  target_resource_id      = module.linux_virtual_machine_scale_set.id
+  data_collection_rule_id = module.compute_data_collection_rule.id
+
+  description = "Associates the compute monitoring DCR with the Linux VMSS."
 }

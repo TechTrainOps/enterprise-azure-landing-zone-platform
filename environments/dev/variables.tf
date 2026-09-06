@@ -799,3 +799,11 @@ variable "bastion_tunneling_enabled" {
   description = "Enable Bastion tunneling"
   type        = bool
 }
+
+
+# DCR vars:
+
+variable "compute_data_collection_rule_name" {
+  description = "Azure Monitor Data Collection Rule name for compute resources"
+  type        = string
+}

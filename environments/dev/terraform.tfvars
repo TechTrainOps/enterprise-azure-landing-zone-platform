@@ -345,3 +345,8 @@ bastion_ip_connect_enabled = true
 bastion_shareable_link_enabled = false
 
 bastion_tunneling_enabled = true
+
+
+# DCR Tfvars:
+
+compute_data_collection_rule_name = "dcr-ealz-dev-eastus2-compute-001"
