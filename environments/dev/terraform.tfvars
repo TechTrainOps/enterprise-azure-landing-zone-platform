@@ -311,6 +311,6 @@ vm_extension_name = "ama-linux"
 
 vmss_name = "vmss-ealz-dev-eastus2-001"
 
-vmss_sku = "Standard_D2s_v5"
+vmss_sku = "Standard_D2als_v7"
 
 vmss_instances = 2
