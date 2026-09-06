@@ -1912,21 +1912,19 @@ module "compute_vm_cpu_metric_alert" {
     module.windows_virtual_machine.id
   ]
 
-  description = "Alerts when CPU utilization exceeds 80 percent on enterprise virtual machines."
+  target_resource_type     = "Microsoft.Compute/virtualMachines"
+  target_resource_location = var.location
 
+  description     = "Alerts when CPU utilization exceeds 80 percent on enterprise virtual machines."
   metric_namespace = "Microsoft.Compute/virtualMachines"
   metric_name      = "Percentage CPU"
-
-  aggregation = "Average"
-  operator    = "GreaterThan"
-  threshold   = 80
-
-  frequency   = "PT5M"
-  window_size = "PT15M"
-
-  severity = 2
-
-  action_group_id = module.monitor_action_group.id
+  aggregation      = "Average"
+  operator         = "GreaterThan"
+  threshold        = 80
+  frequency        = "PT5M"
+  window_size      = "PT15M"
+  severity         = 2
+  action_group_id  = module.monitor_action_group.id
 
   tags = merge(
     var.tags,
@@ -1949,21 +1947,19 @@ module "compute_vm_availability_metric_alert" {
     module.windows_virtual_machine.id
   ]
 
-  description = "Alerts when an enterprise virtual machine becomes unavailable."
+  target_resource_type     = "Microsoft.Compute/virtualMachines"
+  target_resource_location = var.location
 
+  description      = "Alerts when an enterprise virtual machine becomes unavailable."
   metric_namespace = "Microsoft.Compute/virtualMachines"
   metric_name      = "VmAvailabilityMetric"
-
-  aggregation = "Average"
-  operator    = "LessThan"
-  threshold   = 1
-
-  frequency   = "PT1M"
-  window_size = "PT5M"
-
-  severity = 1
-
-  action_group_id = module.monitor_action_group.id
+  aggregation      = "Average"
+  operator         = "LessThan"
+  threshold        = 1
+  frequency        = "PT1M"
+  window_size      = "PT5M"
+  severity         = 1
+  action_group_id  = module.monitor_action_group.id
 
   tags = merge(
     var.tags,

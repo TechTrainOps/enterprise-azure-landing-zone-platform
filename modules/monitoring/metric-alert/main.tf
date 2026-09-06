@@ -9,6 +9,9 @@ resource "azurerm_monitor_metric_alert" "metric_alert" {
   enabled       = var.enabled
   auto_mitigate = var.auto_mitigate
 
+  target_resource_type     = var.target_resource_type
+  target_resource_location = var.target_resource_location
+
   frequency   = var.frequency
   window_size = var.window_size
 

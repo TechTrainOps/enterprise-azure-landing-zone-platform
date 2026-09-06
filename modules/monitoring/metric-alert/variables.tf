@@ -83,3 +83,15 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "target_resource_type" {
+  description = "The resource type targeted by the metric alert."
+  type        = string
+  default     = null
+}
+
+variable "target_resource_location" {
+  description = "The Azure region of the target resource."
+  type        = string
+  default     = null
+}
