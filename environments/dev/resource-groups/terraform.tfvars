@@ -1,5 +1,5 @@
 resource_group_name = "rg-ealz-dev-eastus2"
-location             = "eastus2"
+location            = "eastus2"
 
 tags = {
   Environment = "dev"
