@@ -47,10 +47,6 @@ variable "vnet_ip_address_pools" {
   type = list(string)
 }
 
-variable "vnet_ip_address_pools" {
-  type = list(string)
-}
-
 variable "subnet_name" {
   type = string
 }
