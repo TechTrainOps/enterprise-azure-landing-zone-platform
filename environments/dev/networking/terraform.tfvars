@@ -1,23 +1,9 @@
-# =========================================================
-# Resource Group / Common
-# =========================================================
-
-
-location = "eastus2"
-
 resource_group_name = "rg-ealz-dev-eastus2"
+location            = "eastus2"
 
-tags = {
-  Environment = "dev"
-  Project     = "enterprise-azure-landing-zone-platform"
-  ManagedBy   = "terraform"
-  Owner       = "Shakir"
-}
-
-
-# =========================================================
-# Virtual Network
-# =========================================================
+# ============================================================
+# VNet
+# ============================================================
 
 vnet_name = "vnet-ealz-dev-eastus2-001"
 
@@ -38,9 +24,9 @@ vnet_encryption = null
 vnet_ip_address_pools = []
 
 
-# =========================================================
+# ============================================================
 # Workload Subnet
-# =========================================================
+# ============================================================
 
 subnet_name = "snet-ealz-dev-eastus2-001"
 
@@ -48,8 +34,7 @@ subnet_address_prefixes = [
   "10.10.1.0/24"
 ]
 
-subnet_service_endpoints = []
-
+subnet_service_endpoints           = []
 subnet_service_endpoint_policy_ids = []
 
 subnet_private_endpoint_network_policies = "Disabled"
@@ -61,16 +46,11 @@ subnet_default_outbound_access_enabled = true
 subnet_delegation = []
 
 
-# =========================================================
-# Network Security Group
-# =========================================================
+# ============================================================
+# NSG
+# ============================================================
 
 nsg_name = "nsg-ealz-dev-eastus2-001"
-
-
-# =========================================================
-# NSG Rules
-# =========================================================
 
 nsg_security_rules = {
 
@@ -82,12 +62,10 @@ nsg_security_rules = {
     protocol    = "Tcp"
     description = "Allow inbound HTTPS traffic"
 
-    source_port_range = "*"
-
+    source_port_range      = "*"
     destination_port_range = "443"
 
-    source_address_prefix = "Internet"
-
+    source_address_prefix      = "Internet"
     destination_address_prefix = "*"
   }
 
@@ -99,20 +77,18 @@ nsg_security_rules = {
     protocol    = "Tcp"
     description = "Allow outbound HTTPS traffic"
 
-    source_port_range = "*"
-
+    source_port_range      = "*"
     destination_port_range = "443"
 
-    source_address_prefix = "*"
-
+    source_address_prefix      = "*"
     destination_address_prefix = "Internet"
   }
 }
 
 
-# =========================================================
+# ============================================================
 # Route Table
-# =========================================================
+# ============================================================
 
 route_table_name = "rt-ealz-dev-eastus2-001"
 
@@ -123,21 +99,19 @@ route_table_routes = []
 routes = {}
 
 
-# =========================================================
-# NAT Gateway Public IP
-# =========================================================
+# ============================================================
+# NAT Public IP
+# ============================================================
 
 nat_public_ip_name = "pip-ealz-dev-eastus2-001"
 
 nat_public_ip_allocation_method = "Static"
 
-nat_public_ip_sku = "Standard"
-
+nat_public_ip_sku      = "Standard"
 nat_public_ip_sku_tier = "Regional"
 
 nat_public_ip_domain_name_label = null
-
-nat_public_ip_reverse_fqdn = null
+nat_public_ip_reverse_fqdn      = null
 
 nat_public_ip_idle_timeout_in_minutes = 4
 
@@ -150,9 +124,9 @@ nat_public_ip_ip_tags = {
 }
 
 
-# =========================================================
+# ============================================================
 # NAT Gateway
-# =========================================================
+# ============================================================
 
 nat_gateway_name = "nat-ealz-dev-eastus2-001"
 
@@ -163,9 +137,9 @@ nat_gateway_idle_timeout_in_minutes = 4
 nat_gateway_zones = []
 
 
-# =========================================================
-# Private DNS Zone
-# =========================================================
+# ============================================================
+# Key Vault Private DNS Zone
+# ============================================================
 
 private_dns_zone_name = "privatelink.vaultcore.azure.net"
 
@@ -179,9 +153,9 @@ private_dns_zone_timeouts = {
 }
 
 
-# =========================================================
-# Private DNS Zone VNet Link
-# =========================================================
+# ============================================================
+# Key Vault Private DNS Zone Link
+# ============================================================
 
 private_dns_zone_link_name = "link-vnet-ealz-dev-eastus2-001"
 
@@ -190,23 +164,86 @@ private_dns_zone_link_registration_enabled = false
 private_dns_zone_link_resolution_policy = "Default"
 
 
-# =========================================================
+# ============================================================
+# Key Vault Private Endpoint
+# ============================================================
+
+private_endpoint_name = "pe-ealz-dev-eastus2-001"
+
+private_service_connection_name = "psc-ealz-dev-eastus2-001"
+
+private_endpoint_is_manual_connection = false
+
+private_endpoint_subresource_names = [
+  "vault"
+]
+
+
+# ============================================================
 # Storage Private DNS Zone
-# =========================================================
+# ============================================================
 
 storage_private_dns_zone_name = "privatelink.blob.core.windows.net"
 
 
-# =========================================================
+# ============================================================
+# Storage Private Endpoint
+# ============================================================
+
+storage_private_endpoint_name = "pe-ealz-dev-eastus2-storage-001"
+
+storage_private_service_connection_name = "psc-ealz-dev-eastus2-storage-001"
+
+storage_private_endpoint_is_manual_connection = false
+
+storage_private_endpoint_subresource_names = [
+  "blob"
+]
+
+storage_private_endpoint_dns_zone_group_name = "storage-dns-zone-group"
+
+
+# ============================================================
 # ACR Private DNS Zone
-# =========================================================
+# ============================================================
 
 acr_private_dns_zone_name = "privatelink.azurecr.io"
 
 
-# =========================================================
-# Azure Bastion
-# =========================================================
+# ============================================================
+# ACR Private Endpoint
+# ============================================================
+
+acr_private_endpoint_name = "pe-ealz-dev-eastus2-acr-001"
+
+acr_private_service_connection_name = "psc-ealz-dev-eastus2-acr-001"
+
+acr_private_endpoint_is_manual_connection = false
+
+acr_private_endpoint_subresource_names = [
+  "registry"
+]
+
+acr_private_endpoint_dns_zone_group_name = "acr-dns-zone-group"
+
+
+# ============================================================
+# Existing Security Resources
+#
+# These are NOT created by Networking.
+# Networking uses them as existing Azure resources.
+# ============================================================
+
+key_vault_name = "kv-ealz-dev-eastus2-001"
+
+storage_account_name = "stealzdeveastus2001"
+
+container_registry_name = "crealzdeveastus2001"
+
+
+# ============================================================
+# Bastion
+# ============================================================
 
 bastion_name = "bas-ealz-dev-eastus2-001"
 
@@ -226,12 +263,20 @@ bastion_public_ip_sku = "Standard"
 
 bastion_public_ip_sku_tier = "Regional"
 
-bastion_copy_paste_enabled = true
-
-bastion_file_copy_enabled = true
-
-bastion_ip_connect_enabled = true
-
+bastion_copy_paste_enabled     = true
+bastion_file_copy_enabled      = true
+bastion_ip_connect_enabled     = true
 bastion_shareable_link_enabled = false
+bastion_tunneling_enabled      = true
 
-bastion_tunneling_enabled = true
+
+# ============================================================
+# Tags
+# ============================================================
+
+tags = {
+  Environment = "dev"
+  Project     = "enterprise-azure-landing-zone-platform"
+  ManagedBy   = "terraform"
+  Owner       = "Shakir"
+}

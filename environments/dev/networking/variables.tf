@@ -6,15 +6,6 @@ variable "location" {
   type = string
 }
 
-variable "tags" {
-  type = map(string)
-}
-
-
-# ============================================================
-# Virtual Network
-# ============================================================
-
 variable "vnet_name" {
   type = string
 }
@@ -53,14 +44,12 @@ variable "vnet_encryption" {
 }
 
 variable "vnet_ip_address_pools" {
-  type    = any
-  default = []
+  type = list(string)
 }
 
-
-# ============================================================
-# Workload Subnet
-# ============================================================
+variable "vnet_ip_address_pools" {
+  type = list(string)
+}
 
 variable "subnet_name" {
   type = string
@@ -95,11 +84,6 @@ variable "subnet_delegation" {
   default = null
 }
 
-
-# ============================================================
-# Network Security Group
-# ============================================================
-
 variable "nsg_name" {
   type = string
 }
@@ -107,11 +91,6 @@ variable "nsg_name" {
 variable "nsg_security_rules" {
   type = any
 }
-
-
-# ============================================================
-# Route Table
-# ============================================================
 
 variable "route_table_name" {
   type = string
@@ -128,11 +107,6 @@ variable "route_table_routes" {
 variable "routes" {
   type = any
 }
-
-
-# ============================================================
-# NAT Gateway Public IP
-# ============================================================
 
 variable "nat_public_ip_name" {
   type = string
@@ -176,11 +150,6 @@ variable "nat_public_ip_ip_tags" {
   type = map(string)
 }
 
-
-# ============================================================
-# NAT Gateway
-# ============================================================
-
 variable "nat_gateway_name" {
   type = string
 }
@@ -197,27 +166,18 @@ variable "nat_gateway_zones" {
   type = list(string)
 }
 
-
-# ============================================================
-# Private DNS Zone
-# ============================================================
-
 variable "private_dns_zone_name" {
   type = string
 }
 
 variable "private_dns_zone_soa_record" {
-  type = any
+  type    = any
+  default = null
 }
 
 variable "private_dns_zone_timeouts" {
   type = any
 }
-
-
-# ============================================================
-# Private DNS Zone VNet Link
-# ============================================================
 
 variable "private_dns_zone_link_name" {
   type = string
@@ -231,28 +191,69 @@ variable "private_dns_zone_link_resolution_policy" {
   type = string
 }
 
-
-# ============================================================
-# Storage Private DNS Zone
-# ============================================================
-
 variable "storage_private_dns_zone_name" {
   type = string
 }
-
-
-# ============================================================
-# ACR Private DNS Zone
-# ============================================================
 
 variable "acr_private_dns_zone_name" {
   type = string
 }
 
+variable "private_endpoint_name" {
+  type = string
+}
 
-# ============================================================
-# Azure Bastion Subnet
-# ============================================================
+variable "private_service_connection_name" {
+  type = string
+}
+
+variable "private_endpoint_is_manual_connection" {
+  type = bool
+}
+
+variable "private_endpoint_subresource_names" {
+  type = list(string)
+}
+
+variable "storage_private_endpoint_name" {
+  type = string
+}
+
+variable "storage_private_service_connection_name" {
+  type = string
+}
+
+variable "storage_private_endpoint_is_manual_connection" {
+  type = bool
+}
+
+variable "storage_private_endpoint_subresource_names" {
+  type = list(string)
+}
+
+variable "storage_private_endpoint_dns_zone_group_name" {
+  type = string
+}
+
+variable "acr_private_endpoint_name" {
+  type = string
+}
+
+variable "acr_private_service_connection_name" {
+  type = string
+}
+
+variable "acr_private_endpoint_is_manual_connection" {
+  type = bool
+}
+
+variable "acr_private_endpoint_subresource_names" {
+  type = list(string)
+}
+
+variable "acr_private_endpoint_dns_zone_group_name" {
+  type = string
+}
 
 variable "bastion_subnet_name" {
   type = string
@@ -261,11 +262,6 @@ variable "bastion_subnet_name" {
 variable "bastion_subnet_address_prefixes" {
   type = list(string)
 }
-
-
-# ============================================================
-# Azure Bastion Public IP
-# ============================================================
 
 variable "bastion_public_ip_name" {
   type = string
@@ -282,11 +278,6 @@ variable "bastion_public_ip_sku" {
 variable "bastion_public_ip_sku_tier" {
   type = string
 }
-
-
-# ============================================================
-# Azure Bastion
-# ============================================================
 
 variable "bastion_name" {
   type = string
@@ -314,4 +305,20 @@ variable "bastion_shareable_link_enabled" {
 
 variable "bastion_tunneling_enabled" {
   type = bool
+}
+
+variable "key_vault_name" {
+  type = string
+}
+
+variable "storage_account_name" {
+  type = string
+}
+
+variable "container_registry_name" {
+  type = string
+}
+
+variable "tags" {
+  type = map(string)
 }
