@@ -44,7 +44,11 @@ variable "vnet_encryption" {
 }
 
 variable "vnet_ip_address_pools" {
-  type = list(string)
+  type = list(object({
+    id                     = string
+    number_of_ip_addresses = string
+  }))
+  default = []
 }
 
 variable "subnet_name" {
