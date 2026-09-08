@@ -44,7 +44,7 @@ data "azurerm_subscription" "current" {}
 #
 
 module "log_analytics" {
-  source = "../../../monitoring/log-analytics"
+  source = "../../../modules/monitoring/log-analytics"
 
   name                = var.log_analytics_workspace_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -66,7 +66,7 @@ module "log_analytics" {
 #
 
 module "key_vault_diagnostic_setting" {
-  source = "../../../monitoring/diagnostic-setting"
+  source = "../../../modules/monitoring/diagnostic-setting"
 
   name                       = "diag-keyvault"
   target_resource_id         = data.azurerm_key_vault.key_vault.id
@@ -80,7 +80,7 @@ module "key_vault_diagnostic_setting" {
 }
 
 module "storage_account_diagnostic_setting" {
-  source = "../../../monitoring/diagnostic-setting"
+  source = "../../../modules/monitoring/diagnostic-setting"
 
   name = "diag-storage-blob"
 
@@ -101,7 +101,7 @@ module "storage_account_diagnostic_setting" {
 }
 
 module "acr_diagnostic_setting" {
-  source = "../../../monitoring/diagnostic-setting"
+  source = "../../../modules/monitoring/diagnostic-setting"
 
   name                       = "diag-acr"
   target_resource_id         = data.azurerm_container_registry.container_registry.id
@@ -118,7 +118,7 @@ module "acr_diagnostic_setting" {
 }
 
 module "subscription_activity_log_diagnostic_setting" {
-  source = "../../../monitoring/diagnostic-setting"
+  source = "../../../modules/monitoring/diagnostic-setting"
 
   name = "diag-subscription-activity-log"
 
@@ -146,7 +146,7 @@ module "subscription_activity_log_diagnostic_setting" {
 #
 
 module "monitor_action_group" {
-  source = "../../../monitoring/action-group"
+  source = "../../../modules/monitoring/action-group"
 
   name                = var.monitor_action_group_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -169,7 +169,7 @@ module "monitor_action_group" {
 #
 
 module "activity_log_alert" {
-  source = "../../../monitoring/activity-log-alert"
+  source = "../../../modules/monitoring/activity-log-alert"
 
   name                = "alert-ealz-dev-admin-changes"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -196,7 +196,7 @@ module "activity_log_alert" {
 #
 
 module "storage_account_metric_alert" {
-  source = "../../../monitoring/metric-alert"
+  source = "../../../modules/monitoring/metric-alert"
 
   name                = "alert-ealz-dev-storage-capacity"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -235,7 +235,7 @@ module "storage_account_metric_alert" {
 #
 
 module "acr_metric_alert" {
-  source = "../../../monitoring/metric-alert"
+  source = "../../../modules/monitoring/metric-alert"
 
   name                = "alert-ealz-dev-acr-requests"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -274,7 +274,7 @@ module "acr_metric_alert" {
 #
 
 module "key_vault_metric_alert" {
-  source = "../../../monitoring/metric-alert"
+  source = "../../../modules/monitoring/metric-alert"
 
   name                = "alert-ealz-dev-keyvault-requests"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -317,7 +317,7 @@ data "azurerm_policy_definition" "key_vault_diagnostic_settings" {
 }
 
 module "key_vault_diagnostic_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "assign-ealz-dev-kv-diagnostics"
 
@@ -361,7 +361,7 @@ module "key_vault_diagnostic_policy_assignment" {
 }
 
 module "key_vault_diagnostic_policy_monitoring_role" {
-  source = "../../../security/key-vault-role-assignment"
+  source = "../../../modules/security/key-vault-role-assignment"
 
   scope                = data.azurerm_resource_group.rg.id
   role_definition_name = "Monitoring Contributor"
@@ -373,7 +373,7 @@ module "key_vault_diagnostic_policy_monitoring_role" {
 }
 
 module "key_vault_diagnostic_policy_log_analytics_role" {
-  source = "../../../security/key-vault-role-assignment"
+  source = "../../../modules/security/key-vault-role-assignment"
 
   scope                = module.log_analytics.id
   role_definition_name = "Log Analytics Contributor"
@@ -395,7 +395,7 @@ data "azurerm_policy_definition" "storage_account_diagnostic_settings" {
 }
 
 module "storage_account_diagnostic_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "assign-ealz-dev-storage-diagnostics"
 
@@ -427,7 +427,7 @@ module "storage_account_diagnostic_policy_assignment" {
 }
 
 module "storage_account_diagnostic_policy_monitoring_role" {
-  source = "../../../security/key-vault-role-assignment"
+  source = "../../../modules/security/key-vault-role-assignment"
 
   scope                = data.azurerm_resource_group.rg.id
   role_definition_name = "Monitoring Contributor"
@@ -439,7 +439,7 @@ module "storage_account_diagnostic_policy_monitoring_role" {
 }
 
 module "storage_account_diagnostic_policy_log_analytics_role" {
-  source = "../../../security/key-vault-role-assignment"
+  source = "../../../modules/security/key-vault-role-assignment"
 
   scope                = module.log_analytics.id
   role_definition_name = "Log Analytics Contributor"
@@ -461,7 +461,7 @@ data "azurerm_policy_definition" "acr_diagnostic_settings" {
 }
 
 module "acr_diagnostic_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "assign-ealz-dev-acr-diagnostics"
 
@@ -507,7 +507,7 @@ module "acr_diagnostic_policy_assignment" {
 }
 
 module "acr_diagnostic_policy_log_analytics_role_assignment" {
-  source = "../../../security/key-vault-role-assignment"
+  source = "../../../modules/security/key-vault-role-assignment"
 
   scope                = module.log_analytics.id
   role_definition_name = "Log Analytics Contributor"
@@ -524,7 +524,7 @@ module "acr_diagnostic_policy_log_analytics_role_assignment" {
 #
 
 module "compute_data_collection_rule" {
-  source = "../../../monitoring/data-collection-rule"
+  source = "../../../modules/monitoring/data-collection-rule"
 
   name                = var.compute_data_collection_rule_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -546,7 +546,7 @@ module "compute_data_collection_rule" {
 #
 
 module "linux_vm_data_collection_rule_association" {
-  source = "../../../monitoring/data-collection-rule-association"
+  source = "../../../modules/monitoring/data-collection-rule-association"
 
   name                    = "dcr-assoc-linux-vm"
   target_resource_id      = data.azurerm_linux_virtual_machine.linux_vm.id
@@ -556,7 +556,7 @@ module "linux_vm_data_collection_rule_association" {
 }
 
 module "windows_vm_data_collection_rule_association" {
-  source = "../../../monitoring/data-collection-rule-association"
+  source = "../../../modules/monitoring/data-collection-rule-association"
 
   name                    = "dcr-assoc-windows-vm"
   target_resource_id      = data.azurerm_windows_virtual_machine.windows_vm.id
@@ -566,7 +566,7 @@ module "windows_vm_data_collection_rule_association" {
 }
 
 module "vmss_data_collection_rule_association" {
-  source = "../../../monitoring/data-collection-rule-association"
+  source = "../../../modules/monitoring/data-collection-rule-association"
 
   name                    = "dcr-assoc-vmss"
   target_resource_id      = data.azurerm_linux_virtual_machine_scale_set.vmss.id
@@ -581,7 +581,7 @@ module "vmss_data_collection_rule_association" {
 #
 
 module "compute_vm_cpu_metric_alert" {
-  source = "../../../monitoring/metric-alert"
+  source = "../../../modules/monitoring/metric-alert"
 
   name                = "alert-ealz-dev-vm-cpu"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -622,7 +622,7 @@ module "compute_vm_cpu_metric_alert" {
 #
 
 module "compute_vm_availability_metric_alert" {
-  source = "../../../monitoring/metric-alert"
+  source = "../../../modules/monitoring/metric-alert"
 
   name                = "alert-ealz-dev-vm-availability"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -663,7 +663,7 @@ module "compute_vm_availability_metric_alert" {
 #
 
 module "vmss_cpu_metric_alert" {
-  source = "../../../monitoring/metric-alert"
+  source = "../../../modules/monitoring/metric-alert"
 
   name                = "alert-ealz-dev-vmss-cpu"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -701,7 +701,7 @@ module "vmss_cpu_metric_alert" {
 #
 
 module "vmss_availability_metric_alert" {
-  source = "../../../monitoring/metric-alert"
+  source = "../../../modules/monitoring/metric-alert"
 
   name                = "alert-ealz-dev-vmss-availability"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -739,7 +739,7 @@ module "vmss_availability_metric_alert" {
 #
 
 module "linux_vm_memory_alert" {
-  source = "../../../monitoring/scheduled-query-alert"
+  source = "../../../modules/monitoring/scheduled-query-alert"
 
   name                = "alert-ealz-dev-linux-memory"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -787,7 +787,7 @@ module "linux_vm_memory_alert" {
 #
 
 module "windows_vm_memory_alert" {
-  source = "../../../monitoring/scheduled-query-alert"
+  source = "../../../modules/monitoring/scheduled-query-alert"
 
   name                = "alert-ealz-dev-windows-memory"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -835,7 +835,7 @@ module "windows_vm_memory_alert" {
 #
 
 module "linux_vm_disk_alert" {
-  source = "../../../monitoring/scheduled-query-alert"
+  source = "../../../modules/monitoring/scheduled-query-alert"
 
   name                = "alert-ealz-dev-linux-disk"
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -883,7 +883,7 @@ module "linux_vm_disk_alert" {
 #
 
 module "windows_vm_disk_alert" {
-  source = "../../../monitoring/scheduled-query-alert"
+  source = "../../../modules/monitoring/scheduled-query-alert"
 
   name                = "alert-ealz-dev-windows-disk"
   resource_group_name = data.azurerm_resource_group.rg.name
