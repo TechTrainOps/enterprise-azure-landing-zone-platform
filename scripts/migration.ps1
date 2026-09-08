@@ -1,59 +1,37 @@
+cd "$(System.DefaultWorkingDirectory)\environments\dev"
+
+terraform init -input=false
+if ($LASTEXITCODE -ne 0) {
+    throw "Terraform init failed."
+}
+
 terraform state rm 'module.acr_diagnostic_policy_assignment.azurerm_resource_group_policy_assignment.assignment'
-
 terraform state rm 'module.acr_diagnostic_policy_log_analytics_role_assignment.azurerm_role_assignment.role_assignment'
-
 terraform state rm 'module.acr_diagnostic_setting.azurerm_monitor_diagnostic_setting.diagnostic_setting'
-
 terraform state rm 'module.acr_metric_alert.azurerm_monitor_metric_alert.metric_alert'
-
 terraform state rm 'module.activity_log_alert.azurerm_monitor_activity_log_alert.alert'
-
 terraform state rm 'module.compute_data_collection_rule.azurerm_monitor_data_collection_rule.compute'
-
 terraform state rm 'module.compute_vm_availability_metric_alert.azurerm_monitor_metric_alert.metric_alert'
-
 terraform state rm 'module.compute_vm_cpu_metric_alert.azurerm_monitor_metric_alert.metric_alert'
-
 terraform state rm 'module.key_vault_diagnostic_policy_assignment.azurerm_resource_group_policy_assignment.assignment'
-
 terraform state rm 'module.key_vault_diagnostic_policy_log_analytics_role.azurerm_role_assignment.role_assignment'
-
 terraform state rm 'module.key_vault_diagnostic_policy_monitoring_role.azurerm_role_assignment.role_assignment'
-
 terraform state rm 'module.key_vault_diagnostic_setting.azurerm_monitor_diagnostic_setting.diagnostic_setting'
-
 terraform state rm 'module.key_vault_metric_alert.azurerm_monitor_metric_alert.metric_alert'
-
 terraform state rm 'module.linux_vm_data_collection_rule_association.azurerm_monitor_data_collection_rule_association.association'
-
 terraform state rm 'module.linux_vm_disk_alert.azurerm_monitor_scheduled_query_rules_alert_v2.scheduled_query_alert'
-
 terraform state rm 'module.linux_vm_memory_alert.azurerm_monitor_scheduled_query_rules_alert_v2.scheduled_query_alert'
-
 terraform state rm 'module.log_analytics.azurerm_log_analytics_workspace.log_analytics'
-
 terraform state rm 'module.monitor_action_group.azurerm_monitor_action_group.action_group'
-
 terraform state rm 'module.storage_account_diagnostic_policy_assignment.azurerm_resource_group_policy_assignment.assignment'
-
 terraform state rm 'module.storage_account_diagnostic_policy_log_analytics_role.azurerm_role_assignment.role_assignment'
-
 terraform state rm 'module.storage_account_diagnostic_policy_monitoring_role.azurerm_role_assignment.role_assignment'
-
 terraform state rm 'module.storage_account_diagnostic_setting.azurerm_monitor_diagnostic_setting.diagnostic_setting'
-
 terraform state rm 'module.storage_account_metric_alert.azurerm_monitor_metric_alert.metric_alert'
-
 terraform state rm 'module.subscription_activity_log_diagnostic_setting.azurerm_monitor_diagnostic_setting.diagnostic_setting'
-
 terraform state rm 'module.vmss_availability_metric_alert.azurerm_monitor_metric_alert.metric_alert'
-
 terraform state rm 'module.vmss_cpu_metric_alert.azurerm_monitor_metric_alert.metric_alert'
-
 terraform state rm 'module.vmss_data_collection_rule_association.azurerm_monitor_data_collection_rule_association.association'
-
 terraform state rm 'module.windows_vm_data_collection_rule_association.azurerm_monitor_data_collection_rule_association.association'
-
 terraform state rm 'module.windows_vm_disk_alert.azurerm_monitor_scheduled_query_rules_alert_v2.scheduled_query_alert'
-
 terraform state rm 'module.windows_vm_memory_alert.azurerm_monitor_scheduled_query_rules_alert_v2.scheduled_query_alert'
