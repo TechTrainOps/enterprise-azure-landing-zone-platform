@@ -558,7 +558,7 @@ module "linux_vm_data_collection_rule_association" {
   source = "../../../modules/monitoring/data-collection-rule-association"
 
   name                    = "dcr-assoc-linux-vm"
-  target_resource_id      = data.azurerm_linux_virtual_machine.linux_vm.id
+  target_resource_id      = data.azurerm_resources.linux_vm.resources[0].id
   data_collection_rule_id = module.compute_data_collection_rule.id
 
   description = "Associates the compute monitoring DCR with the Linux VM."
@@ -568,7 +568,7 @@ module "windows_vm_data_collection_rule_association" {
   source = "../../../modules/monitoring/data-collection-rule-association"
 
   name                    = "dcr-assoc-windows-vm"
-  target_resource_id      = data.azurerm_windows_virtual_machine.windows_vm.id
+  target_resource_id      = data.azurerm_resources.windows_vm.resources[0].id
   data_collection_rule_id = module.compute_data_collection_rule.id
 
   description = "Associates the compute monitoring DCR with the Windows VM."
@@ -578,7 +578,7 @@ module "vmss_data_collection_rule_association" {
   source = "../../../modules/monitoring/data-collection-rule-association"
 
   name                    = "dcr-assoc-vmss"
-  target_resource_id      = data.azurerm_linux_virtual_machine_scale_set.vmss.id
+  target_resource_id      = data.azurerm_resources.vmss.resources[0].id
   data_collection_rule_id = module.compute_data_collection_rule.id
 
   description = "Associates the compute monitoring DCR with the Linux VMSS."
@@ -596,8 +596,8 @@ module "compute_vm_cpu_metric_alert" {
   resource_group_name = data.azurerm_resource_group.rg.name
 
   scopes = [
-    data.azurerm_linux_virtual_machine.linux_vm.id,
-    data.azurerm_windows_virtual_machine.windows_vm.id
+    ddata.azurerm_resources.linux_vm.resources[0].id,
+    data.azurerm_resources.windows_vm.resources[0].id
   ]
 
   target_resource_type     = "Microsoft.Compute/virtualMachines"
@@ -637,8 +637,8 @@ module "compute_vm_availability_metric_alert" {
   resource_group_name = data.azurerm_resource_group.rg.name
 
   scopes = [
-    data.azurerm_linux_virtual_machine.linux_vm.id,
-    data.azurerm_windows_virtual_machine.windows_vm.id
+    data.azurerm_resources.linux_vm.resources[0].id,
+    data.azurerm_resources.windows_vm.resources[0].id
   ]
 
   target_resource_type     = "Microsoft.Compute/virtualMachines"
@@ -678,7 +678,7 @@ module "vmss_cpu_metric_alert" {
   resource_group_name = data.azurerm_resource_group.rg.name
 
   scopes = [
-    data.azurerm_linux_virtual_machine_scale_set.vmss.id
+    data.azurerm_resources.vmss.resources[0].id
   ]
 
   description = "Alerts when CPU utilization exceeds 80 percent on the enterprise Linux VMSS."
@@ -716,7 +716,7 @@ module "vmss_availability_metric_alert" {
   resource_group_name = data.azurerm_resource_group.rg.name
 
   scopes = [
-    data.azurerm_linux_virtual_machine_scale_set.vmss.id
+    data.azurerm_resources.vmss.resources[0].id
   ]
 
   description = "Alerts when an enterprise Linux VMSS becomes unavailable."
