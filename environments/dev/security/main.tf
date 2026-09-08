@@ -12,7 +12,7 @@ data "azurerm_resource_group" "rg" {
 # ============================================================
 
 module "key_vault" {
-  source = "../../../security/key-vault"
+  source = "../../../modules/security/key-vault"
 
   name                = var.key_vault_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -46,7 +46,7 @@ module "key_vault" {
 # ============================================================
 
 module "key_vault_pipeline_role_assignment" {
-  source = "../../../security/key-vault-role-assignment"
+  source = "../../../modules/security/key-vault-role-assignment"
 
   scope                = module.key_vault.id
   role_definition_name = var.key_vault_pipeline_role
@@ -59,7 +59,7 @@ module "key_vault_pipeline_role_assignment" {
 # ============================================================
 
 module "storage_account" {
-  source = "../../../security/storage-account"
+  source = "../../../modules/security/storage-account"
 
   name                = var.storage_account_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -99,7 +99,7 @@ module "storage_account" {
 # ============================================================
 
 module "storage_account_pipeline_role_assignment" {
-  source = "../../../security/key-vault-role-assignment"
+  source = "../../../modules/security/key-vault-role-assignment"
 
   scope                = module.storage_account.id
   role_definition_name = "Storage Blob Data Contributor"
@@ -112,7 +112,7 @@ module "storage_account_pipeline_role_assignment" {
 # ============================================================
 
 module "container_registry" {
-  source = "../../../security/container-registry"
+  source = "../../../modules/security/container-registry"
 
   name                = var.container_registry_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -144,7 +144,7 @@ module "container_registry" {
 # ============================================================
 
 module "acr_pipeline_role_assignment" {
-  source = "../../../security/key-vault-role-assignment"
+  source = "../../../modules/security/key-vault-role-assignment"
 
   scope                = module.container_registry.id
   role_definition_name = "AcrPush"
