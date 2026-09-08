@@ -596,7 +596,7 @@ module "compute_vm_cpu_metric_alert" {
   resource_group_name = data.azurerm_resource_group.rg.name
 
   scopes = [
-    ddata.azurerm_resources.linux_vm.resources[0].id,
+    data.azurerm_resources.linux_vm.resources[0].id,
     data.azurerm_resources.windows_vm.resources[0].id
   ]
 
