@@ -21,19 +21,28 @@ data "azurerm_container_registry" "container_registry" {
   resource_group_name = data.azurerm_resource_group.rg.name
 }
 
-data "azurerm_linux_virtual_machine" "linux_vm" {
-  name                = var.linux_vm_name
+data "azurerm_resources" "linux_vm" {
   resource_group_name = data.azurerm_resource_group.rg.name
+
+  type = "Microsoft.Compute/virtualMachines"
+
+  name = var.linux_vm_name
 }
 
-data "azurerm_windows_virtual_machine" "windows_vm" {
-  name                = var.windows_vm_name
+data "azurerm_resources" "windows_vm" {
   resource_group_name = data.azurerm_resource_group.rg.name
+
+  type = "Microsoft.Compute/virtualMachines"
+
+  name = var.windows_vm_name
 }
 
-data "azurerm_linux_virtual_machine_scale_set" "vmss" {
-  name                = var.vmss_name
+data "azurerm_resources" "vmss" {
   resource_group_name = data.azurerm_resource_group.rg.name
+
+  type = "Microsoft.Compute/virtualMachineScaleSets"
+
+  name = var.vmss_name
 }
 
 data "azurerm_subscription" "current" {}
