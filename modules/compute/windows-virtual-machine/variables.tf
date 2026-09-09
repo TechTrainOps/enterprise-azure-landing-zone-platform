@@ -38,7 +38,7 @@ variable "admin_password" {
 variable "os_disk_storage_account_type" {
   description = "Windows VM OS disk storage type"
   type        = string
-  default     = "Premium_LRS"
+  default     = "Standard_LRS"
 }
 
 variable "image_publisher" {

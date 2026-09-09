@@ -67,7 +67,7 @@ variable "image_version" {
 variable "os_disk_storage_account_type" {
   description = "OS disk storage account type"
   type        = string
-  default     = "Premium_LRS"
+  default     = "Standard_LRS"
 }
 
 variable "tags" {

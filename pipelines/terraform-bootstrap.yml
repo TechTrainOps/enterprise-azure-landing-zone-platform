@@ -25,57 +25,6 @@ variables:
 
 stages:
 
-  # TEMPORARY STAGE - Run only once
-  # - stage: MigrateState
-  #   displayName: Migrate Bootstrap State
-
-  #   jobs:
-  #     - deployment: TerraformStateMigration
-  #       displayName: Migrate Local State to Remote Backend
-  #       environment: 'bootstrap'
-
-  #       strategy:
-  #         runOnce:
-  #           deploy:
-  #             steps:
-
-  #               - checkout: self
-
-  #               - task: DownloadSecureFile@1
-  #                 name: DownloadBootstrapState
-  #                 displayName: Download Bootstrap Terraform State
-  #                 inputs:
-  #                   secureFile: 'terraform.tfstate'
-
-  #               - task: PowerShell@2
-  #                 displayName: Copy Terraform State
-  #                 inputs:
-  #                   targetType: inline
-  #                   workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformWorkingDirectory)'
-  #                   script: |
-  #                     Copy-Item `
-  #                       "$(DownloadBootstrapState.secureFilePath)" `
-  #                       "$(System.DefaultWorkingDirectory)/$(terraformWorkingDirectory)/terraform.tfstate" `
-  #                       -Force
-
-  #               - task: TerraformInstaller@1
-  #                 displayName: Install Terraform
-  #                 inputs:
-  #                   terraformVersion: '$(terraformVersion)'
-
-  #               - task: TerraformTaskV4@4
-  #                 displayName: Migrate Terraform State
-  #                 inputs:
-  #                   provider: 'azurerm'
-  #                   command: 'init'
-  #                   workingDirectory: '$(terraformWorkingDirectory)'
-  #                   backendServiceArm: '$(serviceConnection)'
-  #                   backendAzureRmResourceGroupName: '$(backendResourceGroupName)'
-  #                   backendAzureRmStorageAccountName: '$(backendStorageAccountName)'
-  #                   backendAzureRmContainerName: '$(backendContainerName)'
-  #                   backendAzureRmKey: '$(backendKey)'
-  #                   commandOptions: '-migrate-state -force-copy -input=false'
-
   - stage: Plan
     displayName: Terraform Bootstrap Plan
 

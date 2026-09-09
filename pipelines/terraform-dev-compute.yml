@@ -4,12 +4,20 @@ trigger:
       - main
   paths:
     include:
-      - environments/dev/**
-      - modules/**
-      - shared/**
-      - pipelines/terraform-dev.yml
+      - environments/dev/compute/**
+      - modules/compute/**
+      - pipelines/terraform-dev-compute.yml
 
-pr: none
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - environments/dev/compute/**
+      - modules/compute/**
+      - pipelines/terraform-dev-compute.yml
 
 pool:
   name: MultiOsPool
@@ -18,17 +26,89 @@ pool:
 
 variables:
   terraformVersion: '1.15.9'
-  terraformWorkingDirectory: 'environments/dev'
+  terraformWorkingDirectory: 'environments/dev/compute'
   serviceConnection: 'sc-ealz-dev'
 
   backendResourceGroup: 'rg-ealz-tfstate-eus2-001'
   backendStorageAccount: 'stealztfstate001'
   backendContainer: 'tfstate'
-  backendKey: 'dev.tfstate'
+  backendKey: 'dev-compute.tfstate'
 
 stages:
+
+  - stage: PRValidation
+    displayName: Terraform PR Validation
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+
+    jobs:
+      - job: TerraformValidation
+        displayName: Terraform Validate and Plan
+
+        steps:
+          - checkout: self
+
+          - task: TerraformInstaller@1
+            displayName: Install Terraform
+            inputs:
+              terraformVersion: '$(terraformVersion)'
+
+          - powershell: |
+              terraform fmt -check -recursive -diff
+            displayName: Terraform Format Check
+            workingDirectory: '$(Build.SourcesDirectory)'
+
+          - task: TerraformTaskV4@4
+            displayName: Terraform Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(terraformWorkingDirectory)'
+              backendServiceArm: '$(serviceConnection)'
+              backendAzureRmUseEntraIdForAuthentication: true
+              backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+              backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+              backendAzureRmContainerName: '$(backendContainer)'
+              backendAzureRmKey: '$(backendKey)'
+              commandOptions: '-input=false'
+
+          - task: TerraformTaskV4@4
+            displayName: Terraform Validate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+              workingDirectory: '$(terraformWorkingDirectory)'
+
+          - task: TerraformTaskV4@4
+            displayName: Terraform Plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(terraformWorkingDirectory)'
+              environmentServiceNameAzureRM: '$(serviceConnection)'
+              commandOptions: '-out=tfplan -input=false'
+
+          - powershell: |
+              terraform show -no-color tfplan | Out-File -FilePath tfplan.txt -Encoding utf8
+            displayName: Generate Readable Terraform Plan
+            workingDirectory: '$(terraformWorkingDirectory)'
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Terraform Plan
+            inputs:
+              targetPath: '$(terraformWorkingDirectory)/tfplan'
+              artifact: 'terraform-pr-compute-plan'
+              publishLocation: 'pipeline'
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Readable Terraform Plan
+            inputs:
+              targetPath: '$(terraformWorkingDirectory)/tfplan.txt'
+              artifact: 'terraform-pr-compute-plan-readable'
+              publishLocation: 'pipeline'
+
   - stage: Plan
     displayName: Terraform Plan
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
 
     jobs:
       - job: TerraformPlan
@@ -81,13 +161,13 @@ stages:
             displayName: Publish Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan'
-              artifact: 'terraform-plan'
+              artifact: 'terraform-compute-plan'
               publishLocation: 'pipeline'
 
   - stage: Apply
     displayName: Terraform Apply
     dependsOn: Plan
-    condition: succeeded()
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
     jobs:
       - deployment: TerraformApply
@@ -108,7 +188,7 @@ stages:
                 - task: DownloadPipelineArtifact@2
                   displayName: Download Terraform Plan
                   inputs:
-                    artifact: 'terraform-plan'
+                    artifact: 'terraform-compute-plan'
                     path: '$(terraformWorkingDirectory)'
 
                 - task: TerraformTaskV4@4

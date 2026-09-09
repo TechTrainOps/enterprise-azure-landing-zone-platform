@@ -25,8 +25,9 @@ resource "azurerm_windows_virtual_machine" "windows_vm" {
 
   computer_name = "win-ealz-dev-01"
 
-  admin_username = var.admin_username
-  admin_password = var.admin_password
+  admin_username                                         = var.admin_username
+  admin_password                                         = var.admin_password
+  bypass_platform_safety_checks_on_user_schedule_enabled = true
 
   network_interface_ids = [
     azurerm_network_interface.windows_vm.id
