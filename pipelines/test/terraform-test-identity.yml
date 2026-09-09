@@ -4,9 +4,9 @@ trigger:
       - main
   paths:
     include:
-      - environments/dev/monitoring/**
-      - modules/monitoring/**
-      - pipelines/terraform-dev-monitoring.yml
+      - environments/test/identity/**
+      - modules/identity/**
+      - pipelines/test/terraform-test-identity.yml
 
 pr:
   autoCancel: true
@@ -15,9 +15,9 @@ pr:
       - main
   paths:
     include:
-      - environments/dev/monitoring/**
-      - modules/monitoring/**
-      - pipelines/terraform-dev-monitoring.yml
+      - environments/test/identity/**
+      - modules/identity/**
+      - pipelines/test/terraform-test-identity.yml
 
 pool:
   name: MultiOsPool
@@ -26,13 +26,13 @@ pool:
 
 variables:
   terraformVersion: '1.15.9'
-  terraformWorkingDirectory: 'environments/dev/monitoring'
-  serviceConnection: 'sc-ealz-dev'
+  terraformWorkingDirectory: 'environments/test/identity'
+  serviceConnection: 'sc-ealz-test'
 
   backendResourceGroup: 'rg-ealz-tfstate-eus2-001'
   backendStorageAccount: 'stealztfstate001'
   backendContainer: 'tfstate'
-  backendKey: 'dev-monitoring.tfstate'
+  backendKey: 'test-identity.tfstate'
 
 stages:
 
@@ -96,14 +96,14 @@ stages:
             displayName: Publish Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan'
-              artifact: 'terraform-pr-monitoring-plan'
+              artifact: 'terraform-pr-identity-plan'
               publishLocation: 'pipeline'
 
           - task: PublishPipelineArtifact@1
             displayName: Publish Readable Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan.txt'
-              artifact: 'terraform-pr-monitoring-plan-readable'
+              artifact: 'terraform-pr-identity-plan-readable'
               publishLocation: 'pipeline'
 
   - stage: Plan
@@ -161,7 +161,7 @@ stages:
             displayName: Publish Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan'
-              artifact: 'terraform-monitoring-plan'
+              artifact: 'terraform-identity-plan'
               publishLocation: 'pipeline'
 
   - stage: Apply
@@ -172,7 +172,7 @@ stages:
     jobs:
       - deployment: TerraformApply
         displayName: Terraform Apply
-        environment: 'dev'
+        environment: 'test'
 
         strategy:
           runOnce:
@@ -188,7 +188,7 @@ stages:
                 - task: DownloadPipelineArtifact@2
                   displayName: Download Terraform Plan
                   inputs:
-                    artifact: 'terraform-monitoring-plan'
+                    artifact: 'terraform-identity-plan'
                     path: '$(terraformWorkingDirectory)'
 
                 - task: TerraformTaskV4@4

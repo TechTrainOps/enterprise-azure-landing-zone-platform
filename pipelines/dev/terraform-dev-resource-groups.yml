@@ -4,9 +4,9 @@ trigger:
       - main
   paths:
     include:
-      - environments/dev/security/**
-      - modules/security/**
-      - pipelines/terraform-dev-security.yml
+      - environments/dev/resource-groups/**
+      - modules/resource-group/**
+      - pipelines/dev/terraform-dev-resource-groups.yml
 
 pr:
   autoCancel: true
@@ -15,9 +15,9 @@ pr:
       - main
   paths:
     include:
-      - environments/dev/security/**
-      - modules/security/**
-      - pipelines/terraform-dev-security.yml
+      - environments/dev/resource-groups/**
+      - modules/resource-group/**
+      - pipelines/dev/terraform-dev-resource-groups.yml
 
 pool:
   name: MultiOsPool
@@ -26,13 +26,13 @@ pool:
 
 variables:
   terraformVersion: '1.15.9'
-  terraformWorkingDirectory: 'environments/dev/security'
+  terraformWorkingDirectory: 'environments/dev/resource-groups'
   serviceConnection: 'sc-ealz-dev'
 
   backendResourceGroup: 'rg-ealz-tfstate-eus2-001'
   backendStorageAccount: 'stealztfstate001'
   backendContainer: 'tfstate'
-  backendKey: 'dev-security.tfstate'
+  backendKey: 'dev-resource-groups.tfstate'
 
 stages:
 
@@ -96,14 +96,14 @@ stages:
             displayName: Publish Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan'
-              artifact: 'terraform-pr-security-plan'
+              artifact: 'terraform-pr-resource-groups-plan'
               publishLocation: 'pipeline'
 
           - task: PublishPipelineArtifact@1
             displayName: Publish Readable Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan.txt'
-              artifact: 'terraform-pr-security-plan-readable'
+              artifact: 'terraform-pr-resource-groups-plan-readable'
               publishLocation: 'pipeline'
 
   - stage: Plan
@@ -161,7 +161,7 @@ stages:
             displayName: Publish Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan'
-              artifact: 'terraform-security-plan'
+              artifact: 'terraform-resource-groups-plan'
               publishLocation: 'pipeline'
 
   - stage: Apply
@@ -188,7 +188,7 @@ stages:
                 - task: DownloadPipelineArtifact@2
                   displayName: Download Terraform Plan
                   inputs:
-                    artifact: 'terraform-security-plan'
+                    artifact: 'terraform-resource-groups-plan'
                     path: '$(terraformWorkingDirectory)'
 
                 - task: TerraformTaskV4@4

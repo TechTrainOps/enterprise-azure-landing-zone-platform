@@ -4,9 +4,9 @@ trigger:
       - main
   paths:
     include:
-      - environments/dev/identity/**
-      - modules/identity/**
-      - pipelines/terraform-dev-identity.yml
+      - environments/dev/compute/**
+      - modules/compute/**
+      - pipelines/dev/terraform-dev-compute.yml
 
 pr:
   autoCancel: true
@@ -15,9 +15,9 @@ pr:
       - main
   paths:
     include:
-      - environments/dev/identity/**
-      - modules/identity/**
-      - pipelines/terraform-dev-identity.yml
+      - environments/dev/compute/**
+      - modules/compute/**
+      - pipelines/dev/terraform-dev-compute.yml
 
 pool:
   name: MultiOsPool
@@ -26,13 +26,13 @@ pool:
 
 variables:
   terraformVersion: '1.15.9'
-  terraformWorkingDirectory: 'environments/dev/identity'
+  terraformWorkingDirectory: 'environments/dev/compute'
   serviceConnection: 'sc-ealz-dev'
 
   backendResourceGroup: 'rg-ealz-tfstate-eus2-001'
   backendStorageAccount: 'stealztfstate001'
   backendContainer: 'tfstate'
-  backendKey: 'dev-identity.tfstate'
+  backendKey: 'dev-compute.tfstate'
 
 stages:
 
@@ -96,14 +96,14 @@ stages:
             displayName: Publish Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan'
-              artifact: 'terraform-pr-identity-plan'
+              artifact: 'terraform-pr-compute-plan'
               publishLocation: 'pipeline'
 
           - task: PublishPipelineArtifact@1
             displayName: Publish Readable Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan.txt'
-              artifact: 'terraform-pr-identity-plan-readable'
+              artifact: 'terraform-pr-compute-plan-readable'
               publishLocation: 'pipeline'
 
   - stage: Plan
@@ -161,7 +161,7 @@ stages:
             displayName: Publish Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan'
-              artifact: 'terraform-identity-plan'
+              artifact: 'terraform-compute-plan'
               publishLocation: 'pipeline'
 
   - stage: Apply
@@ -188,7 +188,7 @@ stages:
                 - task: DownloadPipelineArtifact@2
                   displayName: Download Terraform Plan
                   inputs:
-                    artifact: 'terraform-identity-plan'
+                    artifact: 'terraform-compute-plan'
                     path: '$(terraformWorkingDirectory)'
 
                 - task: TerraformTaskV4@4

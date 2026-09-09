@@ -4,9 +4,9 @@ trigger:
       - main
   paths:
     include:
-      - environments/dev/compute/**
+      - environments/prod/compute/**
       - modules/compute/**
-      - pipelines/terraform-dev-compute.yml
+      - pipelines/prod/terraform-prod-compute.yml
 
 pr:
   autoCancel: true
@@ -15,9 +15,9 @@ pr:
       - main
   paths:
     include:
-      - environments/dev/compute/**
+      - environments/prod/compute/**
       - modules/compute/**
-      - pipelines/terraform-dev-compute.yml
+      - pipelines/prod/terraform-prod-compute.yml
 
 pool:
   name: MultiOsPool
@@ -26,13 +26,13 @@ pool:
 
 variables:
   terraformVersion: '1.15.9'
-  terraformWorkingDirectory: 'environments/dev/compute'
-  serviceConnection: 'sc-ealz-dev'
+  terraformWorkingDirectory: 'environments/prod/compute'
+  serviceConnection: 'sc-ealz-prod'
 
   backendResourceGroup: 'rg-ealz-tfstate-eus2-001'
   backendStorageAccount: 'stealztfstate001'
   backendContainer: 'tfstate'
-  backendKey: 'dev-compute.tfstate'
+  backendKey: 'prod-compute.tfstate'
 
 stages:
 
@@ -172,7 +172,7 @@ stages:
     jobs:
       - deployment: TerraformApply
         displayName: Terraform Apply
-        environment: 'dev'
+        environment: 'prod'
 
         strategy:
           runOnce:

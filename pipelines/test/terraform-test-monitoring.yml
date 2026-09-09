@@ -4,9 +4,9 @@ trigger:
       - main
   paths:
     include:
-      - environments/dev/resource-groups/**
-      - modules/resource-group/**
-      - pipelines/terraform-dev-resource-groups.yml
+      - environments/test/monitoring/**
+      - modules/monitoring/**
+      - pipelines/test/terraform-test-monitoring.yml
 
 pr:
   autoCancel: true
@@ -15,9 +15,9 @@ pr:
       - main
   paths:
     include:
-      - environments/dev/resource-groups/**
-      - modules/resource-group/**
-      - pipelines/terraform-dev-resource-groups.yml
+      - environments/test/monitoring/**
+      - modules/monitoring/**
+      - pipelines/test/terraform-test-monitoring.yml
 
 pool:
   name: MultiOsPool
@@ -26,13 +26,13 @@ pool:
 
 variables:
   terraformVersion: '1.15.9'
-  terraformWorkingDirectory: 'environments/dev/resource-groups'
-  serviceConnection: 'sc-ealz-dev'
+  terraformWorkingDirectory: 'environments/test/monitoring'
+  serviceConnection: 'sc-ealz-test'
 
   backendResourceGroup: 'rg-ealz-tfstate-eus2-001'
   backendStorageAccount: 'stealztfstate001'
   backendContainer: 'tfstate'
-  backendKey: 'dev-resource-groups.tfstate'
+  backendKey: 'test-monitoring.tfstate'
 
 stages:
 
@@ -96,14 +96,14 @@ stages:
             displayName: Publish Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan'
-              artifact: 'terraform-pr-resource-groups-plan'
+              artifact: 'terraform-pr-monitoring-plan'
               publishLocation: 'pipeline'
 
           - task: PublishPipelineArtifact@1
             displayName: Publish Readable Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan.txt'
-              artifact: 'terraform-pr-resource-groups-plan-readable'
+              artifact: 'terraform-pr-monitoring-plan-readable'
               publishLocation: 'pipeline'
 
   - stage: Plan
@@ -161,7 +161,7 @@ stages:
             displayName: Publish Terraform Plan
             inputs:
               targetPath: '$(terraformWorkingDirectory)/tfplan'
-              artifact: 'terraform-resource-groups-plan'
+              artifact: 'terraform-monitoring-plan'
               publishLocation: 'pipeline'
 
   - stage: Apply
@@ -172,7 +172,7 @@ stages:
     jobs:
       - deployment: TerraformApply
         displayName: Terraform Apply
-        environment: 'dev'
+        environment: 'test'
 
         strategy:
           runOnce:
@@ -188,7 +188,7 @@ stages:
                 - task: DownloadPipelineArtifact@2
                   displayName: Download Terraform Plan
                   inputs:
-                    artifact: 'terraform-resource-groups-plan'
+                    artifact: 'terraform-monitoring-plan'
                     path: '$(terraformWorkingDirectory)'
 
                 - task: TerraformTaskV4@4
