@@ -4,55 +4,106 @@
 
 The platform uses Azure DevOps pipelines to validate and deploy Terraform infrastructure.
 
-Each environment is divided into seven independent Terraform domains.
+Each environment contains seven independent Terraform domains:
 
-Each domain has its own pipeline and Terraform state.
+1. Resource Groups
+2. Identity
+3. Networking
+4. Security
+5. Monitoring
+6. Compute
+7. Governance
 
-The deployment process supports:
+Each domain has its own Terraform root and Terraform state.
 
-- Pull Request validation
-- Terraform plan
-- Main branch deployment
-- Environment approval
-- Terraform apply
+The Azure DevOps pipelines use a shared Terraform template to avoid duplicating the same pipeline logic across environments and domains.
 
-## Terraform Roots
-
-Each environment contains the following Terraform roots:
+## Pipeline Structure
 
 ```text
-environments/
+pipelines/
+│
+├── templates/
+│   └── terraform-domain.yml
+│
 ├── dev/
-│   ├── resource-groups/
-│   ├── identity/
-│   ├── networking/
-│   ├── security/
-│   ├── monitoring/
-│   ├── compute/
-│   └── governance/
+│   ├── terraform-dev-resource-groups.yml
+│   ├── terraform-dev-identity.yml
+│   ├── terraform-dev-networking.yml
+│   ├── terraform-dev-security.yml
+│   ├── terraform-dev-monitoring.yml
+│   ├── terraform-dev-compute.yml
+│   └── terraform-dev-governance.yml
 │
 ├── test/
-│   ├── resource-groups/
-│   ├── identity/
-│   ├── networking/
-│   ├── security/
-│   ├── monitoring/
-│   ├── compute/
-│   └── governance/
+│   ├── terraform-test-resource-groups.yml
+│   ├── terraform-test-identity.yml
+│   ├── terraform-test-networking.yml
+│   ├── terraform-test-security.yml
+│   ├── terraform-test-monitoring.yml
+│   ├── terraform-test-compute.yml
+│   └── terraform-test-governance.yml
 │
-└── prod/
-    ├── resource-groups/
-    ├── identity/
-    ├── networking/
-    ├── security/
-    ├── monitoring/
-    ├── compute/
-    └── governance/
+├── prod/
+│   ├── terraform-prod-resource-groups.yml
+│   ├── terraform-prod-identity.yml
+│   ├── terraform-prod-networking.yml
+│   ├── terraform-prod-security.yml
+│   ├── terraform-prod-monitoring.yml
+│   ├── terraform-prod-compute.yml
+│   └── terraform-prod-governance.yml
+│
+└── terraform-bootstrap.yml
 ```
 
-## Development Pipelines
+## Shared Terraform Pipeline Template
 
-The Development environment has seven Azure DevOps pipelines:
+The common Terraform pipeline logic is stored in:
+
+```text
+pipelines/templates/terraform-domain.yml
+```
+
+The shared template contains the common stages used by the domain pipelines.
+
+### Pull Request Validation
+
+```text
+PR Validation
+     |
+     +-- Terraform Install
+     +-- Terraform Format Check
+     +-- Terraform Init
+     +-- Terraform Validate
+     +-- Terraform Plan
+     +-- Publish Plan
+```
+
+### Main Branch Deployment
+
+```text
+Plan
+ |
+ +-- Terraform Install
+ +-- Terraform Format Check
+ +-- Terraform Init
+ +-- Terraform Validate
+ +-- Terraform Plan
+ +-- Publish Plan
+ |
+ v
+Apply
+ |
+ +-- Download Plan
+ +-- Terraform Init
+ +-- Terraform Apply
+```
+
+## Environment Pipeline Files
+
+Each environment contains seven domain-specific pipeline files.
+
+### Development
 
 ```text
 terraform-dev-resource-groups.yml
@@ -64,19 +115,63 @@ terraform-dev-compute.yml
 terraform-dev-governance.yml
 ```
 
-Each pipeline manages only its corresponding Terraform root.
+### Test
+
+```text
+terraform-test-resource-groups.yml
+terraform-test-identity.yml
+terraform-test-networking.yml
+terraform-test-security.yml
+terraform-test-monitoring.yml
+terraform-test-compute.yml
+terraform-test-governance.yml
+```
+
+### Production
+
+```text
+terraform-prod-resource-groups.yml
+terraform-prod-identity.yml
+terraform-prod-networking.yml
+terraform-prod-security.yml
+terraform-prod-monitoring.yml
+terraform-prod-compute.yml
+terraform-prod-governance.yml
+```
+
+## Environment Pipeline Configuration
+
+Environment-specific pipeline files reference the shared Terraform template.
 
 For example:
 
 ```text
-terraform-dev-networking.yml
-        |
-        └── environments/dev/networking/
+pipelines/dev/terraform-dev-compute.yml
+```
+
+references:
+
+```text
+pipelines/templates/terraform-domain.yml
+```
+
+The environment/domain pipeline provides:
+
+```text
+environmentName
+domainName
+terraformWorkingDirectory
+serviceConnection
+backendResourceGroup
+backendStorageAccount
+backendContainer
+backendKey
+deploymentEnvironment
 ```
 
 ## Pull Request Validation
 
-When a Pull Request targets the `main` branch, the relevant pipeline performs validation and planning.
+When a Pull Request targets the `main` branch, the relevant domain pipeline performs validation and planning.
 
 The flow is:
 
@@ -100,27 +195,49 @@ Terraform Validate
      |
      v
 Terraform Plan
+     |
+     v
+Publish Plan
 ```
 
 No Terraform Apply is performed during Pull Request validation.
+
+## Path Filters
+
+Each pipeline uses path filters so that only relevant changes trigger the pipeline.
+
+For example, the Development Compute pipeline monitors:
+
+```text
+environments/dev/compute/**
+modules/compute/**
+pipelines/dev/terraform-dev-compute.yml
+pipelines/templates/**
+```
+
+The shared template is included in the path filter because changes to the shared Terraform pipeline logic can affect all domain pipelines.
+
+Each environment/domain pipeline follows the same pattern with its corresponding environment and domain paths.
 
 ## Terraform Format Check
 
 The pipeline checks Terraform formatting using:
 
-```text
+```powershell
 terraform fmt -check -recursive -diff
 ```
 
-The check is performed from the repository root.
+The format check is performed from the repository root.
 
-## Terraform Init
+## Terraform Initialization
 
-Each pipeline initializes Terraform using its own backend configuration.
+Each Terraform root uses its own backend configuration.
 
-Example for Development Compute:
+Example:
 
 ```text
+Development Compute
+
 Working Directory:
 environments/dev/compute/
 
@@ -128,13 +245,23 @@ Backend Key:
 dev-compute.tfstate
 ```
 
-## Terraform Validate
+Terraform is initialized using:
 
-The pipeline validates the Terraform configuration before generating the plan.
+```text
+terraform init
+```
+
+The backend uses Azure Storage with Microsoft Entra ID authentication.
+
+## Terraform Validation
+
+After initialization, the pipeline validates the Terraform configuration:
 
 ```text
 terraform validate
 ```
+
+Validation must succeed before the Terraform plan is generated.
 
 ## Terraform Plan
 
@@ -144,29 +271,28 @@ The pipeline generates a Terraform plan using:
 terraform plan -out=tfplan -input=false
 ```
 
-For Pull Request validation, the plan is also converted to a readable text file.
+The plan is stored as:
 
 ```text
 tfplan
+```
+
+For Pull Request validation, a readable version is also generated:
+
+```text
 tfplan.txt
 ```
 
-The plan artifacts can be reviewed from the Azure DevOps pipeline run.
+The plan files are published as Azure DevOps pipeline artifacts.
 
 ## Main Branch Deployment
 
-After a Pull Request is merged into `main`, the deployment pipeline is triggered.
+After a Pull Request is merged into `main`, the relevant pipeline runs the deployment stages.
 
 The flow is:
 
 ```text
 Merge to main
-     |
-     v
-Terraform Init
-     |
-     v
-Terraform Validate
      |
      v
 Terraform Plan
@@ -183,11 +309,15 @@ Terraform Apply
 
 ## Plan and Apply Separation
 
-The deployment pipeline creates the Terraform plan during the Plan stage.
+The Plan stage creates the Terraform plan:
 
-The generated plan is published as a pipeline artifact.
+```text
+tfplan
+```
 
-The Apply stage downloads the same plan artifact.
+The plan is published as a pipeline artifact.
+
+The Apply stage downloads the same artifact.
 
 ```text
 Plan Stage
@@ -203,11 +333,9 @@ Apply Stage
     └── terraform apply tfplan
 ```
 
-This ensures that the Apply stage uses the plan generated by the deployment Plan stage.
+This ensures that the Apply stage uses the plan generated by the Plan stage.
 
 ## Apply Conditions
-
-The Apply stage depends on the Plan stage.
 
 The Apply stage runs only when:
 
@@ -225,87 +353,85 @@ condition: and(
 
 This prevents Terraform Apply from running during Pull Request validation.
 
-## Environment Approval
+## Azure DevOps Environments
 
-The Development deployment uses the Azure DevOps environment:
-
-```yaml
-environment: 'dev'
-```
-
-The configured approval must be completed before Terraform Apply proceeds.
-
-Test and Production deployments should use their respective Azure DevOps environments:
-
-```text
-dev
-test
-prod
-```
-
-## Backend State
-
-Each Terraform root uses a dedicated backend state.
+Each deployment environment has its own Azure DevOps environment.
 
 Development:
 
 ```text
-dev-resource-groups.tfstate
-dev-identity.tfstate
-dev-networking.tfstate
-dev-security.tfstate
-dev-monitoring.tfstate
-dev-compute.tfstate
-dev-governance.tfstate
+dev
 ```
 
 Test:
 
 ```text
-test-resource-groups.tfstate
-test-identity.tfstate
-test-networking.tfstate
-test-security.tfstate
-test-monitoring.tfstate
-test-compute.tfstate
-test-governance.tfstate
+test
 ```
 
 Production:
 
 ```text
-prod-resource-groups.tfstate
-prod-identity.tfstate
-prod-networking.tfstate
-prod-security.tfstate
-prod-monitoring.tfstate
-prod-compute.tfstate
-prod-governance.tfstate
+prod
 ```
 
-## Pipeline Path Filters
+The Azure DevOps environment provides the deployment approval control before Terraform Apply.
 
-Each pipeline should run only when relevant files change.
+## Backend Configuration
 
-For example, the Development Compute pipeline monitors:
+Each domain uses a separate Terraform state.
+
+Example for Compute:
 
 ```text
-environments/dev/compute/**
+Development:
+dev-compute.tfstate
+
+Test:
+test-compute.tfstate
+
+Production:
+prod-compute.tfstate
 ```
 
-and the corresponding reusable Compute module directory.
+The backend storage is:
 
-Changes to unrelated domains should not trigger the Compute pipeline.
+```text
+Resource Group:
+rg-ealz-tfstate-eus2-001
+
+Storage Account:
+stealztfstate001
+
+Container:
+tfstate
+```
+
+## Pipeline Naming Convention
+
+Pipeline files follow this naming convention:
+
+```text
+terraform-<environment>-<domain>.yml
+```
+
+Examples:
+
+```text
+terraform-dev-compute.yml
+terraform-test-compute.yml
+terraform-prod-compute.yml
+```
 
 ## Deployment Model
 
-The deployment model is:
+The complete deployment flow is:
 
 ```text
                     Pull Request
                          |
                          v
-                 PR Validation
+                  PR Validation
                          |
                   Terraform Plan
                          |
@@ -319,11 +445,79 @@ The deployment model is:
                   Terraform Plan
                          |
                          v
-                 Environment Approval
+                  Publish Plan
+                         |
+                         v
+                Environment Approval
                          |
                          v
                   Terraform Apply
 ```
+
+## Independent Domain Deployment
+
+Each domain is deployed independently.
+
+For example:
+
+```text
+Networking Change
+       |
+       v
+terraform-dev-networking.yml
+       |
+       v
+environments/dev/networking/
+       |
+       v
+dev-networking.tfstate
+```
+
+A Networking deployment does not automatically modify:
+
+```text
+dev-compute.tfstate
+dev-security.tfstate
+dev-monitoring.tfstate
+dev-governance.tfstate
+```
+
+Each domain maintains its own Terraform ownership.
+
+## Pipeline Template Benefits
+
+The shared template provides a single location for common Terraform pipeline logic.
+
+The template handles:
+
+- Terraform installation
+- Terraform formatting
+- Terraform initialization
+- Terraform validation
+- Terraform plan
+- Plan artifact creation
+- Plan artifact download
+- Terraform apply
+
+Environment/domain pipeline files contain configuration specific to the environment and domain.
+
+If common pipeline behavior changes, the shared template can be updated instead of modifying all domain pipelines individually.
+
+## Pipeline Count
+
+The deployment model contains:
+
+```text
+3 environments
+×
+7 domains
+=
+21 domain pipelines
+```
+
+All 21 domain pipelines use the same shared Terraform pipeline template.
+
+The Terraform bootstrap pipeline is separate from the 21 environment/domain pipelines.
 
 ## Deployment Principles
 
@@ -337,7 +531,7 @@ They must not modify Azure infrastructure.
 
 Merging to `main` triggers the deployment pipeline.
 
-The pipeline generates a new Terraform plan before applying changes.
+The pipeline generates a Terraform plan before applying changes.
 
 ### Approval
 
@@ -345,36 +539,14 @@ Terraform Apply requires the configured Azure DevOps environment approval.
 
 ### Independent Domains
 
-Each domain is deployed independently.
+Each domain is deployed independently using its own Terraform root and state.
 
-A change to Networking does not require the Compute, Security, or Monitoring Terraform states to be applied.
+### Shared Pipeline Logic
 
-## Pipeline Naming Convention
-
-The naming convention is:
+Common pipeline logic must be maintained in:
 
 ```text
-terraform-<environment>-<domain>.yml
+pipelines/templates/terraform-domain.yml
 ```
 
-Examples:
-
-```text
-terraform-dev-networking.yml
-terraform-test-networking.yml
-terraform-prod-networking.yml
-```
-
-## Pipeline Count
-
-The target deployment model is:
-
-```text
-7 domains
-×
-3 environments
-=
-21 pipelines
-```
-
-Each pipeline manages one environment and one Terraform domain.
+Environment-specific configuration belongs in the corresponding environment pipeline file.

@@ -16,6 +16,14 @@ The infrastructure is divided into seven independent domains:
 
 Each domain has its own Terraform root and independent Terraform state.
 
+The platform supports multiple environments:
+
+- Development
+- Test
+- Production
+
+Each environment follows the same seven-domain structure.
+
 ## Repository Structure
 
 ```text
@@ -60,26 +68,68 @@ enterprise-azure-landing-zone-platform/
 │       └── governance/
 │
 ├── modules/
+│   ├── compute/
+│   ├── governance/
+│   ├── identity/
+│   ├── monitoring/
+│   ├── networking/
+│   ├── resource-group/
+│   └── security/
+│
 ├── pipelines/
+│   ├── templates/
+│   │   └── terraform-domain.yml
+│   │
+│   ├── dev/
+│   │   ├── terraform-dev-resource-groups.yml
+│   │   ├── terraform-dev-identity.yml
+│   │   ├── terraform-dev-networking.yml
+│   │   ├── terraform-dev-security.yml
+│   │   ├── terraform-dev-monitoring.yml
+│   │   ├── terraform-dev-compute.yml
+│   │   └── terraform-dev-governance.yml
+│   │
+│   ├── test/
+│   │   ├── terraform-test-resource-groups.yml
+│   │   ├── terraform-test-identity.yml
+│   │   ├── terraform-test-networking.yml
+│   │   ├── terraform-test-security.yml
+│   │   ├── terraform-test-monitoring.yml
+│   │   ├── terraform-test-compute.yml
+│   │   └── terraform-test-governance.yml
+│   │
+│   ├── prod/
+│   │   ├── terraform-prod-resource-groups.yml
+│   │   ├── terraform-prod-identity.yml
+│   │   ├── terraform-prod-networking.yml
+│   │   ├── terraform-prod-security.yml
+│   │   ├── terraform-prod-monitoring.yml
+│   │   ├── terraform-prod-compute.yml
+│   │   └── terraform-prod-governance.yml
+│   │
+│   └── terraform-bootstrap.yml
+│
 └── scripts/
 ```
 
 ## Environment Architecture
 
-Each environment follows the same seven-domain structure.
+Each environment contains seven independent Terraform roots.
 
 ```text
                          Environment
                               |
         -------------------------------------------------
         |         |          |          |        |      |
-        RG     Identity   Networking  Security Monitoring
-                                                         
-                              |                   |
-                           Compute            Governance
+   Resource   Identity   Networking  Security Monitoring
+    Groups
+        |
+        +-------------------+-------------------+
+                            |                   |
+                         Compute            Governance
 ```
 
-Each domain is independently managed using its own Terraform root and state file.
+The seven domains are logically independent and maintain separate Terraform state.
 
 ## Domain Ownership
 
@@ -98,6 +148,8 @@ Responsible for:
 - Key Vault access for the Managed Identity
 - Storage Account access for the Managed Identity
 - Azure Container Registry access for the Managed Identity
+
+Managed Identity and its role assignments are owned only by Identity.
 
 ### Networking
 
@@ -118,6 +170,8 @@ Responsible for:
 - Private DNS Zone Virtual Network Links
 - Private Endpoint DNS Zone Groups
 
+Networking owns Private Endpoints and Private DNS resources.
+
 ### Security
 
 Responsible for:
@@ -127,9 +181,13 @@ Responsible for:
 - Azure Container Registry
 - Security-related RBAC assignments
 
-Private Endpoints and Private DNS are owned by Networking.
+Private Endpoints and Private DNS are not managed by Security.
 
-Managed Identity and its RBAC assignments are owned by Identity.
+They are owned by Networking.
+
+Managed Identity and its RBAC assignments are not managed by Security.
+
+They are owned by Identity.
 
 ### Monitoring
 
@@ -145,6 +203,8 @@ Responsible for:
 - Scheduled Query Alerts
 - Data Collection Rules
 - Data Collection Rule Associations
+
+Diagnostic policy assignments and their required monitoring RBAC remain owned by Monitoring.
 
 ### Compute
 
@@ -162,7 +222,7 @@ Responsible for:
 
 Networking resources such as VNets, subnets and NSGs remain owned by Networking.
 
-Monitoring resources such as DCRs, DCR associations and alerts remain owned by Monitoring.
+Monitoring resources such as Data Collection Rules, associations and alerts remain owned by Monitoring.
 
 ### Governance
 
@@ -172,6 +232,52 @@ Responsible for:
 - Azure Policy Assignments
 
 Monitoring diagnostic policy assignments remain under Monitoring ownership.
+
+## Cross-Domain Resource Ownership
+
+A resource must be managed by only one Terraform root.
+
+Examples:
+
+```text
+Resource Group
+    └── Resource Groups
+
+Managed Identity
+    └── Identity
+
+Private Endpoint
+    └── Networking
+
+Private DNS Zone
+    └── Networking
+
+Key Vault
+    └── Security
+
+Storage Account
+    └── Security
+
+Azure Container Registry
+    └── Security
+
+Diagnostic Settings
+    └── Monitoring
+
+Data Collection Rules
+    └── Monitoring
+
+Virtual Machine
+    └── Compute
+
+Virtual Machine Scale Set
+    └── Compute
+
+Azure Policy Assignment
+    └── Governance
+```
+
+This prevents multiple Terraform states from attempting to manage the same Azure resource.
 
 ## Terraform State Architecture
 
@@ -188,7 +294,9 @@ Container:
 tfstate
 ```
 
-Development uses seven independent state files:
+Each environment and domain uses an independent state file.
+
+### Development
 
 ```text
 dev-resource-groups.tfstate
@@ -200,11 +308,33 @@ dev-compute.tfstate
 dev-governance.tfstate
 ```
 
-Test and Production will follow the same naming convention.
+### Test
+
+```text
+test-resource-groups.tfstate
+test-identity.tfstate
+test-networking.tfstate
+test-security.tfstate
+test-monitoring.tfstate
+test-compute.tfstate
+test-governance.tfstate
+```
+
+### Production
+
+```text
+prod-resource-groups.tfstate
+prod-identity.tfstate
+prod-networking.tfstate
+prod-security.tfstate
+prod-monitoring.tfstate
+prod-compute.tfstate
+prod-governance.tfstate
+```
 
 ## State Isolation
 
-Each environment and domain must have its own state.
+Each environment and domain must use its own Terraform state.
 
 For example:
 
@@ -216,30 +346,54 @@ prod-compute.tfstate
 
 An environment must never use another environment's Terraform state.
 
-## Cross-Domain Ownership
+Similarly, one domain must not use another domain's state.
 
-Resources are managed by only one Terraform root.
+## Pipeline Architecture
 
-Examples:
+Azure DevOps pipelines are separated by environment and domain.
+
+The common Terraform pipeline logic is maintained in:
 
 ```text
-Private Endpoint
-    └── Networking
-
-Managed Identity
-    └── Identity
-
-Key Vault
-    └── Security
-
-Diagnostic Settings
-    └── Monitoring
-
-Azure Policy Assignment
-    └── Governance
-
-Virtual Machine
-    └── Compute
+pipelines/templates/terraform-domain.yml
 ```
 
-This prevents multiple Terraform states from attempting to manage the same Azure resource.
+Environment-specific pipeline files provide configuration to the shared template.
+
+The configuration includes:
+
+- Environment name
+- Domain name
+- Terraform working directory
+- Service connection
+- Backend resource group
+- Backend storage account
+- Backend container
+- Backend state key
+- Azure DevOps deployment environment
+
+This avoids duplicating the same Terraform pipeline logic across all environments and domains.
+
+## Pipeline Organization
+
+```text
+pipelines/
+│
+├── templates/
+│   └── terraform-domain.yml
+│
+├── dev/
+│   └── 7 domain pipelines
+│
+├── test/
+│   └── 7 domain pipelines
+│
+├── prod/
+│   └── 7 domain pipelines
+│
+└── terraform-bootstrap.yml
+```
+
+The shared template contains the common Terraform workflow.
+
+The environment-specific pipeline files provide only the values that differ between environments and domains.
