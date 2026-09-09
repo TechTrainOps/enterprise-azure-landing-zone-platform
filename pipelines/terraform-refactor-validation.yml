@@ -234,7 +234,7 @@ stages:
               backendServiceArm: '$(serviceConnection)'
               backendAzureRmUseEntraIdForAuthentication: true
               backendAzureRmResourceGroupName: '$(backendResourceGroup)'
-              backendStorageAccountName: '$(backendStorageAccount)'
+              backendAzureRmStorageAccountName: '$(backendStorageAccount)'
               backendAzureRmContainerName: '$(backendContainer)'
               backendAzureRmKey: 'dev-compute.tfstate'
               commandOptions: '-input=false'
