@@ -1,5 +1,5 @@
 # Go to the old monolithic Terraform root
-cd "$env:BUILD_SOURCESDIRECTORY\governance\environments\dev"
+cd "$env:BUILD_SOURCESDIRECTORY\environments\dev"
 
 Write-Host "=== Creating backup of old monolithic state ==="
 
