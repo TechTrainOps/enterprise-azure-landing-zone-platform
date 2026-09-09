@@ -76,3 +76,5 @@ Each compute module contains:
 
 **Typical use**
 Provides the compute layer for landing-zone workloads, including Linux and Windows virtual machines, VM Scale Sets, managed disks, availability sets, and monitoring/management extensions.
+
+END

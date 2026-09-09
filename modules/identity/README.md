@@ -21,3 +21,5 @@ Creates a reusable Azure User Assigned Managed Identity.
 
 **Typical use**
 Used by compute resources and Azure service integrations that require Azure AD / Microsoft Entra authentication without storing credentials.
+
+END

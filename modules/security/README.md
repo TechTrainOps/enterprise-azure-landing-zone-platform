@@ -49,3 +49,5 @@ Each security module contains:
 
 **Typical use**
 Used to provide protected platform services such as Key Vault, private Storage, and private Azure Container Registry resources.
+
+END

@@ -22,3 +22,5 @@ Creates an Azure Resource Group.
 
 **Typical use**
 Used as the foundational scope for the Azure landing-zone resources deployed into an environment.
+
+END

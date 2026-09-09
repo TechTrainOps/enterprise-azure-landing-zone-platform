@@ -74,3 +74,5 @@ Each monitoring module contains:
 
 **Typical use**
 Provides the monitoring layer for platform resources and compute workloads, including guest performance telemetry, activity logs, metrics, and KQL-based alerts.
+
+END
