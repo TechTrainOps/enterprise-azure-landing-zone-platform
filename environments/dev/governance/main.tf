@@ -7,7 +7,7 @@ data "azurerm_resource_group" "rg" {
 # ============================================================
 
 module "required_tags_policy" {
-  source = "../../../governance/policy"
+  source = "../../../modules/governance/policy"
 
   name         = "require-standard-tags"
   display_name = "Require standard resource tags"
@@ -15,7 +15,7 @@ module "required_tags_policy" {
 }
 
 module "required_tags_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "required-tags-dev"
 
@@ -32,7 +32,7 @@ module "required_tags_policy_assignment" {
 # ============================================================
 
 module "allowed_regions_policy" {
-  source = "../../../governance/allowed-regions"
+  source = "../../../modules/governance/allowed-regions"
 
   name         = "allowed-azure-regions"
   display_name = "Allowed Azure regions"
@@ -42,7 +42,7 @@ module "allowed_regions_policy" {
 }
 
 module "allowed_regions_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "allowed-regions-dev"
 
@@ -63,7 +63,7 @@ data "azurerm_policy_definition" "acr_public_network_access" {
 }
 
 module "acr_public_network_access_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "acr-public-network-access-dev"
 
@@ -87,7 +87,7 @@ data "azurerm_policy_definition" "acr_local_admin_disabled" {
 }
 
 module "acr_local_admin_disabled_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "acr-local-admin-disabled-dev"
 
@@ -111,7 +111,7 @@ data "azurerm_policy_definition" "acr_private_link" {
 }
 
 module "acr_private_link_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "acr-private-link-dev"
 
@@ -139,7 +139,7 @@ data "azurerm_policy_definition" "storage_secure_transfer" {
 }
 
 module "storage_secure_transfer_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "storage-secure-transfer-dev"
 
@@ -163,7 +163,7 @@ data "azurerm_policy_definition" "storage_minimum_tls" {
 }
 
 module "storage_minimum_tls_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "storage-minimum-tls-dev"
 
@@ -191,7 +191,7 @@ data "azurerm_policy_definition" "storage_public_network_access" {
 }
 
 module "storage_public_network_access_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "storage-public-network-access-dev"
 
@@ -215,7 +215,7 @@ data "azurerm_policy_definition" "storage_blob_public_access" {
 }
 
 module "storage_blob_public_access_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "storage-blob-public-access-dev"
 
@@ -239,7 +239,7 @@ data "azurerm_policy_definition" "storage_shared_key_access" {
 }
 
 module "storage_shared_key_access_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "storage-shared-key-access-dev"
 
@@ -263,7 +263,7 @@ data "azurerm_policy_definition" "storage_private_link" {
 }
 
 module "storage_private_link_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "storage-private-link-dev"
 
@@ -291,7 +291,7 @@ data "azurerm_policy_definition" "key_vault_rbac" {
 }
 
 module "key_vault_rbac_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "key-vault-rbac-dev"
 
@@ -315,7 +315,7 @@ data "azurerm_policy_definition" "key_vault_public_network_access" {
 }
 
 module "key_vault_public_network_access_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "key-vault-public-network-access-dev"
 
@@ -339,7 +339,7 @@ data "azurerm_policy_definition" "key_vault_purge_protection" {
 }
 
 module "key_vault_purge_protection_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "key-vault-purge-protection-dev"
 
@@ -363,7 +363,7 @@ data "azurerm_policy_definition" "key_vault_soft_delete" {
 }
 
 module "key_vault_soft_delete_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "key-vault-soft-delete-dev"
 
@@ -391,7 +391,7 @@ data "azurerm_policy_definition" "subnet_nsg_association" {
 }
 
 module "subnet_nsg_association_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "subnet-nsg-association-dev"
 
@@ -419,7 +419,7 @@ data "azurerm_policy_definition" "vnet_flow_logs" {
 }
 
 module "vnet_flow_logs_policy_assignment" {
-  source = "../../../governance/policy-assignment"
+  source = "../../../modules/governance/policy-assignment"
 
   name = "vnet-flow-logs-dev"
 
