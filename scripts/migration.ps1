@@ -9,6 +9,4 @@ if ($LASTEXITCODE -ne 0) {
     throw "Terraform init failed."
 }
 
-terraform state show 'module.availability_set.azurerm_availability_set.compute'
-
-terraform state show 'module.availability_set.azurerm_availability_set.compute' | Select-String "id|resource_group_name"
+terraform state pull | Select-String -Pattern "availset-ealz-dev-eastus2-001" -Context 5,10
