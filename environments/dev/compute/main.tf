@@ -19,7 +19,7 @@ data "azurerm_user_assigned_identity" "managed_identity" {
 # ============================================================
 
 module "availability_set" {
-  source = "../../../compute/availability-set"
+  source = "../../../modules/compute/availability-set"
 
   name                = var.availability_set_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -39,7 +39,7 @@ module "availability_set" {
 # ============================================================
 
 module "linux_virtual_machine" {
-  source = "../../../compute/linux-virtual-machine"
+  source = "../../../modules/compute/linux-virtual-machine"
 
   name                = var.linux_vm_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -72,7 +72,7 @@ module "linux_virtual_machine" {
 # ============================================================
 
 module "windows_virtual_machine" {
-  source = "../../../compute/windows-virtual-machine"
+  source = "../../../modules/compute/windows-virtual-machine"
 
   name                = var.windows_vm_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -103,7 +103,7 @@ module "windows_virtual_machine" {
 # ============================================================
 
 module "managed_disk" {
-  source = "../../../compute/managed-disk"
+  source = "../../../modules/compute/managed-disk"
 
   name                = var.managed_disk_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -127,7 +127,7 @@ module "managed_disk" {
 # ============================================================
 
 module "linux_vm_extension" {
-  source = "../../../compute/virtual-machine-extension"
+  source = "../../../modules/compute/virtual-machine-extension"
 
   name               = var.vm_extension_name
   virtual_machine_id = module.linux_virtual_machine.id
@@ -150,7 +150,7 @@ module "linux_vm_extension" {
 # ============================================================
 
 module "linux_virtual_machine_scale_set" {
-  source = "../../../compute/virtual-machine-scale-set"
+  source = "../../../modules/compute/virtual-machine-scale-set"
 
   name                = var.vmss_name
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -182,7 +182,7 @@ module "linux_virtual_machine_scale_set" {
 # ============================================================
 
 module "windows_vm_extension" {
-  source = "../../../compute/windows-vm-extension"
+  source = "../../../modules/compute/windows-vm-extension"
 
   name               = "ama-windows"
   virtual_machine_id = module.windows_virtual_machine.id
@@ -201,7 +201,7 @@ module "windows_vm_extension" {
 # ============================================================
 
 module "vmss_extension" {
-  source = "../../../compute/virtual-machine-scale-set-extension"
+  source = "../../../modules/compute/virtual-machine-scale-set-extension"
 
   name                         = "ama-linux"
   virtual_machine_scale_set_id = module.linux_virtual_machine_scale_set.id
