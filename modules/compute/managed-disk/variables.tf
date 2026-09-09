@@ -16,7 +16,7 @@ variable "resource_group_name" {
 variable "storage_account_type" {
   description = "Managed disk storage type"
   type        = string
-  default     = "Premium_LRS"
+  default     = "Standard_LRS"
 }
 
 variable "disk_size_gb" {
