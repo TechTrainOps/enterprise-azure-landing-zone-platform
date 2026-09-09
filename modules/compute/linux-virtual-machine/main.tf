@@ -27,6 +27,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
   availability_set_id = var.availability_set_id
 
   disable_password_authentication = true
+  bypass_platform_safety_checks_on_user_schedule_enabled = true
 
   admin_ssh_key {
     username   = var.admin_username
