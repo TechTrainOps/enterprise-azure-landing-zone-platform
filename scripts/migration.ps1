@@ -11,6 +11,15 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "State backup created successfully."
 
+Write-Host "Current Terraform directory:"
+Get-Location
+
+terraform init -input=false
+
+if ($LASTEXITCODE -ne 0) {
+    throw "Terraform init failed."
+}
+
 Write-Host "=== Removing Governance resources from old state ==="
 
 terraform state rm `
