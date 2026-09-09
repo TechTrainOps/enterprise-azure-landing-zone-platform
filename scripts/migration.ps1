@@ -1,127 +1,54 @@
-# Go to the Terraform root
-cd "$env:BUILD_SOURCESDIRECTORY\environments\dev\compute"
+$terraformRoots = @(
+    "compute",
+    "governance",
+    "identity",
+    "monitoring",
+    "networking",
+    "resource-groups",
+    "security"
+)
 
-Write-Host "Current Terraform directory:"
-Get-Location
+$basePath = "$env:BUILD_SOURCESDIRECTORY\environments\dev"
 
-Write-Host "=== Terraform Init ==="
+foreach ($root in $terraformRoots) {
 
-terraform init -input=false
+    Write-Host ""
+    Write-Host "============================================================"
+    Write-Host "Checking Terraform root: $root"
+    Write-Host "============================================================"
 
-if ($LASTEXITCODE -ne 0) {
-    throw "Terraform init failed."
+    $rootPath = Join-Path $basePath $root
+
+    Set-Location $rootPath
+
+    Write-Host "Current Terraform directory:"
+    Get-Location
+
+    Write-Host ""
+    Write-Host "=== Terraform Init ==="
+
+    terraform init -input=false
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Terraform init failed for root: $root"
+    }
+
+    Write-Host "Terraform init completed successfully."
+
+    Write-Host ""
+    Write-Host "=== Terraform Plan ==="
+
+    terraform plan
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Terraform plan failed for root: $root"
+    }
+
+    Write-Host ""
+    Write-Host "Terraform plan completed successfully for root: $root"
 }
 
-Write-Host "Terraform init completed successfully."
-
-terraform Plan
-
-# Go to the Terraform root
-cd "$env:BUILD_SOURCESDIRECTORY\environments\dev\governance"
-
-Write-Host "Current Terraform directory:"
-Get-Location
-
-Write-Host "=== Terraform Init ==="
-
-terraform init -input=false
-
-if ($LASTEXITCODE -ne 0) {
-    throw "Terraform init failed."
-}
-
-Write-Host "Terraform init completed successfully."
-
-terraform Plan
-
-# Go to the Terraform root
-cd "$env:BUILD_SOURCESDIRECTORY\environments\dev\identity"
-
-Write-Host "Current Terraform directory:"
-Get-Location
-
-Write-Host "=== Terraform Init ==="
-
-terraform init -input=false
-
-if ($LASTEXITCODE -ne 0) {
-    throw "Terraform init failed."
-}
-
-Write-Host "Terraform init completed successfully."
-
-terraform Plan
-
-# Go to the Terraform root
-cd "$env:BUILD_SOURCESDIRECTORY\environments\dev\monitoring"
-
-Write-Host "Current Terraform directory:"
-Get-Location
-
-Write-Host "=== Terraform Init ==="
-
-terraform init -input=false
-
-if ($LASTEXITCODE -ne 0) {
-    throw "Terraform init failed."
-}
-
-Write-Host "Terraform init completed successfully."
-
-terraform Plan
-
-
-# Go to the Terraform root
-cd "$env:BUILD_SOURCESDIRECTORY\environments\dev\networking"
-
-Write-Host "Current Terraform directory:"
-Get-Location
-
-Write-Host "=== Terraform Init ==="
-
-terraform init -input=false
-
-if ($LASTEXITCODE -ne 0) {
-    throw "Terraform init failed."
-}
-
-Write-Host "Terraform init completed successfully."
-
-terraform Plan
-
-# Go to the Terraform root
-cd "$env:BUILD_SOURCESDIRECTORY\environments\dev\resource-groups"
-
-Write-Host "Current Terraform directory:"
-Get-Location
-
-Write-Host "=== Terraform Init ==="
-
-terraform init -input=false
-
-if ($LASTEXITCODE -ne 0) {
-    throw "Terraform init failed."
-}
-
-Write-Host "Terraform init completed successfully."
-
-terraform Plan
-
-
-# Go to the Terraform root
-cd "$env:BUILD_SOURCESDIRECTORY\environments\dev\security"
-
-Write-Host "Current Terraform directory:"
-Get-Location
-
-Write-Host "=== Terraform Init ==="
-
-terraform init -input=false
-
-if ($LASTEXITCODE -ne 0) {
-    throw "Terraform init failed."
-}
-
-Write-Host "Terraform init completed successfully."
-
-terraform Plan
+Write-Host ""
+Write-Host "============================================================"
+Write-Host "All Terraform roots validated successfully."
+Write-Host "============================================================"
