@@ -7,7 +7,7 @@ data "azurerm_resource_group" "rg" {
 # ============================================================
 
 module "required_tags_policy" {
-  source = "../../../modules/governance/policy"
+  source = "../../../governance/policy"
 
   name         = "require-standard-tags"
   display_name = "Require standard resource tags"
@@ -15,10 +15,12 @@ module "required_tags_policy" {
 }
 
 module "required_tags_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "required-tags-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "required-tags-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = module.required_tags_policy.id
 
   description = "Assigns the enterprise required-tags policy to the development resource group."
@@ -30,7 +32,7 @@ module "required_tags_policy_assignment" {
 # ============================================================
 
 module "allowed_regions_policy" {
-  source = "../../../modules/governance/allowed-regions"
+  source = "../../../governance/allowed-regions"
 
   name         = "allowed-azure-regions"
   display_name = "Allowed Azure regions"
@@ -40,10 +42,12 @@ module "allowed_regions_policy" {
 }
 
 module "allowed_regions_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "allowed-regions-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "allowed-regions-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = module.allowed_regions_policy.id
 
   description = "Assigns the allowed Azure regions policy to the development resource group."
@@ -59,13 +63,15 @@ data "azurerm_policy_definition" "acr_public_network_access" {
 }
 
 module "acr_public_network_access_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "acr-public-network-access-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "acr-public-network-access-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.acr_public_network_access.id
 
-  description = "Audits Azure Container Registries that allow public network access."
+  description  = "Audits Azure Container Registries that allow public network access."
   display_name = "Audit ACR public network access"
 
   parameters = jsonencode({
@@ -81,13 +87,15 @@ data "azurerm_policy_definition" "acr_local_admin_disabled" {
 }
 
 module "acr_local_admin_disabled_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "acr-local-admin-disabled-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "acr-local-admin-disabled-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.acr_local_admin_disabled.id
 
-  description = "Audits Azure Container Registries where the local admin account is enabled."
+  description  = "Audits Azure Container Registries where the local admin account is enabled."
   display_name = "Audit ACR local admin account"
 
   parameters = jsonencode({
@@ -103,13 +111,15 @@ data "azurerm_policy_definition" "acr_private_link" {
 }
 
 module "acr_private_link_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "acr-private-link-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "acr-private-link-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.acr_private_link.id
 
-  description = "Audits Azure Container Registries that do not use an approved private endpoint."
+  description  = "Audits Azure Container Registries that do not use an approved private endpoint."
   display_name = "Audit ACR private link"
 
   parameters = jsonencode({
@@ -129,13 +139,15 @@ data "azurerm_policy_definition" "storage_secure_transfer" {
 }
 
 module "storage_secure_transfer_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "storage-secure-transfer-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "storage-secure-transfer-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.storage_secure_transfer.id
 
-  description = "Audits Storage Accounts that do not require secure HTTPS transfer."
+  description  = "Audits Storage Accounts that do not require secure HTTPS transfer."
   display_name = "Audit Storage secure transfer"
 
   parameters = jsonencode({
@@ -147,22 +159,28 @@ module "storage_secure_transfer_policy_assignment" {
 
 
 data "azurerm_policy_definition" "storage_minimum_tls" {
-  name = "8c122e39-1a3d-4a1d-8a95-8c6d6f4b5d5d"
+  name = "fe83a0eb-a853-422d-aac2-1bffd182c5d0"
 }
 
 module "storage_minimum_tls_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "storage-minimum-tls-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "storage-minimum-tls-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.storage_minimum_tls.id
 
-  description = "Audits Storage Accounts that do not require a minimum TLS version."
+  description  = "Audits Storage Accounts that do not use TLS 1.2 or the configured minimum TLS version."
   display_name = "Audit Storage minimum TLS version"
 
   parameters = jsonencode({
     effect = {
       value = "Audit"
+    }
+
+    minimumTlsVersion = {
+      value = "TLS1_2"
     }
   })
 }
@@ -173,13 +191,15 @@ data "azurerm_policy_definition" "storage_public_network_access" {
 }
 
 module "storage_public_network_access_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "storage-public-network-access-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "storage-public-network-access-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.storage_public_network_access.id
 
-  description = "Audits Storage Accounts that allow public network access."
+  description  = "Audits Storage Accounts that allow public network access."
   display_name = "Audit Storage public network access"
 
   parameters = jsonencode({
@@ -195,13 +215,15 @@ data "azurerm_policy_definition" "storage_blob_public_access" {
 }
 
 module "storage_blob_public_access_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "storage-blob-public-access-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "storage-blob-public-access-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.storage_blob_public_access.id
 
-  description = "Audits Storage Accounts that allow public access to blobs."
+  description  = "Audits Storage Accounts that allow public access to blobs."
   display_name = "Audit Storage blob public access"
 
   parameters = jsonencode({
@@ -217,13 +239,15 @@ data "azurerm_policy_definition" "storage_shared_key_access" {
 }
 
 module "storage_shared_key_access_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "storage-shared-key-access-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "storage-shared-key-access-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.storage_shared_key_access.id
 
-  description = "Audits Storage Accounts that allow Shared Key authorization."
+  description  = "Audits Storage Accounts that allow Shared Key authorization."
   display_name = "Audit Storage shared key access"
 
   parameters = jsonencode({
@@ -239,13 +263,15 @@ data "azurerm_policy_definition" "storage_private_link" {
 }
 
 module "storage_private_link_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "storage-private-link-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "storage-private-link-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.storage_private_link.id
 
-  description = "Audits Storage Accounts that do not have an approved private endpoint."
+  description  = "Audits Storage Accounts that do not have an approved private endpoint."
   display_name = "Audit Storage private link"
 
   parameters = jsonencode({
@@ -265,13 +291,15 @@ data "azurerm_policy_definition" "key_vault_rbac" {
 }
 
 module "key_vault_rbac_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "key-vault-rbac-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "key-vault-rbac-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.key_vault_rbac.id
 
-  description = "Audits Key Vaults that do not use the Azure RBAC permission model."
+  description  = "Audits Key Vaults that do not use the Azure RBAC permission model."
   display_name = "Audit Key Vault RBAC permission model"
 
   parameters = jsonencode({
@@ -287,13 +315,15 @@ data "azurerm_policy_definition" "key_vault_public_network_access" {
 }
 
 module "key_vault_public_network_access_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "key-vault-public-network-access-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "key-vault-public-network-access-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.key_vault_public_network_access.id
 
-  description = "Audits Key Vaults that allow public network access."
+  description  = "Audits Key Vaults that allow public network access."
   display_name = "Audit Key Vault public network access"
 
   parameters = jsonencode({
@@ -309,13 +339,15 @@ data "azurerm_policy_definition" "key_vault_purge_protection" {
 }
 
 module "key_vault_purge_protection_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "key-vault-purge-protection-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "key-vault-purge-protection-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.key_vault_purge_protection.id
 
-  description = "Audits Key Vaults that do not have purge protection enabled."
+  description  = "Audits Key Vaults that do not have purge protection enabled."
   display_name = "Audit Key Vault purge protection"
 
   parameters = jsonencode({
@@ -331,13 +363,15 @@ data "azurerm_policy_definition" "key_vault_soft_delete" {
 }
 
 module "key_vault_soft_delete_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "key-vault-soft-delete-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "key-vault-soft-delete-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.key_vault_soft_delete.id
 
-  description = "Audits Key Vaults that do not have soft delete enabled."
+  description  = "Audits Key Vaults that do not have soft delete enabled."
   display_name = "Audit Key Vault soft delete"
 
   parameters = jsonencode({
@@ -357,13 +391,15 @@ data "azurerm_policy_definition" "subnet_nsg_association" {
 }
 
 module "subnet_nsg_association_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "subnet-nsg-association-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "subnet-nsg-association-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.subnet_nsg_association.id
 
-  description = "Audits subnets that are not associated with a Network Security Group."
+  description  = "Audits subnets that are not associated with a Network Security Group."
   display_name = "Audit subnet NSG association"
 
   parameters = jsonencode({
@@ -383,13 +419,15 @@ data "azurerm_policy_definition" "vnet_flow_logs" {
 }
 
 module "vnet_flow_logs_policy_assignment" {
-  source = "../../../modules/governance/policy-assignment"
+  source = "../../../governance/policy-assignment"
 
-  name                 = "vnet-flow-logs-dev"
-  resource_group_id    = data.azurerm_resource_group.rg.id
+  name = "vnet-flow-logs-dev"
+
+  resource_group_id = data.azurerm_resource_group.rg.id
+
   policy_definition_id = data.azurerm_policy_definition.vnet_flow_logs.id
 
-  description = "Audits virtual networks that do not have flow logging configured."
+  description  = "Audits virtual networks that do not have flow logging configured."
   display_name = "Audit VNet flow logs"
 
   parameters = jsonencode({

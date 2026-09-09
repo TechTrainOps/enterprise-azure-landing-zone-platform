@@ -3,12 +3,7 @@ variable "resource_group_name" {
   type        = string
 }
 
-variable "location" {
-  description = "Azure region"
-  type        = string
-}
-
 variable "allowed_azure_locations" {
-  description = "Azure regions allowed by the policy"
+  description = "Azure regions allowed for resource deployment"
   type        = list(string)
 }
