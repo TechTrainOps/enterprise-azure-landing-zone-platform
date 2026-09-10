@@ -34,7 +34,7 @@ stages:
       environmentName: test
       domainName: governance
       terraformWorkingDirectory: environments/test/governance
-      serviceConnection: sc-ealz-test
+      serviceConnection: sc-ealz-dev
       backendResourceGroup: rg-ealz-tfstate-eus2-001
       backendStorageAccount: stealztfstate001
       backendContainer: tfstate
