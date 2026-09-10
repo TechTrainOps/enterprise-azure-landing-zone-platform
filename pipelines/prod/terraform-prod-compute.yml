@@ -1,3 +1,5 @@
+# Prod
+
 trigger:
   branches:
     include:
@@ -33,7 +35,7 @@ stages:
       domainName: compute
       terraformWorkingDirectory: environments/prod/compute
       modulePath: modules/compute
-      serviceConnection: sc-ealz-prod
+      serviceConnection: sc-ealz-dev
       backendResourceGroup: rg-ealz-tfstate-eus2-001
       backendStorageAccount: stealztfstate001
       backendContainer: tfstate

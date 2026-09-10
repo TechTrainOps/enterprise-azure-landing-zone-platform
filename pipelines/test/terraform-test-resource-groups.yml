@@ -1,3 +1,5 @@
+# Test
+
 trigger:
   branches:
     include:
@@ -32,7 +34,7 @@ stages:
       environmentName: test
       domainName: resource-groups
       terraformWorkingDirectory: environments/test/resource-groups
-      serviceConnection: sc-ealz-test
+      serviceConnection: sc-ealz-dev
       backendResourceGroup: rg-ealz-tfstate-eus2-001
       backendStorageAccount: stealztfstate001
       backendContainer: tfstate
