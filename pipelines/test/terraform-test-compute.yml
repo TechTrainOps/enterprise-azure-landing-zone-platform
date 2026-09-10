@@ -1,0 +1,41 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - environments/test/compute/**
+      - modules/compute/**
+      - pipelines/test/terraform-test-compute.yml
+      - pipelines/templates/**
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - environments/test/compute/**
+      - modules/compute/**
+      - pipelines/test/terraform-test-compute.yml
+      - pipelines/templates/**
+
+pool:
+  name: MultiOsPool
+  demands:
+    - Agent.Name -equals prod-win-vm-age
+
+stages:
+  - template: ../templates/terraform-domain.yml
+    parameters:
+      environmentName: test
+      domainName: compute
+      terraformWorkingDirectory: environments/test/compute
+      modulePath: modules/compute
+      serviceConnection: sc-ealz-test
+      backendResourceGroup: rg-ealz-tfstate-eus2-001
+      backendStorageAccount: stealztfstate001
+      backendContainer: tfstate
+      backendKey: test-compute.tfstate
+      deploymentEnvironment: test

@@ -1,0 +1,40 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - environments/test/networking/**
+      - modules/networking/**
+      - pipelines/test/terraform-test-networking.yml
+      - pipelines/templates/**
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - environments/test/networking/**
+      - modules/networking/**
+      - pipelines/test/terraform-test-networking.yml
+      - pipelines/templates/**
+
+pool:
+  name: MultiOsPool
+  demands:
+    - Agent.Name -equals prod-win-vm-age
+
+stages:
+  - template: ../templates/terraform-domain.yml
+    parameters:
+      environmentName: test
+      domainName: networking
+      terraformWorkingDirectory: environments/test/networking
+      serviceConnection: sc-ealz-test
+      backendResourceGroup: rg-ealz-tfstate-eus2-001
+      backendStorageAccount: stealztfstate001
+      backendContainer: tfstate
+      backendKey: test-networking.tfstate
+      deploymentEnvironment: test

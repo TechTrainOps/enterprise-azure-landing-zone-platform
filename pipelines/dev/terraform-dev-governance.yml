@@ -1,0 +1,40 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - environments/dev/governance/**
+      - modules/governance/**
+      - pipelines/dev/terraform-dev-governance.yml
+      - pipelines/templates/**
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - environments/dev/governance/**
+      - modules/governance/**
+      - pipelines/dev/terraform-dev-governance.yml
+      - pipelines/templates/**
+
+pool:
+  name: MultiOsPool
+  demands:
+    - Agent.Name -equals prod-win-vm-age
+
+stages:
+  - template: ../templates/terraform-domain.yml
+    parameters:
+      environmentName: dev
+      domainName: governance
+      terraformWorkingDirectory: environments/dev/governance
+      serviceConnection: sc-ealz-dev
+      backendResourceGroup: rg-ealz-tfstate-eus2-001
+      backendStorageAccount: stealztfstate001
+      backendContainer: tfstate
+      backendKey: dev-governance.tfstate
+      deploymentEnvironment: dev

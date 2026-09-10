@@ -1,0 +1,40 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - environments/prod/identity/**
+      - modules/identity/**
+      - pipelines/prod/terraform-prod-identity.yml
+      - pipelines/templates/**
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - environments/prod/identity/**
+      - modules/identity/**
+      - pipelines/prod/terraform-prod-identity.yml
+      - pipelines/templates/**
+
+pool:
+  name: MultiOsPool
+  demands:
+    - Agent.Name -equals prod-win-vm-age
+
+stages:
+  - template: ../templates/terraform-domain.yml
+    parameters:
+      environmentName: prod
+      domainName: identity
+      terraformWorkingDirectory: environments/prod/identity
+      serviceConnection: sc-ealz-prod
+      backendResourceGroup: rg-ealz-tfstate-eus2-001
+      backendStorageAccount: stealztfstate001
+      backendContainer: tfstate
+      backendKey: prod-identity.tfstate
+      deploymentEnvironment: prod

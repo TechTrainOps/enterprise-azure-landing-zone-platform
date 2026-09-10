@@ -1,0 +1,40 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - environments/prod/resource-groups/**
+      - modules/resource-group/**
+      - pipelines/prod/terraform-prod-resource-groups.yml
+      - pipelines/templates/**
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - environments/prod/resource-groups/**
+      - modules/resource-group/**
+      - pipelines/prod/terraform-prod-resource-groups.yml
+      - pipelines/templates/**
+
+pool:
+  name: MultiOsPool
+  demands:
+    - Agent.Name -equals prod-win-vm-age
+
+stages:
+  - template: ../templates/terraform-domain.yml
+    parameters:
+      environmentName: prod
+      domainName: resource-groups
+      terraformWorkingDirectory: environments/prod/resource-groups
+      serviceConnection: sc-ealz-prod
+      backendResourceGroup: rg-ealz-tfstate-eus2-001
+      backendStorageAccount: stealztfstate001
+      backendContainer: tfstate
+      backendKey: prod-resource-groups.tfstate
+      deploymentEnvironment: prod
