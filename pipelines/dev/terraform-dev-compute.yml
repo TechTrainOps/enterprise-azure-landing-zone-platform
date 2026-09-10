@@ -32,7 +32,6 @@ stages:
       environmentName: dev
       domainName: compute
       terraformWorkingDirectory: environments/dev/compute
-      modulePath: modules/compute
       serviceConnection: sc-ealz-dev
       backendResourceGroup: rg-ealz-tfstate-eus2-001
       backendStorageAccount: stealztfstate001
