@@ -79,6 +79,20 @@ stages:
               command: validate
               workingDirectory: '${{ parameters.terraformWorkingDirectory }}'
 
+          - powershell: |
+              Write-Host "Running Checkov security scan..."
+
+              checkov `
+                 -d "$(Build.SourcesDirectory)/${{ parameters.terraformWorkingDirectory }}" `
+                 --framework terraform `
+                 --quiet
+
+              if ($LASTEXITCODE -ne 0) {
+                Write-Error "Checkov security scan failed. Review the failed checks above."
+                exit $LASTEXITCODE
+              }
+              displayName: Run Checkov Security Scan
+
           - task: TerraformTaskV4@4
             displayName: Terraform Plan
             inputs:
@@ -154,6 +168,16 @@ stages:
               provider: azurerm
               command: validate
               workingDirectory: '${{ parameters.terraformWorkingDirectory }}'
+
+          - powershell: |
+              python -m pip install --upgrade pip
+              python -m pip install checkov
+
+              checkov `
+                -d "$(Build.SourcesDirectory)/${{ parameters.terraformWorkingDirectory }}" `
+                --framework terraform `
+                --quiet
+            displayName: Terraform Security Scan
 
           - task: TerraformTaskV4@4
             displayName: Terraform Plan
