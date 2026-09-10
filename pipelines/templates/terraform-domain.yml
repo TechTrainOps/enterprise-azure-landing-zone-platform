@@ -1,3 +1,5 @@
+# Template:
+
 parameters:
   - name: environmentName
     type: string
@@ -180,8 +182,7 @@ stages:
 
     condition: and(
       succeeded('Plan'),
-      eq(variables['Build.SourceBranch'], 'refs/heads/main')
-    )
+      eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
     jobs:
       - deployment: TerraformApply
