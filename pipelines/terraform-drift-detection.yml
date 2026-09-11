@@ -67,7 +67,7 @@ stages:
 
           terraform validate
 
-          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
+          terraform plan -input=false -detailed-exitcode -out=drift.tfplan
 
           $exitCode = $LASTEXITCODE
 
