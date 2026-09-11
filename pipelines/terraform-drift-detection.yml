@@ -53,6 +53,9 @@ stages:
         workingDirectory: '$(Build.SourcesDirectory)/environments/dev/resource-groups'
         inlineScript: |
 
+          $env:TF_CLI_ARGS = $null
+          $env:TF_CLI_ARGS_plan = $null
+
           terraform version
 
           terraform init `
