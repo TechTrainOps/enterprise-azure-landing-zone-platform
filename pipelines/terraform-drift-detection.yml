@@ -52,13 +52,62 @@ stages:
             scriptLocation: inlineScript
             workingDirectory: '$(Build.SourcesDirectory)/environments/dev/resource-groups'
             inlineScript: |
-              $env:TF_CLI_ARGS = $null
-              $env:TF_CLI_ARGS_plan = $null
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM DIAGNOSTICS"
+              Write-Host "=================================================="
 
-              Write-Host "Working directory:"
+              Write-Host "Current working directory:"
               Get-Location
 
+              Write-Host ""
+              Write-Host "Terraform executable:"
+              Get-Command terraform | Format-List Name, Source, CommandType
+
+              Write-Host ""
+              Write-Host "Terraform version:"
               terraform version
+
+              Write-Host ""
+              Write-Host "Terraform-related environment variables BEFORE cleanup:"
+
+              Get-ChildItem Env: |
+                Where-Object {
+                  $_.Name -like "TF_*" -or
+                  $_.Name -like "TERRAFORM*"
+                } |
+                Sort-Object Name |
+                Format-Table -AutoSize
+
+              # Remove Terraform CLI argument injection variables
+
+              [Environment\]::SetEnvironmentVariable(
+                "TF_CLI_ARGS",
+                $null,
+                [EnvironmentVariableTarget\]::Process
+              )
+
+              [Environment\]::SetEnvironmentVariable(
+                "TF_CLI_ARGS_plan",
+                $null,
+                [EnvironmentVariableTarget\]::Process
+              )
+
+              Remove-Item Env:TF_CLI_ARGS -ErrorAction SilentlyContinue
+              Remove-Item Env:TF_CLI_ARGS_plan -ErrorAction SilentlyContinue
+
+              Write-Host ""
+              Write-Host "Checking CLI argument variables AFTER cleanup:"
+
+              Write-Host "TF_CLI_ARGS:"
+              Write-Host $env:TF_CLI_ARGS
+
+              Write-Host "TF_CLI_ARGS_plan:"
+              Write-Host $env:TF_CLI_ARGS_plan
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM INIT"
+              Write-Host "=================================================="
 
               terraform init `
                 -backend-config="resource_group_name=$(backendResourceGroup)" `
@@ -67,25 +116,63 @@ stages:
                 -backend-config="key=dev-resource-groups.tfstate" `
                 -input=false
 
-              if ($LASTEXITCODE -ne 0) {
+              $initExitCode = $LASTEXITCODE
+
+              Write-Host "Terraform init exit code: $initExitCode"
+
+              if ($initExitCode -ne 0) {
                   Write-Host "##vso[task.logissue type=error]Terraform init failed for Resource Groups."
-                  exit $LASTEXITCODE
+                  exit $initExitCode
               }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM VALIDATE"
+              Write-Host "=================================================="
 
               terraform validate
 
-              if ($LASTEXITCODE -ne 0) {
+              $validateExitCode = $LASTEXITCODE
+
+              Write-Host "Terraform validate exit code: $validateExitCode"
+
+              if ($validateExitCode -ne 0) {
                   Write-Host "##vso[task.logissue type=error]Terraform validation failed for Resource Groups."
-                  exit $LASTEXITCODE
+                  exit $validateExitCode
               }
 
-              terraform plan `
-                -input=false `
-                -detailed-exitcode `
-                -out=drift.tfplan
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM PLAN"
+              Write-Host "=================================================="
+
+              Write-Host "Executing:"
+              Write-Host "terraform plan -input=false -detailed-exitcode -out=drift.tfplan"
+
+              $terraform = (Get-Command terraform).Source
+
+              $planArguments = @(
+                  "plan"
+                  "-input=false"
+                  "-detailed-exitcode"
+                  "-out=drift.tfplan"
+              )
+
+              Write-Host "Terraform executable:"
+              Write-Host $terraform
+
+              Write-Host ""
+              Write-Host "Arguments being passed:"
+
+              $planArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              & $terraform @planArguments
 
               $exitCode = $LASTEXITCODE
 
+              Write-Host ""
               Write-Host "Terraform plan exit code: $exitCode"
 
               if ($exitCode -eq 0) {
@@ -98,8 +185,8 @@ stages:
                   exit 0
               }
 
-              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Resource Groups."
-              exit $exitCode
+              Write-Host "##vso[task.logissue type=error
+   
 
 
 # ============================================================
