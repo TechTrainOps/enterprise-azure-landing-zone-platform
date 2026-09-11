@@ -53,6 +53,7 @@ stages:
             workingDirectory: '$(Build.SourcesDirectory)/environments/dev/resource-groups'
             powerShellErrorActionPreference: stop
             powerShellIgnoreLASTEXITCODE: true
+
             inlineScript: |
               Write-Host "=================================================="
               Write-Host "TERRAFORM DIAGNOSTICS"
@@ -69,7 +70,7 @@ stages:
 
               $terraform = $terraformCommand.Source
 
-              if ([string]::IsNullOrWhiteSpace($terraform)) {
+              if ([string\]::IsNullOrWhiteSpace($terraform)) {
                   Write-Host "##vso[task.logissue type=error]Unable to resolve the Terraform executable."
                   exit 1
               }
@@ -80,6 +81,7 @@ stages:
 
               Write-Host ""
               Write-Host "Terraform version:"
+
               & $terraform version
 
               $versionExitCode = $LASTEXITCODE
@@ -110,7 +112,9 @@ stages:
 
               if (Test-Path Env:TF_CLI_ARGS) {
                   Write-Host "TF_CLI_ARGS is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS]"
                   Write-Host "Removing TF_CLI_ARGS."
+
                   Remove-Item Env:TF_CLI_ARGS -ErrorAction SilentlyContinue
               }
               else {
@@ -119,10 +123,144 @@ stages:
 
               if (Test-Path Env:TF_CLI_ARGS_plan) {
                   Write-Host "TF_CLI_ARGS_plan is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS_plan]"
                   Write-Host "Removing TF_CLI_ARGS_plan."
+
                   Remove-Item Env:TF_CLI_ARGS_plan -ErrorAction SilentlyContinue
               }
               else {
+                  Write-Host "TF_CLI_ARGS_plan is not defined."
+              }
+
+              Write-Host ""
+              Write-Host "Terraform CLI argument variables after cleanup:"
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS still exists: [$env:TF_CLI_ARGS]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS: [not defined]"
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan still exists: [$env:TF_CLI_ARGS_plan]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan: [not defined]"
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM INIT"
+              Write-Host "=================================================="
+
+              $initArguments = @(
+                  "init"
+                  "-backend-config=resource_group_name=$(backendResourceGroup)"
+                  "-backend-config=storage_account_name=$(backendStorageAccount)"
+                  "-backend-config=container_name=$(backendContainer)"
+                  "-backend-config=key=dev-resource-groups.tfstate"
+                  "-input=false"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform init executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform init arguments:"
+
+              $initArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform init..."
+
+              & $terraform @initArguments
+
+              $initExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform init exit code: $initExitCode"
+
+              if ($initExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Resource Groups with exit code $initExitCode."
+                  exit $initExitCode
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM VALIDATE"
+              Write-Host "=================================================="
+
+              Write-Host ""
+              Write-Host "Executing Terraform validate..."
+
+              & $terraform validate
+
+              $validateExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform validate exit code: $validateExitCode"
+
+              if ($validateExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Resource Groups with exit code $validateExitCode."
+                  exit $validateExitCode
+              }
+
+              Write-Host ""
+              Write-Host "Terraform configuration validation succeeded."
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM PLAN"
+              Write-Host "=================================================="
+
+              $planArguments = @(
+                  "plan"
+                  "-input=false"
+                  "-detailed-exitcode"
+                  "-out=drift.tfplan"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform plan executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform plan arguments:"
+
+              $planArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform plan..."
+
+              & $terraform @planArguments
+
+              $planExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform plan exit code: $planExitCode"
+
+              if ($planExitCode -eq 0) {
+                  Write-Host ""
+                  Write-Host "No drift detected for Resource Groups."
+                  exit 0
+              }
+
+              if ($planExitCode -eq 2) {
+                  Write-Host ""
+                  Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Resource Groups."
+                  exit 0
+              }
+
+              Write-Host ""
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Resource Groups with exit code $planExitCode."
+              exit $planExitCode
+  
 
 
 # ============================================================
