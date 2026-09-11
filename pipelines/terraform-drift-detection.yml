@@ -219,6 +219,7 @@ stages:
 
               $planArguments = @(
                   "plan"
+                  "-refresh-only"
                   "-input=false"
                   "-detailed-exitcode"
                   "-out=drift.tfplan"
@@ -261,13 +262,11 @@ stages:
               Write-Host "##vso[task.logissue type=error]Terraform plan failed for Resource Groups with exit code $planExitCode."
               exit $planExitCode
   
-
-
 # ============================================================
 # IDENTITY
 # ============================================================
 
-- stage: Drift_Identity
+- stage: Drift_identity
   displayName: Drift Detection - Identity
 
   jobs:
@@ -289,55 +288,216 @@ stages:
             scriptType: ps
             scriptLocation: inlineScript
             workingDirectory: '$(Build.SourcesDirectory)/environments/dev/identity'
-            inlineScript: |
-              $env:TF_CLI_ARGS = $null
-              $env:TF_CLI_ARGS_plan = $null
+            powerShellErrorActionPreference: stop
+            powerShellIgnoreLASTEXITCODE: true
 
-              Write-Host "Working directory:"
+            inlineScript: |
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM DIAGNOSTICS"
+              Write-Host "=================================================="
+
+              Write-Host "Current working directory:"
               Get-Location
 
-              terraform version
+              Write-Host ""
+              Write-Host "Terraform executable:"
 
-              terraform init `
-                -backend-config="resource_group_name=$(backendResourceGroup)" `
-                -backend-config="storage_account_name=$(backendStorageAccount)" `
-                -backend-config="container_name=$(backendContainer)" `
-                -backend-config="key=dev-identity.tfstate" `
-                -input=false
+              $terraformCommand = Get-Command terraform -ErrorAction Stop
+              $terraformCommand | Format-List Name, Source, CommandType
 
-              if ($LASTEXITCODE -ne 0) {
-                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Identity."
-                  exit $LASTEXITCODE
+              $terraform = $terraformCommand.Source
+
+              if ([string]::IsNullOrWhiteSpace($terraform)) {
+                  Write-Host "##vso[task.logissue type=error]Unable to resolve the Terraform executable."
+                  exit 1
               }
 
-              terraform validate
+              Write-Host ""
+              Write-Host "Terraform executable resolved to:"
+              Write-Host $terraform
 
-              if ($LASTEXITCODE -ne 0) {
-                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Identity."
-                  exit $LASTEXITCODE
+              Write-Host ""
+              Write-Host "Terraform version:"
+
+              & $terraform version
+
+              $versionExitCode = $LASTEXITCODE
+
+              if ($versionExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Unable to execute Terraform."
+                  exit $versionExitCode
               }
 
-              terraform plan `
-                -input=false `
-                -detailed-exitcode `
-                -out=drift.tfplan
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM ENVIRONMENT"
+              Write-Host "=================================================="
 
-              $exitCode = $LASTEXITCODE
+              Write-Host ""
+              Write-Host "Terraform-related environment variables:"
 
-              Write-Host "Terraform plan exit code: $exitCode"
+              Get-ChildItem Env: |
+                Where-Object {
+                    $_.Name -like "TF_*" -or
+                    $_.Name -like "TERRAFORM*"
+                } |
+                Sort-Object Name |
+                Format-Table -AutoSize
 
-              if ($exitCode -eq 0) {
+              Write-Host ""
+              Write-Host "Checking Terraform CLI argument variables."
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS]"
+                  Write-Host "Removing TF_CLI_ARGS."
+
+                  Remove-Item Env:TF_CLI_ARGS -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS is not defined."
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS_plan]"
+                  Write-Host "Removing TF_CLI_ARGS_plan."
+
+                  Remove-Item Env:TF_CLI_ARGS_plan -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan is not defined."
+              }
+
+              Write-Host ""
+              Write-Host "Terraform CLI argument variables after cleanup:"
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS still exists: [$env:TF_CLI_ARGS]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS: [not defined]"
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan still exists: [$env:TF_CLI_ARGS_plan]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan: [not defined]"
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM INIT"
+              Write-Host "=================================================="
+
+              $initArguments = @(
+                  "init"
+                  "-backend-config=resource_group_name=$(backendResourceGroup)"
+                  "-backend-config=storage_account_name=$(backendStorageAccount)"
+                  "-backend-config=container_name=$(backendContainer)"
+                  "-backend-config=key=dev-identity.tfstate"
+                  "-input=false"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform init executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform init arguments:"
+
+              $initArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform init..."
+
+              & $terraform @initArguments
+
+              $initExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform init exit code: $initExitCode"
+
+              if ($initExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Identity with exit code $initExitCode."
+                  exit $initExitCode
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM VALIDATE"
+              Write-Host "=================================================="
+
+              Write-Host ""
+              Write-Host "Executing Terraform validate..."
+
+              & $terraform validate
+
+              $validateExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform validate exit code: $validateExitCode"
+
+              if ($validateExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for identity with exit code $validateExitCode."
+                  exit $validateExitCode
+              }
+
+              Write-Host ""
+              Write-Host "Terraform configuration validation succeeded."
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM PLAN"
+              Write-Host "=================================================="
+
+              $planArguments = @(
+                  "plan"
+                  "-refresh-only"
+                  "-input=false"
+                  "-detailed-exitcode"
+                  "-out=drift.tfplan"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform plan executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform plan arguments:"
+
+              $planArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform plan..."
+
+              & $terraform @planArguments
+
+              $planExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform plan exit code: $planExitCode"
+
+              if ($planExitCode -eq 0) {
+                  Write-Host ""
                   Write-Host "No drift detected for Identity."
                   exit 0
               }
 
-              if ($exitCode -eq 2) {
+              if ($planExitCode -eq 2) {
+                  Write-Host ""
                   Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Identity."
                   exit 0
               }
 
-              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Identity."
-              exit $exitCode
+              Write-Host ""
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Identity with exit code $planExitCode."
+              exit $planExitCode
 
 
 # ============================================================
@@ -366,56 +526,216 @@ stages:
             scriptType: ps
             scriptLocation: inlineScript
             workingDirectory: '$(Build.SourcesDirectory)/environments/dev/networking'
-            inlineScript: |
-              $env:TF_CLI_ARGS = $null
-              $env:TF_CLI_ARGS_plan = $null
+            powerShellErrorActionPreference: stop
+            powerShellIgnoreLASTEXITCODE: true
 
-              Write-Host "Working directory:"
+            inlineScript: |
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM DIAGNOSTICS"
+              Write-Host "=================================================="
+
+              Write-Host "Current working directory:"
               Get-Location
 
-              terraform version
+              Write-Host ""
+              Write-Host "Terraform executable:"
 
-              terraform init `
-                -backend-config="resource_group_name=$(backendResourceGroup)" `
-                -backend-config="storage_account_name=$(backendStorageAccount)" `
-                -backend-config="container_name=$(backendContainer)" `
-                -backend-config="key=dev-networking.tfstate" `
-                -input=false
+              $terraformCommand = Get-Command terraform -ErrorAction Stop
+              $terraformCommand | Format-List Name, Source, CommandType
 
-              if ($LASTEXITCODE -ne 0) {
-                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Networking."
-                  exit $LASTEXITCODE
+              $terraform = $terraformCommand.Source
+
+              if ([string]::IsNullOrWhiteSpace($terraform)) {
+                  Write-Host "##vso[task.logissue type=error]Unable to resolve the Terraform executable."
+                  exit 1
               }
 
-              terraform validate
+              Write-Host ""
+              Write-Host "Terraform executable resolved to:"
+              Write-Host $terraform
 
-              if ($LASTEXITCODE -ne 0) {
-                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Networking."
-                  exit $LASTEXITCODE
+              Write-Host ""
+              Write-Host "Terraform version:"
+
+              & $terraform version
+
+              $versionExitCode = $LASTEXITCODE
+
+              if ($versionExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Unable to execute Terraform."
+                  exit $versionExitCode
               }
 
-              terraform plan `
-                -input=false `
-                -detailed-exitcode `
-                -out=drift.tfplan
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM ENVIRONMENT"
+              Write-Host "=================================================="
 
-              $exitCode = $LASTEXITCODE
+              Write-Host ""
+              Write-Host "Terraform-related environment variables:"
 
-              Write-Host "Terraform plan exit code: $exitCode"
+              Get-ChildItem Env: |
+                Where-Object {
+                    $_.Name -like "TF_*" -or
+                    $_.Name -like "TERRAFORM*"
+                } |
+                Sort-Object Name |
+                Format-Table -AutoSize
 
-              if ($exitCode -eq 0) {
+              Write-Host ""
+              Write-Host "Checking Terraform CLI argument variables."
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS]"
+                  Write-Host "Removing TF_CLI_ARGS."
+
+                  Remove-Item Env:TF_CLI_ARGS -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS is not defined."
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS_plan]"
+                  Write-Host "Removing TF_CLI_ARGS_plan."
+
+                  Remove-Item Env:TF_CLI_ARGS_plan -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan is not defined."
+              }
+
+              Write-Host ""
+              Write-Host "Terraform CLI argument variables after cleanup:"
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS still exists: [$env:TF_CLI_ARGS]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS: [not defined]"
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan still exists: [$env:TF_CLI_ARGS_plan]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan: [not defined]"
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM INIT"
+              Write-Host "=================================================="
+
+              $initArguments = @(
+                  "init"
+                  "-backend-config=resource_group_name=$(backendResourceGroup)"
+                  "-backend-config=storage_account_name=$(backendStorageAccount)"
+                  "-backend-config=container_name=$(backendContainer)"
+                  "-backend-config=key=dev-networking.tfstate"
+                  "-input=false"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform init executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform init arguments:"
+
+              $initArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform init..."
+
+              & $terraform @initArguments
+
+              $initExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform init exit code: $initExitCode"
+
+              if ($initExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Networking with exit code $initExitCode."
+                  exit $initExitCode
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM VALIDATE"
+              Write-Host "=================================================="
+
+              Write-Host ""
+              Write-Host "Executing Terraform validate..."
+
+              & $terraform validate
+
+              $validateExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform validate exit code: $validateExitCode"
+
+              if ($validateExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Networking with exit code $validateExitCode."
+                  exit $validateExitCode
+              }
+
+              Write-Host ""
+              Write-Host "Terraform configuration validation succeeded."
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM PLAN"
+              Write-Host "=================================================="
+
+              $planArguments = @(
+                  "plan"
+                  "-refresh-only"
+                  "-input=false"
+                  "-detailed-exitcode"
+                  "-out=drift.tfplan"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform plan executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform plan arguments:"
+
+              $planArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform plan..."
+
+              & $terraform @planArguments
+
+              $planExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform plan exit code: $planExitCode"
+
+              if ($planExitCode -eq 0) {
+                  Write-Host ""
                   Write-Host "No drift detected for Networking."
                   exit 0
               }
 
-              if ($exitCode -eq 2) {
+              if ($planExitCode -eq 2) {
+                  Write-Host ""
                   Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Networking."
                   exit 0
               }
 
-              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Networking."
-              exit $exitCode
-
+              Write-Host ""
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Networking with exit code $planExitCode."
+              exit $planExitCode
 
 # ============================================================
 # SECURITY
@@ -443,62 +763,223 @@ stages:
             scriptType: ps
             scriptLocation: inlineScript
             workingDirectory: '$(Build.SourcesDirectory)/environments/dev/security'
-            inlineScript: |
-              $env:TF_CLI_ARGS = $null
-              $env:TF_CLI_ARGS_plan = $null
+            powerShellErrorActionPreference: stop
+            powerShellIgnoreLASTEXITCODE: true
 
-              Write-Host "Working directory:"
+            inlineScript: |
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM DIAGNOSTICS"
+              Write-Host "=================================================="
+
+              Write-Host "Current working directory:"
               Get-Location
 
-              terraform version
+              Write-Host ""
+              Write-Host "Terraform executable:"
 
-              terraform init `
-                -backend-config="resource_group_name=$(backendResourceGroup)" `
-                -backend-config="storage_account_name=$(backendStorageAccount)" `
-                -backend-config="container_name=$(backendContainer)" `
-                -backend-config="key=dev-security.tfstate" `
-                -input=false
+              $terraformCommand = Get-Command terraform -ErrorAction Stop
+              $terraformCommand | Format-List Name, Source, CommandType
 
-              if ($LASTEXITCODE -ne 0) {
-                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Security."
-                  exit $LASTEXITCODE
+              $terraform = $terraformCommand.Source
+
+              if ([string]::IsNullOrWhiteSpace($terraform)) {
+                  Write-Host "##vso[task.logissue type=error]Unable to resolve the Terraform executable."
+                  exit 1
               }
 
-              terraform validate
+              Write-Host ""
+              Write-Host "Terraform executable resolved to:"
+              Write-Host $terraform
 
-              if ($LASTEXITCODE -ne 0) {
-                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Security."
-                  exit $LASTEXITCODE
+              Write-Host ""
+              Write-Host "Terraform version:"
+
+              & $terraform version
+
+              $versionExitCode = $LASTEXITCODE
+
+              if ($versionExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Unable to execute Terraform."
+                  exit $versionExitCode
               }
 
-              terraform plan `
-                -input=false `
-                -detailed-exitcode `
-                -out=drift.tfplan
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM ENVIRONMENT"
+              Write-Host "=================================================="
 
-              $exitCode = $LASTEXITCODE
+              Write-Host ""
+              Write-Host "Terraform-related environment variables:"
 
-              Write-Host "Terraform plan exit code: $exitCode"
+              Get-ChildItem Env: |
+                Where-Object {
+                    $_.Name -like "TF_*" -or
+                    $_.Name -like "TERRAFORM*"
+                } |
+                Sort-Object Name |
+                Format-Table -AutoSize
 
-              if ($exitCode -eq 0) {
+              Write-Host ""
+              Write-Host "Checking Terraform CLI argument variables."
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS]"
+                  Write-Host "Removing TF_CLI_ARGS."
+
+                  Remove-Item Env:TF_CLI_ARGS -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS is not defined."
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS_plan]"
+                  Write-Host "Removing TF_CLI_ARGS_plan."
+
+                  Remove-Item Env:TF_CLI_ARGS_plan -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan is not defined."
+              }
+
+              Write-Host ""
+              Write-Host "Terraform CLI argument variables after cleanup:"
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS still exists: [$env:TF_CLI_ARGS]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS: [not defined]"
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan still exists: [$env:TF_CLI_ARGS_plan]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan: [not defined]"
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM INIT"
+              Write-Host "=================================================="
+
+              $initArguments = @(
+                  "init"
+                  "-backend-config=resource_group_name=$(backendResourceGroup)"
+                  "-backend-config=storage_account_name=$(backendStorageAccount)"
+                  "-backend-config=container_name=$(backendContainer)"
+                  "-backend-config=key=dev-security.tfstate"
+                  "-input=false"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform init executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform init arguments:"
+
+              $initArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform init..."
+
+              & $terraform @initArguments
+
+              $initExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform init exit code: $initExitCode"
+
+              if ($initExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Security with exit code $initExitCode."
+                  exit $initExitCode
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM VALIDATE"
+              Write-Host "=================================================="
+
+              Write-Host ""
+              Write-Host "Executing Terraform validate..."
+
+              & $terraform validate
+
+              $validateExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform validate exit code: $validateExitCode"
+
+              if ($validateExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Security with exit code $validateExitCode."
+                  exit $validateExitCode
+              }
+
+              Write-Host ""
+              Write-Host "Terraform configuration validation succeeded."
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM PLAN"
+              Write-Host "=================================================="
+
+              $planArguments = @(
+                  "plan"
+                  "-refresh-only"
+                  "-input=false"
+                  "-detailed-exitcode"
+                  "-out=drift.tfplan"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform plan executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform plan arguments:"
+
+              $planArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform plan..."
+
+              & $terraform @planArguments
+
+              $planExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform plan exit code: $planExitCode"
+
+              if ($planExitCode -eq 0) {
+                  Write-Host ""
                   Write-Host "No drift detected for Security."
                   exit 0
               }
 
-              if ($exitCode -eq 2) {
+              if ($planExitCode -eq 2) {
+                  Write-Host ""
                   Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Security."
                   exit 0
               }
 
-              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Security."
-              exit $exitCode
+              Write-Host ""
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Security with exit code $planExitCode."
+              exit $planExitCode
 
 
 # ============================================================
 # MONITORING
 # ============================================================
 
-- stage: Drift_Monitoring
+- stage: Monitoring
   displayName: Drift Detection - Monitoring
 
   jobs:
@@ -520,55 +1001,689 @@ stages:
             scriptType: ps
             scriptLocation: inlineScript
             workingDirectory: '$(Build.SourcesDirectory)/environments/dev/monitoring'
-            inlineScript: |
-              $env:TF_CLI_ARGS = $null
-              $env:TF_CLI_ARGS_plan = $null
+            powerShellErrorActionPreference: stop
+            powerShellIgnoreLASTEXITCODE: true
 
-              Write-Host "Working directory:"
+            inlineScript: |
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM DIAGNOSTICS"
+              Write-Host "=================================================="
+
+              Write-Host "Current working directory:"
               Get-Location
 
-              terraform version
+              Write-Host ""
+              Write-Host "Terraform executable:"
 
-              terraform init `
-                -backend-config="resource_group_name=$(backendResourceGroup)" `
-                -backend-config="storage_account_name=$(backendStorageAccount)" `
-                -backend-config="container_name=$(backendContainer)" `
-                -backend-config="key=dev-monitoring.tfstate" `
-                -input=false
+              $terraformCommand = Get-Command terraform -ErrorAction Stop
+              $terraformCommand | Format-List Name, Source, CommandType
 
-              if ($LASTEXITCODE -ne 0) {
-                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Monitoring."
-                  exit $LASTEXITCODE
+              $terraform = $terraformCommand.Source
+
+              if ([string]::IsNullOrWhiteSpace($terraform)) {
+                  Write-Host "##vso[task.logissue type=error]Unable to resolve the Terraform executable."
+                  exit 1
               }
 
-              terraform validate
+              Write-Host ""
+              Write-Host "Terraform executable resolved to:"
+              Write-Host $terraform
 
-              if ($LASTEXITCODE -ne 0) {
-                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Monitoring."
-                  exit $LASTEXITCODE
+              Write-Host ""
+              Write-Host "Terraform version:"
+
+              & $terraform version
+
+              $versionExitCode = $LASTEXITCODE
+
+              if ($versionExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Unable to execute Terraform."
+                  exit $versionExitCode
               }
 
-              terraform plan `
-                -input=false `
-                -detailed-exitcode `
-                -out=drift.tfplan
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM ENVIRONMENT"
+              Write-Host "=================================================="
 
-              $exitCode = $LASTEXITCODE
+              Write-Host ""
+              Write-Host "Terraform-related environment variables:"
 
-              Write-Host "Terraform plan exit code: $exitCode"
+              Get-ChildItem Env: |
+                Where-Object {
+                    $_.Name -like "TF_*" -or
+                    $_.Name -like "TERRAFORM*"
+                } |
+                Sort-Object Name |
+                Format-Table -AutoSize
 
-              if ($exitCode -eq 0) {
+              Write-Host ""
+              Write-Host "Checking Terraform CLI argument variables."
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS]"
+                  Write-Host "Removing TF_CLI_ARGS."
+
+                  Remove-Item Env:TF_CLI_ARGS -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS is not defined."
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS_plan]"
+                  Write-Host "Removing TF_CLI_ARGS_plan."
+
+                  Remove-Item Env:TF_CLI_ARGS_plan -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan is not defined."
+              }
+
+              Write-Host ""
+              Write-Host "Terraform CLI argument variables after cleanup:"
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS still exists: [$env:TF_CLI_ARGS]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS: [not defined]"
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan still exists: [$env:TF_CLI_ARGS_plan]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan: [not defined]"
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM INIT"
+              Write-Host "=================================================="
+
+              $initArguments = @(
+                  "init"
+                  "-backend-config=resource_group_name=$(backendResourceGroup)"
+                  "-backend-config=storage_account_name=$(backendStorageAccount)"
+                  "-backend-config=container_name=$(backendContainer)"
+                  "-backend-config=key=dev-monitoring.tfstate"
+                  "-input=false"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform init executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform init arguments:"
+
+              $initArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform init..."
+
+              & $terraform @initArguments
+
+              $initExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform init exit code: $initExitCode"
+
+              if ($initExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Monitoring with exit code $initExitCode."
+                  exit $initExitCode
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM VALIDATE"
+              Write-Host "=================================================="
+
+              Write-Host ""
+              Write-Host "Executing Terraform validate..."
+
+              & $terraform validate
+
+              $validateExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform validate exit code: $validateExitCode"
+
+              if ($validateExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Monitoring with exit code $validateExitCode."
+                  exit $validateExitCode
+              }
+
+              Write-Host ""
+              Write-Host "Terraform configuration validation succeeded."
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM PLAN"
+              Write-Host "=================================================="
+
+              $planArguments = @(
+                  "plan"
+                  "-refresh-only"
+                  "-input=false"
+                  "-detailed-exitcode"
+                  "-out=drift.tfplan"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform plan executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform plan arguments:"
+
+              $planArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform plan..."
+
+              & $terraform @planArguments
+
+              $planExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform plan exit code: $planExitCode"
+
+              if ($planExitCode -eq 0) {
+                  Write-Host ""
                   Write-Host "No drift detected for Monitoring."
                   exit 0
               }
 
-              if ($exitCode -eq 2) {
+              if ($planExitCode -eq 2) {
+                  Write-Host ""
                   Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Monitoring."
                   exit 0
               }
 
-              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Monitoring."
-              exit $exitCode
+              Write-Host ""
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Monitoring with exit code $planExitCode."
+              exit $planExitCode
 
 
-# =======
+# ============================================================
+# COMPUTE
+# ============================================================
+
+- stage: Compute
+  displayName: Drift Detection - Compute
+
+  jobs:
+    - job: Check_Compute
+      displayName: Check Compute Drift
+
+      steps:
+        - checkout: self
+
+        - task: TerraformInstaller@1
+          displayName: Install Terraform
+          inputs:
+            terraformVersion: $(terraformVersion)
+
+        - task: AzureCLI@2
+          displayName: Terraform Drift Check - Compute
+          inputs:
+            azureSubscription: $(serviceConnection)
+            scriptType: ps
+            scriptLocation: inlineScript
+            workingDirectory: '$(Build.SourcesDirectory)/environments/dev/compute'
+            powerShellErrorActionPreference: stop
+            powerShellIgnoreLASTEXITCODE: true
+
+            inlineScript: |
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM DIAGNOSTICS"
+              Write-Host "=================================================="
+
+              Write-Host "Current working directory:"
+              Get-Location
+
+              Write-Host ""
+              Write-Host "Terraform executable:"
+
+              $terraformCommand = Get-Command terraform -ErrorAction Stop
+              $terraformCommand | Format-List Name, Source, CommandType
+
+              $terraform = $terraformCommand.Source
+
+              if ([string]::IsNullOrWhiteSpace($terraform)) {
+                  Write-Host "##vso[task.logissue type=error]Unable to resolve the Terraform executable."
+                  exit 1
+              }
+
+              Write-Host ""
+              Write-Host "Terraform executable resolved to:"
+              Write-Host $terraform
+
+              Write-Host ""
+              Write-Host "Terraform version:"
+
+              & $terraform version
+
+              $versionExitCode = $LASTEXITCODE
+
+              if ($versionExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Unable to execute Terraform."
+                  exit $versionExitCode
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM ENVIRONMENT"
+              Write-Host "=================================================="
+
+              Write-Host ""
+              Write-Host "Terraform-related environment variables:"
+
+              Get-ChildItem Env: |
+                Where-Object {
+                    $_.Name -like "TF_*" -or
+                    $_.Name -like "TERRAFORM*"
+                } |
+                Sort-Object Name |
+                Format-Table -AutoSize
+
+              Write-Host ""
+              Write-Host "Checking Terraform CLI argument variables."
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS]"
+                  Write-Host "Removing TF_CLI_ARGS."
+
+                  Remove-Item Env:TF_CLI_ARGS -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS is not defined."
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS_plan]"
+                  Write-Host "Removing TF_CLI_ARGS_plan."
+
+                  Remove-Item Env:TF_CLI_ARGS_plan -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan is not defined."
+              }
+
+              Write-Host ""
+              Write-Host "Terraform CLI argument variables after cleanup:"
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS still exists: [$env:TF_CLI_ARGS]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS: [not defined]"
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan still exists: [$env:TF_CLI_ARGS_plan]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan: [not defined]"
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM INIT"
+              Write-Host "=================================================="
+
+              $initArguments = @(
+                  "init"
+                  "-backend-config=resource_group_name=$(backendResourceGroup)"
+                  "-backend-config=storage_account_name=$(backendStorageAccount)"
+                  "-backend-config=container_name=$(backendContainer)"
+                  "-backend-config=key=dev-compute.tfstate"
+                  "-input=false"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform init executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform init arguments:"
+
+              $initArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform init..."
+
+              & $terraform @initArguments
+
+              $initExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform init exit code: $initExitCode"
+
+              if ($initExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Compute with exit code $initExitCode."
+                  exit $initExitCode
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM VALIDATE"
+              Write-Host "=================================================="
+
+              Write-Host ""
+              Write-Host "Executing Terraform validate..."
+
+              & $terraform validate
+
+              $validateExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform validate exit code: $validateExitCode"
+
+              if ($validateExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Compute with exit code $validateExitCode."
+                  exit $validateExitCode
+              }
+
+              Write-Host ""
+              Write-Host "Terraform configuration validation succeeded."
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM PLAN"
+              Write-Host "=================================================="
+
+              $planArguments = @(
+                  "plan"
+                  "-refresh-only"
+                  "-input=false"
+                  "-detailed-exitcode"
+                  "-out=drift.tfplan"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform plan executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform plan arguments:"
+
+              $planArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform plan..."
+
+              & $terraform @planArguments
+
+              $planExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform plan exit code: $planExitCode"
+
+              if ($planExitCode -eq 0) {
+                  Write-Host ""
+                  Write-Host "No drift detected for Compute."
+                  exit 0
+              }
+
+              if ($planExitCode -eq 2) {
+                  Write-Host ""
+                  Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Compute."
+                  exit 0
+              }
+
+              Write-Host ""
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Compute with exit code $planExitCode."
+              exit $planExitCode
+
+
+# ============================================================
+# GOVERNANCE
+# ============================================================
+
+- stage: Governance
+  displayName: Drift Detection - Governance
+
+  jobs:
+    - job: Check_Governance
+      displayName: Check Governance Drift
+
+      steps:
+        - checkout: self
+
+        - task: TerraformInstaller@1
+          displayName: Install Terraform
+          inputs:
+            terraformVersion: $(terraformVersion)
+
+        - task: AzureCLI@2
+          displayName: Terraform Drift Check - Governance
+          inputs:
+            azureSubscription: $(serviceConnection)
+            scriptType: ps
+            scriptLocation: inlineScript
+            workingDirectory: '$(Build.SourcesDirectory)/environments/dev/governance'
+            powerShellErrorActionPreference: stop
+            powerShellIgnoreLASTEXITCODE: true
+
+            inlineScript: |
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM DIAGNOSTICS"
+              Write-Host "=================================================="
+
+              Write-Host "Current working directory:"
+              Get-Location
+
+              Write-Host ""
+              Write-Host "Terraform executable:"
+
+              $terraformCommand = Get-Command terraform -ErrorAction Stop
+              $terraformCommand | Format-List Name, Source, CommandType
+
+              $terraform = $terraformCommand.Source
+
+              if ([string]::IsNullOrWhiteSpace($terraform)) {
+                  Write-Host "##vso[task.logissue type=error]Unable to resolve the Terraform executable."
+                  exit 1
+              }
+
+              Write-Host ""
+              Write-Host "Terraform executable resolved to:"
+              Write-Host $terraform
+
+              Write-Host ""
+              Write-Host "Terraform version:"
+
+              & $terraform version
+
+              $versionExitCode = $LASTEXITCODE
+
+              if ($versionExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Unable to execute Terraform."
+                  exit $versionExitCode
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM ENVIRONMENT"
+              Write-Host "=================================================="
+
+              Write-Host ""
+              Write-Host "Terraform-related environment variables:"
+
+              Get-ChildItem Env: |
+                Where-Object {
+                    $_.Name -like "TF_*" -or
+                    $_.Name -like "TERRAFORM*"
+                } |
+                Sort-Object Name |
+                Format-Table -AutoSize
+
+              Write-Host ""
+              Write-Host "Checking Terraform CLI argument variables."
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS]"
+                  Write-Host "Removing TF_CLI_ARGS."
+
+                  Remove-Item Env:TF_CLI_ARGS -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS is not defined."
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan is defined."
+                  Write-Host "Current value: [$env:TF_CLI_ARGS_plan]"
+                  Write-Host "Removing TF_CLI_ARGS_plan."
+
+                  Remove-Item Env:TF_CLI_ARGS_plan -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan is not defined."
+              }
+
+              Write-Host ""
+              Write-Host "Terraform CLI argument variables after cleanup:"
+
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS still exists: [$env:TF_CLI_ARGS]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS: [not defined]"
+              }
+
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan still exists: [$env:TF_CLI_ARGS_plan]"
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS_plan: [not defined]"
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM INIT"
+              Write-Host "=================================================="
+
+              $initArguments = @(
+                  "init"
+                  "-backend-config=resource_group_name=$(backendResourceGroup)"
+                  "-backend-config=storage_account_name=$(backendStorageAccount)"
+                  "-backend-config=container_name=$(backendContainer)"
+                  "-backend-config=key=dev-governance.tfstate"
+                  "-input=false"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform init executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform init arguments:"
+
+              $initArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform init..."
+
+              & $terraform @initArguments
+
+              $initExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform init exit code: $initExitCode"
+
+              if ($initExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Governance with exit code $initExitCode."
+                  exit $initExitCode
+              }
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM VALIDATE"
+              Write-Host "=================================================="
+
+              Write-Host ""
+              Write-Host "Executing Terraform validate..."
+
+              & $terraform validate
+
+              $validateExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform validate exit code: $validateExitCode"
+
+              if ($validateExitCode -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Governance with exit code $validateExitCode."
+                  exit $validateExitCode
+              }
+
+              Write-Host ""
+              Write-Host "Terraform configuration validation succeeded."
+
+              Write-Host ""
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM PLAN"
+              Write-Host "=================================================="
+
+              $planArguments = @(
+                  "plan"
+                  "-refresh-only"
+                  "-input=false"
+                  "-detailed-exitcode"
+                  "-out=drift.tfplan"
+              )
+
+              Write-Host ""
+              Write-Host "Terraform plan executable:"
+              Write-Host "[$terraform]"
+
+              Write-Host ""
+              Write-Host "Terraform plan arguments:"
+
+              $planArguments | ForEach-Object {
+                  Write-Host "ARG: [$_]"
+              }
+
+              Write-Host ""
+              Write-Host "Executing Terraform plan..."
+
+              & $terraform @planArguments
+
+              $planExitCode = $LASTEXITCODE
+
+              Write-Host ""
+              Write-Host "Terraform plan exit code: $planExitCode"
+
+              if ($planExitCode -eq 0) {
+                  Write-Host ""
+                  Write-Host "No drift detected for Governance."
+                  exit 0
+              }
+
+              if ($planExitCode -eq 2) {
+                  Write-Host ""
+                  Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Governance."
+                  exit 0
+              }
+
+              Write-Host ""
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Governance with exit code $planExitCode."
+              exit $planExitCode
