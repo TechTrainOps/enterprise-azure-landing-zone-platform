@@ -82,13 +82,20 @@ stages:
               Write-Host "Terraform version:"
               & $terraform version
 
-              if ($LASTEXITCODE -ne 0) {
+              $versionExitCode = $LASTEXITCODE
+
+              if ($versionExitCode -ne 0) {
                   Write-Host "##vso[task.logissue type=error]Unable to execute Terraform."
-                  exit $LASTEXITCODE
+                  exit $versionExitCode
               }
 
               Write-Host ""
-              Write-Host "Terraform-related environment variables BEFORE cleanup:"
+              Write-Host "=================================================="
+              Write-Host "TERRAFORM ENVIRONMENT"
+              Write-Host "=================================================="
+
+              Write-Host ""
+              Write-Host "Terraform-related environment variables:"
 
               Get-ChildItem Env: |
                 Where-Object {
@@ -99,23 +106,23 @@ stages:
                 Format-Table -AutoSize
 
               Write-Host ""
-              Write-Host "Removing Terraform CLI argument injection variables."
+              Write-Host "Checking Terraform CLI argument variables."
 
-              [Environment]::SetEnvironmentVariable(
-                  "TF_CLI_ARGS",
-                  $null,
-                  [EnvironmentVariableTarget]::Process
-              )
+              if (Test-Path Env:TF_CLI_ARGS) {
+                  Write-Host "TF_CLI_ARGS is defined."
+                  Write-Host "Removing TF_CLI_ARGS."
+                  Remove-Item Env:TF_CLI_ARGS -ErrorAction SilentlyContinue
+              }
+              else {
+                  Write-Host "TF_CLI_ARGS is not defined."
+              }
 
-              [Environment]::SetEnvironmentVariable(
-                  "TF_CLI_ARGS_plan",
-                  $null,
-                  [EnvironmentVariableTarget]::Process
-              )
-
-              Remove-Item Env:TF_CLI_ARGS -ErrorAction SilentlyContinue
-              Remove-Item Env:TF_CLI_ARGS
-   
+              if (Test-Path Env:TF_CLI_ARGS_plan) {
+                  Write-Host "TF_CLI_ARGS_plan is defined."
+                  Write-Host "Removing TF_CLI_ARGS_plan."
+                  Remove-Item Env:TF_CLI_ARGS_plan -ErrorAction SilentlyContinue
+              }
+              else {
 
 
 # ============================================================
