@@ -70,7 +70,7 @@ stages:
 
               $terraform = $terraformCommand.Source
 
-              if ([string\]::IsNullOrWhiteSpace($terraform)) {
+              if ([string]::IsNullOrWhiteSpace($terraform)) {
                   Write-Host "##vso[task.logissue type=error]Unable to resolve the Terraform executable."
                   exit 1
               }
