@@ -33,56 +33,73 @@ stages:
   displayName: Drift Detection - Resource Groups
 
   jobs:
-  - job: Check_Resource_Groups
+    - job: Check_Resource_Groups
+      displayName: Check Resource Groups Drift
 
-    steps:
+      steps:
+        - checkout: self
 
-    - checkout: self
+        - task: TerraformInstaller@1
+          displayName: Install Terraform
+          inputs:
+            terraformVersion: $(terraformVersion)
 
-    - task: TerraformInstaller@1
-      displayName: Install Terraform
-      inputs:
-        terraformVersion: $(terraformVersion)
+        - task: AzureCLI@2
+          displayName: Terraform Drift Check - Resource Groups
+          inputs:
+            azureSubscription: $(serviceConnection)
+            scriptType: ps
+            scriptLocation: inlineScript
+            workingDirectory: '$(Build.SourcesDirectory)/environments/dev/resource-groups'
+            inlineScript: |
+              $env:TF_CLI_ARGS = $null
+              $env:TF_CLI_ARGS_plan = $null
 
-    - task: AzureCLI@2
-      displayName: Terraform Drift Check
-      inputs:
-        azureSubscription: $(serviceConnection)
-        scriptType: ps
-        scriptLocation: inlineScript
-        workingDirectory: '$(Build.SourcesDirectory)/environments/dev/resource-groups'
-        inlineScript: |
+              Write-Host "Working directory:"
+              Get-Location
 
-          $env:TF_CLI_ARGS = $null
-          $env:TF_CLI_ARGS_plan = $null
+              terraform version
 
-          terraform version
+              terraform init `
+                -backend-config="resource_group_name=$(backendResourceGroup)" `
+                -backend-config="storage_account_name=$(backendStorageAccount)" `
+                -backend-config="container_name=$(backendContainer)" `
+                -backend-config="key=dev-resource-groups.tfstate" `
+                -input=false
 
-          terraform init `
-            -backend-config="resource_group_name=$(backendResourceGroup)" `
-            -backend-config="storage_account_name=$(backendStorageAccount)" `
-            -backend-config="container_name=$(backendContainer)" `
-            -backend-config="key=dev-resource-groups.tfstate" `
-            -input=false
+              if ($LASTEXITCODE -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Resource Groups."
+                  exit $LASTEXITCODE
+              }
 
-          terraform validate
+              terraform validate
 
-          terraform plan -input=false -detailed-exitcode -out=drift.tfplan
+              if ($LASTEXITCODE -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Resource Groups."
+                  exit $LASTEXITCODE
+              }
 
-          $exitCode = $LASTEXITCODE
+              terraform plan `
+                -input=false `
+                -detailed-exitcode `
+                -out=drift.tfplan
 
-          if ($exitCode -eq 0) {
-              Write-Host "No drift detected for Resource Groups."
-              exit 0
-          }
+              $exitCode = $LASTEXITCODE
 
-          if ($exitCode -eq 2) {
-              Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Resource Groups."
-              exit 0
-          }
+              Write-Host "Terraform plan exit code: $exitCode"
 
-          Write-Host "##vso[task.logissue type=error]Terraform plan failed for Resource Groups."
-          exit $exitCode
+              if ($exitCode -eq 0) {
+                  Write-Host "No drift detected for Resource Groups."
+                  exit 0
+              }
+
+              if ($exitCode -eq 2) {
+                  Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Resource Groups."
+                  exit 0
+              }
+
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Resource Groups."
+              exit $exitCode
 
 
 # ============================================================
@@ -93,53 +110,73 @@ stages:
   displayName: Drift Detection - Identity
 
   jobs:
-  - job: Check_Identity
+    - job: Check_Identity
+      displayName: Check Identity Drift
 
-    steps:
+      steps:
+        - checkout: self
 
-    - checkout: self
+        - task: TerraformInstaller@1
+          displayName: Install Terraform
+          inputs:
+            terraformVersion: $(terraformVersion)
 
-    - task: TerraformInstaller@1
-      displayName: Install Terraform
-      inputs:
-        terraformVersion: $(terraformVersion)
+        - task: AzureCLI@2
+          displayName: Terraform Drift Check - Identity
+          inputs:
+            azureSubscription: $(serviceConnection)
+            scriptType: ps
+            scriptLocation: inlineScript
+            workingDirectory: '$(Build.SourcesDirectory)/environments/dev/identity'
+            inlineScript: |
+              $env:TF_CLI_ARGS = $null
+              $env:TF_CLI_ARGS_plan = $null
 
-    - task: AzureCLI@2
-      displayName: Terraform Drift Check
-      inputs:
-        azureSubscription: $(serviceConnection)
-        scriptType: ps
-        scriptLocation: inlineScript
-        workingDirectory: '$(Build.SourcesDirectory)/environments/dev/identity'
-        inlineScript: |
+              Write-Host "Working directory:"
+              Get-Location
 
-          terraform version
+              terraform version
 
-          terraform init `
-            -backend-config="resource_group_name=$(backendResourceGroup)" `
-            -backend-config="storage_account_name=$(backendStorageAccount)" `
-            -backend-config="container_name=$(backendContainer)" `
-            -backend-config="key=dev-identity.tfstate" `
-            -input=false
+              terraform init `
+                -backend-config="resource_group_name=$(backendResourceGroup)" `
+                -backend-config="storage_account_name=$(backendStorageAccount)" `
+                -backend-config="container_name=$(backendContainer)" `
+                -backend-config="key=dev-identity.tfstate" `
+                -input=false
 
-          terraform validate
+              if ($LASTEXITCODE -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Identity."
+                  exit $LASTEXITCODE
+              }
 
-          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
+              terraform validate
 
-          $exitCode = $LASTEXITCODE
+              if ($LASTEXITCODE -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Identity."
+                  exit $LASTEXITCODE
+              }
 
-          if ($exitCode -eq 0) {
-              Write-Host "No drift detected for Identity."
-              exit 0
-          }
+              terraform plan `
+                -input=false `
+                -detailed-exitcode `
+                -out=drift.tfplan
 
-          if ($exitCode -eq 2) {
-              Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Identity."
-              exit 0
-          }
+              $exitCode = $LASTEXITCODE
 
-          Write-Host "##vso[task.logissue type=error]Terraform plan failed for Identity."
-          exit $exitCode
+              Write-Host "Terraform plan exit code: $exitCode"
+
+              if ($exitCode -eq 0) {
+                  Write-Host "No drift detected for Identity."
+                  exit 0
+              }
+
+              if ($exitCode -eq 2) {
+                  Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Identity."
+                  exit 0
+              }
+
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Identity."
+              exit $exitCode
 
 
 # ============================================================
@@ -150,53 +187,73 @@ stages:
   displayName: Drift Detection - Networking
 
   jobs:
-  - job: Check_Networking
+    - job: Check_Networking
+      displayName: Check Networking Drift
 
-    steps:
+      steps:
+        - checkout: self
 
-    - checkout: self
+        - task: TerraformInstaller@1
+          displayName: Install Terraform
+          inputs:
+            terraformVersion: $(terraformVersion)
 
-    - task: TerraformInstaller@1
-      displayName: Install Terraform
-      inputs:
-        terraformVersion: $(terraformVersion)
+        - task: AzureCLI@2
+          displayName: Terraform Drift Check - Networking
+          inputs:
+            azureSubscription: $(serviceConnection)
+            scriptType: ps
+            scriptLocation: inlineScript
+            workingDirectory: '$(Build.SourcesDirectory)/environments/dev/networking'
+            inlineScript: |
+              $env:TF_CLI_ARGS = $null
+              $env:TF_CLI_ARGS_plan = $null
 
-    - task: AzureCLI@2
-      displayName: Terraform Drift Check
-      inputs:
-        azureSubscription: $(serviceConnection)
-        scriptType: ps
-        scriptLocation: inlineScript
-        workingDirectory: '$(Build.SourcesDirectory)/environments/dev/networking'
-        inlineScript: |
+              Write-Host "Working directory:"
+              Get-Location
 
-          terraform version
+              terraform version
 
-          terraform init `
-            -backend-config="resource_group_name=$(backendResourceGroup)" `
-            -backend-config="storage_account_name=$(backendStorageAccount)" `
-            -backend-config="container_name=$(backendContainer)" `
-            -backend-config="key=dev-networking.tfstate" `
-            -input=false
+              terraform init `
+                -backend-config="resource_group_name=$(backendResourceGroup)" `
+                -backend-config="storage_account_name=$(backendStorageAccount)" `
+                -backend-config="container_name=$(backendContainer)" `
+                -backend-config="key=dev-networking.tfstate" `
+                -input=false
 
-          terraform validate
+              if ($LASTEXITCODE -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Networking."
+                  exit $LASTEXITCODE
+              }
 
-          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
+              terraform validate
 
-          $exitCode = $LASTEXITCODE
+              if ($LASTEXITCODE -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Networking."
+                  exit $LASTEXITCODE
+              }
 
-          if ($exitCode -eq 0) {
-              Write-Host "No drift detected for Networking."
-              exit 0
-          }
+              terraform plan `
+                -input=false `
+                -detailed-exitcode `
+                -out=drift.tfplan
 
-          if ($exitCode -eq 2) {
-              Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Networking."
-              exit 0
-          }
+              $exitCode = $LASTEXITCODE
 
-          Write-Host "##vso[task.logissue type=error]Terraform plan failed for Networking."
-          exit $exitCode
+              Write-Host "Terraform plan exit code: $exitCode"
+
+              if ($exitCode -eq 0) {
+                  Write-Host "No drift detected for Networking."
+                  exit 0
+              }
+
+              if ($exitCode -eq 2) {
+                  Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Networking."
+                  exit 0
+              }
+
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Networking."
+              exit $exitCode
 
 
 # ============================================================
@@ -207,53 +264,73 @@ stages:
   displayName: Drift Detection - Security
 
   jobs:
-  - job: Check_Security
+    - job: Check_Security
+      displayName: Check Security Drift
 
-    steps:
+      steps:
+        - checkout: self
 
-    - checkout: self
+        - task: TerraformInstaller@1
+          displayName: Install Terraform
+          inputs:
+            terraformVersion: $(terraformVersion)
 
-    - task: TerraformInstaller@1
-      displayName: Install Terraform
-      inputs:
-        terraformVersion: $(terraformVersion)
+        - task: AzureCLI@2
+          displayName: Terraform Drift Check - Security
+          inputs:
+            azureSubscription: $(serviceConnection)
+            scriptType: ps
+            scriptLocation: inlineScript
+            workingDirectory: '$(Build.SourcesDirectory)/environments/dev/security'
+            inlineScript: |
+              $env:TF_CLI_ARGS = $null
+              $env:TF_CLI_ARGS_plan = $null
 
-    - task: AzureCLI@2
-      displayName: Terraform Drift Check
-      inputs:
-        azureSubscription: $(serviceConnection)
-        scriptType: ps
-        scriptLocation: inlineScript
-        workingDirectory: '$(Build.SourcesDirectory)/environments/dev/security'
-        inlineScript: |
+              Write-Host "Working directory:"
+              Get-Location
 
-          terraform version
+              terraform version
 
-          terraform init `
-            -backend-config="resource_group_name=$(backendResourceGroup)" `
-            -backend-config="storage_account_name=$(backendStorageAccount)" `
-            -backend-config="container_name=$(backendContainer)" `
-            -backend-config="key=dev-security.tfstate" `
-            -input=false
+              terraform init `
+                -backend-config="resource_group_name=$(backendResourceGroup)" `
+                -backend-config="storage_account_name=$(backendStorageAccount)" `
+                -backend-config="container_name=$(backendContainer)" `
+                -backend-config="key=dev-security.tfstate" `
+                -input=false
 
-          terraform validate
+              if ($LASTEXITCODE -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Security."
+                  exit $LASTEXITCODE
+              }
 
-          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
+              terraform validate
 
-          $exitCode = $LASTEXITCODE
+              if ($LASTEXITCODE -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Security."
+                  exit $LASTEXITCODE
+              }
 
-          if ($exitCode -eq 0) {
-              Write-Host "No drift detected for Security."
-              exit 0
-          }
+              terraform plan `
+                -input=false `
+                -detailed-exitcode `
+                -out=drift.tfplan
 
-          if ($exitCode -eq 2) {
-              Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Security."
-              exit 0
-          }
+              $exitCode = $LASTEXITCODE
 
-          Write-Host "##vso[task.logissue type=error]Terraform plan failed for Security."
-          exit $exitCode
+              Write-Host "Terraform plan exit code: $exitCode"
+
+              if ($exitCode -eq 0) {
+                  Write-Host "No drift detected for Security."
+                  exit 0
+              }
+
+              if ($exitCode -eq 2) {
+                  Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Security."
+                  exit 0
+              }
+
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Security."
+              exit $exitCode
 
 
 # ============================================================
@@ -264,164 +341,73 @@ stages:
   displayName: Drift Detection - Monitoring
 
   jobs:
-  - job: Check_Monitoring
+    - job: Check_Monitoring
+      displayName: Check Monitoring Drift
 
-    steps:
+      steps:
+        - checkout: self
 
-    - checkout: self
+        - task: TerraformInstaller@1
+          displayName: Install Terraform
+          inputs:
+            terraformVersion: $(terraformVersion)
 
-    - task: TerraformInstaller@1
-      displayName: Install Terraform
-      inputs:
-        terraformVersion: $(terraformVersion)
+        - task: AzureCLI@2
+          displayName: Terraform Drift Check - Monitoring
+          inputs:
+            azureSubscription: $(serviceConnection)
+            scriptType: ps
+            scriptLocation: inlineScript
+            workingDirectory: '$(Build.SourcesDirectory)/environments/dev/monitoring'
+            inlineScript: |
+              $env:TF_CLI_ARGS = $null
+              $env:TF_CLI_ARGS_plan = $null
 
-    - task: AzureCLI@2
-      displayName: Terraform Drift Check
-      inputs:
-        azureSubscription: $(serviceConnection)
-        scriptType: ps
-        scriptLocation: inlineScript
-        workingDirectory: '$(Build.SourcesDirectory)/environments/dev/monitoring'
-        inlineScript: |
+              Write-Host "Working directory:"
+              Get-Location
 
-          terraform version
+              terraform version
 
-          terraform init `
-            -backend-config="resource_group_name=$(backendResourceGroup)" `
-            -backend-config="storage_account_name=$(backendStorageAccount)" `
-            -backend-config="container_name=$(backendContainer)" `
-            -backend-config="key=dev-monitoring.tfstate" `
-            -input=false
+              terraform init `
+                -backend-config="resource_group_name=$(backendResourceGroup)" `
+                -backend-config="storage_account_name=$(backendStorageAccount)" `
+                -backend-config="container_name=$(backendContainer)" `
+                -backend-config="key=dev-monitoring.tfstate" `
+                -input=false
 
-          terraform validate
+              if ($LASTEXITCODE -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform init failed for Monitoring."
+                  exit $LASTEXITCODE
+              }
 
-          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
+              terraform validate
 
-          $exitCode = $LASTEXITCODE
+              if ($LASTEXITCODE -ne 0) {
+                  Write-Host "##vso[task.logissue type=error]Terraform validation failed for Monitoring."
+                  exit $LASTEXITCODE
+              }
 
-          if ($exitCode -eq 0) {
-              Write-Host "No drift detected for Monitoring."
-              exit 0
-          }
+              terraform plan `
+                -input=false `
+                -detailed-exitcode `
+                -out=drift.tfplan
 
-          if ($exitCode -eq 2) {
-              Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Monitoring."
-              exit 0
-          }
+              $exitCode = $LASTEXITCODE
 
-          Write-Host "##vso[task.logissue type=error]Terraform plan failed for Monitoring."
-          exit $exitCode
+              Write-Host "Terraform plan exit code: $exitCode"
 
+              if ($exitCode -eq 0) {
+                  Write-Host "No drift detected for Monitoring."
+                  exit 0
+              }
 
-# ============================================================
-# COMPUTE
-# ============================================================
+              if ($exitCode -eq 2) {
+                  Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Monitoring."
+                  exit 0
+              }
 
-- stage: Drift_Compute
-  displayName: Drift Detection - Compute
-
-  jobs:
-  - job: Check_Compute
-
-    steps:
-
-    - checkout: self
-
-    - task: TerraformInstaller@1
-      displayName: Install Terraform
-      inputs:
-        terraformVersion: $(terraformVersion)
-
-    - task: AzureCLI@2
-      displayName: Terraform Drift Check
-      inputs:
-        azureSubscription: $(serviceConnection)
-        scriptType: ps
-        scriptLocation: inlineScript
-        workingDirectory: '$(Build.SourcesDirectory)/environments/dev/compute'
-        inlineScript: |
-
-          terraform version
-
-          terraform init `
-            -backend-config="resource_group_name=$(backendResourceGroup)" `
-            -backend-config="storage_account_name=$(backendStorageAccount)" `
-            -backend-config="container_name=$(backendContainer)" `
-            -backend-config="key=dev-compute.tfstate" `
-            -input=false
-
-          terraform validate
-
-          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
-
-          $exitCode = $LASTEXITCODE
-
-          if ($exitCode -eq 0) {
-              Write-Host "No drift detected for Compute."
-              exit 0
-          }
-
-          if ($exitCode -eq 2) {
-              Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Compute."
-              exit 0
-          }
-
-          Write-Host "##vso[task.logissue type=error]Terraform plan failed for Compute."
-          exit $exitCode
+              Write-Host "##vso[task.logissue type=error]Terraform plan failed for Monitoring."
+              exit $exitCode
 
 
-# ============================================================
-# GOVERNANCE
-# ============================================================
-
-- stage: Drift_Governance
-  displayName: Drift Detection - Governance
-
-  jobs:
-  - job: Check_Governance
-
-    steps:
-
-    - checkout: self
-
-    - task: TerraformInstaller@1
-      displayName: Install Terraform
-      inputs:
-        terraformVersion: $(terraformVersion)
-
-    - task: AzureCLI@2
-      displayName: Terraform Drift Check
-      inputs:
-        azureSubscription: $(serviceConnection)
-        scriptType: ps
-        scriptLocation: inlineScript
-        workingDirectory: '$(Build.SourcesDirectory)/environments/dev/governance'
-        inlineScript: |
-
-          terraform version
-
-          terraform init `
-            -backend-config="resource_group_name=$(backendResourceGroup)" `
-            -backend-config="storage_account_name=$(backendStorageAccount)" `
-            -backend-config="container_name=$(backendContainer)" `
-            -backend-config="key=dev-governance.tfstate" `
-            -input=false
-
-          terraform validate
-
-          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
-
-          $exitCode = $LASTEXITCODE
-
-          if ($exitCode -eq 0) {
-              Write-Host "No drift detected for Governance."
-              exit 0
-          }
-
-          if ($exitCode -eq 2) {
-              Write-Host "##vso[task.logissue type=warning]Terraform drift detected for Governance."
-              exit 0
-          }
-
-          Write-Host "##vso[task.logissue type=error]Terraform plan failed for Governance."
-          exit $exitCode
+# =======
