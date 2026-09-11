@@ -64,7 +64,7 @@ stages:
 
           terraform validate
 
-          terraform plan -input=false -detailed-exitcode -out=drift.tfplan
+          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
 
           $exitCode = $LASTEXITCODE
 
@@ -121,7 +121,7 @@ stages:
 
           terraform validate
 
-          terraform plan -input=false -detailed-exitcode -out=drift.tfplan
+          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
 
           $exitCode = $LASTEXITCODE
 
@@ -178,7 +178,7 @@ stages:
 
           terraform validate
 
-          terraform plan -input=false -detailed-exitcode -out=drift.tfplan
+          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
 
           $exitCode = $LASTEXITCODE
 
@@ -235,7 +235,7 @@ stages:
 
           terraform validate
 
-          terraform plan -input=false -detailed-exitcode -out=drift.tfplan
+          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
 
           $exitCode = $LASTEXITCODE
 
@@ -292,7 +292,7 @@ stages:
 
           terraform validate
 
-          terraform plan -input=false -detailed-exitcode -out=drift.tfplan
+          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
 
           $exitCode = $LASTEXITCODE
 
@@ -349,7 +349,7 @@ stages:
 
           terraform validate
 
-          terraform plan -input=false -detailed-exitcode -out=drift.tfplan
+          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
 
           $exitCode = $LASTEXITCODE
 
@@ -406,7 +406,7 @@ stages:
 
           terraform validate
 
-          terraform plan -input=false -detailed-exitcode -out=drift.tfplan
+          terraform -chdir="$(Build.SourcesDirectory)/environments/dev/resource-groups" plan -input=false -detailed-exitcode -out=drift.tfplan
 
           $exitCode = $LASTEXITCODE
 
