@@ -69,7 +69,7 @@ stages:
 
               $terraform = $terraformCommand.Source
 
-              if ([string\]::IsNullOrWhiteSpace($terraform)) {
+              if ([string]::IsNullOrWhiteSpace($terraform)) {
                   Write-Host "##vso[task.logissue type=error]Unable to resolve the Terraform executable."
                   exit 1
               }
@@ -101,13 +101,13 @@ stages:
               Write-Host ""
               Write-Host "Removing Terraform CLI argument injection variables."
 
-              [Environment\]::SetEnvironmentVariable(
+              [Environment]::SetEnvironmentVariable(
                   "TF_CLI_ARGS",
                   $null,
                   [EnvironmentVariableTarget\]::Process
               )
 
-              [Environment\]::SetEnvironmentVariable(
+              [Environment]::SetEnvironmentVariable(
                   "TF_CLI_ARGS_plan",
                   $null,
                   [EnvironmentVariableTarget\]::Process
