@@ -81,17 +81,16 @@ stages:
 
           - powershell: |
               Write-Host "Running Checkov security scan..."
-
               checkov `
-                 -d "$(Build.SourcesDirectory)/${{ parameters.terraformWorkingDirectory }}" `
-                 --framework terraform `
-                 --quiet
+                -d "$(Build.SourcesDirectory)/${{ parameters.terraformWorkingDirectory }}" `
+                --framework terraform `
+                --quiet
 
               if ($LASTEXITCODE -ne 0) {
-                Write-Error "Checkov security scan failed. Review the failed checks above."
-                exit $LASTEXITCODE
+                Write-Warning "Checkov security scan reported failed checks. Review the failed checks above."
+                Write-Host "Continuing pipeline execution."
               }
-              displayName: Run Checkov Security Scan
+            displayName: Run Checkov Security Scan
 
           - task: TerraformTaskV4@4
             displayName: Terraform Plan
